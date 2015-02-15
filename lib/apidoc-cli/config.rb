@@ -44,8 +44,6 @@ module ApidocCli
         else
           name, value = stripped.split(/\s*=\s*/, 2).map(&:strip)
 
-          puts "reading[#{reading}]"
-
           if name && value
             if reading == "default"
               @default.add(name, value)
@@ -58,8 +56,15 @@ module ApidocCli
       end
     end
 
+    # returns a sorted list of the organization
+    def organizations
+      @organizations.keys.sort(&:name).map do |name|
+        @organizations[name]
+      end
+    end
+
     # Returns the Organization instance w/ the specified name
-    def get_organization(organization)
+    def organization(organization)
       Preconditions.assert_class(organization, String)
       Preconditions.check_not_null(@organizations[organization], "Organization[#{organization}] not found")
     end
@@ -88,6 +93,8 @@ module ApidocCli
 
   class Organization
 
+    attr_reader :name
+
     def initialize(name)
       @name = Preconditions.assert_class(name, String)
       @data = {}
@@ -97,6 +104,7 @@ module ApidocCli
       Preconditions.assert_class(key, String)
       Preconditions.assert_class(value, String)
       Preconditions.check_state(!@data.has_key?(key), "Organization[#{@name}] duplicate key[#{key}]")
+      Preconditions.check_state(key != "name", "Name is a reserved word")
 
       @data[key.to_sym] = value
     end

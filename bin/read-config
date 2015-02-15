@@ -14,7 +14,24 @@ path = File.expand_path(args[:path] || ApidocCli::Config::DEFAULT_PATH)
 
 if File.exists?(path)
   config = ApidocCli::Config.new(:path => path)
-  puts config.inspect
+
+  puts "Default:"
+  if d = config.default
+    puts "  organization: #{d.organization}"
+  else
+    puts "  organization: none"
+  end
+
+  config.organizations.each do |org|
+    puts ""
+    puts "Organization #{org.name}:"
+    if org.token
+      puts "  token: " + ApidocCli::Util.mask(org.token)
+    else
+      puts "  token: none"
+    end
+  end
+
 else
   puts "File #{path} does not exit"
   exit(1)
