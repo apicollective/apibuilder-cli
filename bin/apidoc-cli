@@ -9,8 +9,15 @@
 #
 # The arguments vary by the command
 #
-# apidoc-cli [--organization foo] list organizations
+# apidoc-cli list organizations
 #  - Returns a list of all of the organizations that you have access to
+#
+# apidoc-cli list applications gilt
+#  - Returns a list of the applications for the organization gilt
+#
+# apidoc-cli code gilt apidoc latest scala_models
+#  - Returns the code for gilt/apidoc version 'latest' using the
+#    codegenerator 'scala_models'
 #
 
 load File.join(File.dirname(__FILE__), 'apidoc-cli-config')
@@ -35,12 +42,22 @@ if command == "list"
 
   if resource == "organizations"
     puts "organizations:"
-    client.organizations.get.each do |org|
+    client.organizations.get(:limit => 100).each do |org|
       puts " - #{org.name}"
     end
 
   elsif resource == "applications"
-    puts "Get apps"
+    org = ARGV.shift.to_s.strip
+
+    if org == ""
+      puts "organization is required"
+      exit(1)
+    else
+      puts "applications for #{org}:"
+      client.applications.get_by_org_key(org, :limit => 100).each do |app|
+        puts " - #{app.key}"
+      end
+    end
 
   elsif resource == ""
     puts "resource to list is required"
@@ -50,6 +67,22 @@ if command == "list"
     puts "unrecognized resource[#{resource}]"
     exit(1)
   end
+
+elsif command == "code"
+  org = ARGV.shift.to_s.strip
+  application = ARGV.shift.to_s.strip
+  version = ARGV.shift.to_s.strip
+  generator = ARGV.shift.to_s.strip
+
+  if org != "" && application != "" && version != "" && generator != ""
+    code = client.code.get_by_org_key_and_application_key_and_version_and_generator_key(org, application, version, generator)
+    puts code.source
+
+  else
+    puts "org, application, version, and generator are required"
+    exit(1)
+  end
+
 
 elsif command == ""
   puts "command is required"
