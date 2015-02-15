@@ -10,28 +10,58 @@ The file itself should be placed in ~/.apidoc-cli/config
 
 To generate a configuration file:
 
-bin/generate-config --profile <profile name> --token <token>
+    bin/generate-config --profile <profile name> --token <token>
 
 Example:
 
-  bin/generate-config --profile gilt --token abc123
+    bin/generate-config --profile gilt --token abc123
 
 Example File:
 
-# [default]
-# profile = gilt
-# 
-# [profile gilt]
-# token = abc123
-#
-# [profile foo]
-# token = bar
+    [default]
+    profile = gilt
+
+    [profile gilt]
+    token = abc123
+
+    [profile foo]
+    token = bar
 
 To verify that your configuration file is valid:
 
-  bin/read-config
+    bin/read-config
 
 or
 
-  bin/read-config --path <path to config file>
+    bin/read-config --path <path to config file>
 
+# Commands
+
+## list
+
+List all organizations that you have access to:
+
+    bin/apidoc-cli list organizations
+
+List all applications that belong to a specific organization:
+
+    bin/apidoc-cli list applications <organization key>
+    
+Note since the GET requests in apidoc are all paginated, you might need to paginate. Where pagination is required, we use two environment variables: LIMIT, OFFSET
+
+    LIMIT=10 OFFSET=10 bin/apidoc-cli list organizations
+    
+## code
+
+Invoke a code generator from the command line
+
+    bin/apidoc-cli <organization key> <application key> <version> <generator>
+    
+For example, to generate a play 2.3 client for the latest version of apidoc itself:
+
+    bin/apidoc-cli code gilt apidoc latest play_2_3_client
+    
+To view a list of available generators visit [apidoc.me/generators](http://www.apidoc.me/generators)
+
+
+    
