@@ -34,9 +34,9 @@ if command == "list"
   resource = ARGV.shift.to_s.strip
 
   if resource == "organizations"
-    puts "Get orgs"
+    puts "organizations:"
     client.organizations.get.each do |org|
-      puts org.name
+      puts " - #{org.name}"
     end
 
   elsif resource == "applications"
