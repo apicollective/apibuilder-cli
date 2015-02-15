@@ -53,9 +53,8 @@ if command == "list"
   resource = ARGV.shift.to_s.strip
 
   if resource == "organizations"
-    puts "organizations:"
     client.organizations.get(:limit => env[:limit], :offset => env[:offset]).each do |org|
-      puts " - #{org.name}"
+      puts org.key
     end
 
   elsif resource == "applications"
@@ -65,9 +64,8 @@ if command == "list"
       puts "organization is required"
       exit(1)
     else
-      puts "applications for #{org}:"
       client.applications.get_by_org_key(org, :limit => env[:limit], :offset => env[:offset]).each do |app|
-        puts " - #{app.key}"
+        puts app.key
       end
     end
 
