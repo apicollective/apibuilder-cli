@@ -8,6 +8,8 @@ file and hopefully is both familiar and obvious.
 
 The file itself should be placed in ~/.apidoc-cli/config
 
+If you are accessing non public applications in apidoc, you will first need to create [an API token](http://www.apidoc.me/tokens/).
+
 To generate a configuration file:
 
     bin/generate-config --profile <profile name> --token <token>
