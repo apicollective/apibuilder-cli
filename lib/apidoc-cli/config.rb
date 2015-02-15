@@ -23,16 +23,18 @@ module ApidocCli
         end
 
         if md = stripped.match(/^\[(.+)\]$/)
-          key, value = md[1].strip.split(/\s+/, 2).map(&:strip)
+          parts = md[1].strip.split(/\s+/, 2)
+          key = parts[0].to_s.strip
+          value = parts[1].to_s.strip
           reading = key
 
           if key == "default"
-            Preconditions.check_state(value.to_s == "", "%s:%s value attribute[%s] not supported for key default" % [@path, i+1, value])
+            Preconditions.check_state(value == "", "%s:%s value attribute[%s] not supported for key default" % [@path, i+1, value])
             @default = Default.new
 
           elsif key == "profile"
-            Preconditions.check_state(value.to_s != "", "%s:%s profile attribute missing name" % [@path, i+1])
-            Preconditions.check_state(existing = @profiles.find { |p| p.name == value }.nil?, "%s:%s duplicate profile[%s]" % [@path, i+1, value])
+            Preconditions.check_state(value != "", "%s:%s profile attribute missing name" % [@path, i+1])
+            Preconditions.check_state(profile(value).nil?, "%s:%s duplicate profile[%s]" % [@path, i+1, value])
             @profiles << Profile.new(value)
 
           else
@@ -61,8 +63,7 @@ module ApidocCli
 
     # Returns the Profile instance w/ the specified name
     def profile(name)
-      Preconditions.assert_class(name, String)
-      Preconditions.check_not_null(@profiles.find(name), "Profile[#{name}] not found")
+      @profiles.find { |p| p.name == name }
     end
 
   end

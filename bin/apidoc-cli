@@ -3,17 +3,23 @@
 # CLI to apidoc
 #
 # Usage:
-#  apidoc-cli [--organization foo] <command> <arguments>
+#  apidoc-cli <command> <arguments>
+#  PROFILE=gilt apidoc-cli <command> <arguments>
 #
-# --organization: will default to the organization in your config file.
+# Environment variables:
+#    PROFILE: will default to the 'default' specified in your configuration file
 #
 # The arguments vary by the command
 #
 # apidoc-cli list organizations
 #  - Returns a list of all of the organizations that you have access to
+#  - Pagination is implemented with environment variables LIMIT and OFFSET. Example:
+#    LIMIT=10 OFFSET=0 apidoc-cli list organizations
 #
 # apidoc-cli list applications gilt
 #  - Returns a list of the applications for the organization gilt
+#  - Pagination is implemented with environment variables LIMIT and OFFSET. Example:
+#    LIMIT=10 OFFSET=0 apidoc-cli list applications gilt
 #
 # apidoc-cli code gilt apidoc latest scala_models
 #  - Returns the code for gilt/apidoc version 'latest' using the
@@ -22,13 +28,18 @@
 
 load File.join(File.dirname(__FILE__), 'apidoc-cli-config')
 
-config = ApidocCli::Config.new
-args = ApidocCli::Args.parse(ARGV.join(" "))
-organization = args[:organization] || config.default.organization
+env = {}
+['PROFILE', 'LIMIT', 'OFFSET'].each do |name|
+  value = ENV[name].to_s.strip
+  if value != ""
+    env[name.downcase.to_sym] = value
+  end
+end
 
-org_config = config.organization(organization)
-auth = if org_config && org_config.token
-         Com::Gilt::Apidoc::V0::HttpClient::Authorization.basic(org_config.token)
+config = ApidocCli::Config.new
+profile_config = config.profile(env[:profile] || config.default.profile)
+auth = if profile_config && profile_config.token
+         Com::Gilt::Apidoc::V0::HttpClient::Authorization.basic(profile_config.token)
        else
          nil
        end
