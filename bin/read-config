@@ -1,0 +1,21 @@
+#!/usr/bin/env ruby
+
+# Used to read a config file, primarily to test that the file is well formed
+#
+# read-config [--path path]
+#   path: defaults to ~/.apidoc-cli/config
+#
+
+load File.join(File.dirname(__FILE__), 'apidoc-cli-config')
+
+args = ApidocCli::Args.parse(ARGV.join(" "))
+
+path = File.expand_path(args[:path] || ApidocCli::Config::DEFAULT_PATH)
+
+if File.exists?(path)
+  config = ApidocCli::Config.new(:path => path)
+  puts config.inspect
+else
+  puts "File #{path} does not exit"
+  exit(1)
+end
