@@ -10,19 +10,28 @@ The file itself should be placed in ~/.apidoc-cli/config
 
 To generate a configuration file:
 
-bin/generate-config --organization <organization name> --token <token>
+bin/generate-config --profile <profile name> --token <token>
 
 Example:
 
-  bin/generate-config --organization gilt --token abc123
+  bin/generate-config --profile gilt --token abc123
 
 Example File:
 
 # [default]
-# organization = gilt
+# profile = gilt
 # 
-# [organization gilt]
-# token = lkjlk12j3kl21j3lk2
+# [profile gilt]
+# token = abc123
 #
-# [organization foo]
+# [profile foo]
 # token = bar
+
+To verify that your configuration file is valid:
+
+  bin/read-config
+
+or
+
+  bin/read-config --path <path to config file>
+

@@ -13,9 +13,8 @@ module ApidocCli
       Preconditions.check_state(File.exists?(@path), "Apidoc CLI config file[#{@path}] not found")
 
       reading = nil
-      organization = nil
       @default = Default.new
-      @organizations = {}
+      @profiles = []
 
       IO.readlines(@path).each_with_index do |line, i|
         stripped = line.strip
@@ -31,11 +30,10 @@ module ApidocCli
             Preconditions.check_state(value.to_s == "", "%s:%s value attribute[%s] not supported for key default" % [@path, i+1, value])
             @default = Default.new
 
-          elsif key == "organization"
-            Preconditions.check_state(value.to_s != "", "%s:%s organization attribute missing name" % [@path, i+1])
-            Preconditions.check_state(!@organizations.has_key?(value), "%s:%s duplicate organization[%s]" % [@path, i+1, value])
-            organization = Organization.new(value)
-            @organizations[value] = organization
+          elsif key == "profile"
+            Preconditions.check_state(value.to_s != "", "%s:%s profile attribute missing name" % [@path, i+1])
+            Preconditions.check_state(existing = @profiles.find { |p| p.name == value }.nil?, "%s:%s duplicate profile[%s]" % [@path, i+1, value])
+            @profiles << Profile.new(value)
 
           else
             raise "%s:%s unknown configuration key[%s]" % [@path, i+1, key]
@@ -44,11 +42,11 @@ module ApidocCli
         else
           name, value = stripped.split(/\s*=\s*/, 2).map(&:strip)
 
-          if name && value
+          if name != "" && value != ""
             if reading == "default"
               @default.add(name, value)
-            elsif reading == "organization"
-              organization.add(name, value)
+            elsif reading == "profile"
+              @profiles[-1].add(name, value)
             end
           end
         end
@@ -56,17 +54,15 @@ module ApidocCli
       end
     end
 
-    # returns a sorted list of the organization
-    def organizations
-      @organizations.keys.sort(&:name).map do |name|
-        @organizations[name]
-      end
+    # returns a sorted list of the profile
+    def profiles
+      @profiles.sort_by(&:name)
     end
 
-    # Returns the Organization instance w/ the specified name
-    def organization(organization)
-      Preconditions.assert_class(organization, String)
-      Preconditions.check_not_null(@organizations[organization], "Organization[#{organization}] not found")
+    # Returns the Profile instance w/ the specified name
+    def profile(name)
+      Preconditions.assert_class(name, String)
+      Preconditions.check_not_null(@profiles.find(name), "Profile[#{name}] not found")
     end
 
   end
@@ -80,18 +76,18 @@ module ApidocCli
     def add(key, value)
       Preconditions.assert_class(key, String)
       Preconditions.assert_class(value, String)
-      Preconditions.check_state(!@data.has_key?(key), "Organization[#{@name}] duplicate key[#{key}]")
+      Preconditions.check_state(!@data.has_key?(key), "Profile[#{@name}] duplicate key[#{key}]")
 
       @data[key.to_sym] = value
     end
 
-    def organization
-      @data[:organization]
+    def profile
+      @data[:profile]
     end
 
   end
 
-  class Organization
+  class Profile
 
     attr_reader :name
 
@@ -103,7 +99,7 @@ module ApidocCli
     def add(key, value)
       Preconditions.assert_class(key, String)
       Preconditions.assert_class(value, String)
-      Preconditions.check_state(!@data.has_key?(key), "Organization[#{@name}] duplicate key[#{key}]")
+      Preconditions.check_state(!@data.has_key?(key), "Profile[#{@name}] duplicate key[#{key}]")
       Preconditions.check_state(key != "name", "Name is a reserved word")
 
       @data[key.to_sym] = value

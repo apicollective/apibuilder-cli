@@ -2,10 +2,10 @@
 
 # Generates a sample configuration file
 #
-# generate-config --organization <organization name> [--token <token>]
-#   organization: The organization key in apidoc
+# generate-config --profile <profile name> [--token <token>]
+#   profile: The profile key in apidoc
 #   token: Your apidoc token for accessing applications wthin this
-#     organization. The token is optional; if you do not specify a token
+#     profile. The token is optional; if you do not specify a token
 #     you will have access to all public apidoc applications
 #
 
@@ -13,19 +13,17 @@ load File.join(File.dirname(__FILE__), 'apidoc-cli-config')
 
 args = ApidocCli::Args.parse(ARGV.join(" "))
 
-if args[:organization].nil?
-  puts "organization is required"
+if args[:profile].nil?
+  puts "profile is required"
   exit(1)
 end
 
 puts <<-eos
 [default]
-organization = #{args[:organization]}
+profile = #{args[:profile]}
 
-[organization gilt]
+[profile #{args[:profile]}]
+token = #{args[:token]}
 eos
 
-if args[:token]
-  puts "token = #{args[:token]}"
-end
 

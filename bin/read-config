@@ -16,17 +16,17 @@ if File.exists?(path)
   config = ApidocCli::Config.new(:path => path)
 
   puts "Default:"
-  if d = config.default.organization
-    puts "  organization: #{d.organization}"
+  if d = config.default
+    puts "  profile: #{d.profile}"
   else
-    puts "  organization: none"
+    puts "  profile: none"
   end
 
-  config.organizations.each do |org|
+  config.profiles.each do |profile|
     puts ""
-    puts "Organization #{org.name}:"
-    if org.token
-      puts "  token: " + ApidocCli::Util.mask(org.token)
+    puts "Profile #{profile.name}:"
+    if profile.token
+      puts "  token: " + ApidocCli::Util.mask(profile.token)
     else
       puts "  token: none"
     end
