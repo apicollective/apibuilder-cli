@@ -1,0 +1,61 @@
+#!/usr/bin/env ruby
+
+# CLI to apidoc
+#
+# Usage:
+#  apidoc-cli [--organization foo] <command> <arguments>
+#
+# --organization: will default to the organization in your config file.
+#
+# The arguments vary by the command
+#
+# apidoc-cli [--organization foo] list organizations
+#  - Returns a list of all of the organizations that you have access to
+#
+
+load File.join(File.dirname(__FILE__), 'apidoc-cli-config')
+
+config = ApidocCli::Config.new
+args = ApidocCli::Args.parse(ARGV.join(" "))
+organization = args[:organization] || config.default.organization
+
+org_config = config.organization(organization)
+auth = if org_config && org_config.token
+         Com::Gilt::Apidoc::V0::HttpClient::Authorization.basic(org_config.token)
+       else
+         nil
+       end
+
+client = Com::Gilt::Apidoc::V0::Client.new(ApidocCli::Constants::APIDOC_API_URI, :authorization => auth)
+
+command = ARGV.shift.to_s.strip
+
+if command == "list"
+  resource = ARGV.shift.to_s.strip
+
+  if resource == "organizations"
+    puts "Get orgs"
+    client.organizations.get.each do |org|
+      puts org.name
+    end
+
+  elsif resource == "applications"
+    puts "Get apps"
+
+  elsif resource == ""
+    puts "resource to list is required"
+    exit(1)
+
+  else
+    puts "unrecognized resource[#{resource}]"
+    exit(1)
+  end
+
+elsif command == ""
+  puts "command is required"
+  exit(1)
+
+else
+  puts "unrecognized command[#{command}]"
+  exit(1)
+end

@@ -14,7 +14,7 @@ module ApidocCli
 
       reading = nil
       organization = nil
-      @default = nil
+      @default = Default.new
       @organizations = {}
 
       IO.readlines(@path).each_with_index do |line, i|

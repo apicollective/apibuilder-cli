@@ -16,7 +16,7 @@ if File.exists?(path)
   config = ApidocCli::Config.new(:path => path)
 
   puts "Default:"
-  if d = config.default
+  if d = config.default.organization
     puts "  organization: #{d.organization}"
   else
     puts "  organization: none"
