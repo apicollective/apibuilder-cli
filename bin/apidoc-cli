@@ -7,6 +7,7 @@
 #  PROFILE=gilt apidoc-cli <command> <arguments>
 #
 # Environment variables:
+#    APIDOC_API_URI: The URI of the apidoc api. Defaults to http://api.apidoc.me
 #    PROFILE: will default to the 'default' specified in your configuration file
 #
 # The arguments vary by the command
@@ -28,13 +29,13 @@
 
 load File.join(File.dirname(__FILE__), 'apidoc-cli-config')
 
-env = {}
-['PROFILE', 'LIMIT', 'OFFSET'].each do |name|
-  value = ENV[name].to_s.strip
-  if value != ""
-    env[name.downcase.to_sym] = value
-  end
-end
+
+
+env = {
+  :profile => ApidocCli::Util.read_non_empty_string(ENV['PROFILE']),
+  :limit => ApidocCli::Util.read_non_empty_integer(ENV['LIMIT']),
+  :offset => ApidocCli::Util.read_non_empty_integer(ENV['OFFSET'])
+}.select { |k, v| !v.nil? }
 
 config = ApidocCli::Config.new
 profile_config = config.profile(env[:profile] || config.default.profile)
@@ -53,7 +54,7 @@ if command == "list"
 
   if resource == "organizations"
     puts "organizations:"
-    client.organizations.get(:limit => 100).each do |org|
+    client.organizations.get(:limit => env[:limit], :offset => env[:offset]).each do |org|
       puts " - #{org.name}"
     end
 
@@ -65,7 +66,7 @@ if command == "list"
       exit(1)
     else
       puts "applications for #{org}:"
-      client.applications.get_by_org_key(org, :limit => 100).each do |app|
+      client.applications.get_by_org_key(org, :limit => env[:limit], :offset => env[:offset]).each do |app|
         puts " - #{app.key}"
       end
     end
