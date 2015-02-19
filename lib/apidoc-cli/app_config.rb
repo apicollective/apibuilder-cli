@@ -12,18 +12,21 @@ module ApidocCli
       Preconditions.check_state(File.exists?(@path), "Apidoc application config file[#{@path}] not found")
 
       yaml = YAML.load(IO.read(@path))
-      @projects = yaml.map do |project_name, data|
-        Project.new(project_name, data)
-      end
+      @projects = yaml.map do |org_key, project_map|
+        project_map.map do |project_name, data|
+          Project.new(org_key, project_name, data)
+        end
+      end.flatten
     end
 
   end
 
   class Project
 
-    attr_reader :name
+    attr_reader :org, :name
 
-    def initialize(name, data)
+    def initialize(org, name, data)
+      @org = Preconditions.assert_class(org, String)
       @name = Preconditions.assert_class(name, String)
       @data = Preconditions.assert_class(data, Hash)
     end

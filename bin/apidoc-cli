@@ -99,15 +99,18 @@ elsif command == "code"
 elsif command == "update"
   args = ApidocCli::Args.parse(ARGV.join(" "))
   path = File.expand_path(args[:path] || ApidocCli::AppConfig::DEFAULT_FILENAME)
+
   if !File.exists?(path)
     puts "File #{path} does not exit"
     exit(1)
   else
     config = ApidocCli::AppConfig.new(:path => path)
-    config.projects.each do |project|
-      puts "project: #{project.name}"
+      config.projects.each do |project|
+      puts "project: #{project.org}/#{project.name}"
       project.each_generator do |generator, target|
         puts " -- generator[#{generator}] => #{target}"
+        code = client.code.get_by_org_key_and_application_key_and_version_and_generator_key(project.org, project.name, "latest", generator)
+        puts "Downloaded code. target: " + target
       end
     end
   end
