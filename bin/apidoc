@@ -48,7 +48,7 @@ auth = if profile_config && profile_config.token
          nil
        end
 
-client = Com::Gilt::Apidoc::V0::Client.new(ApidocCli::Constants::APIDOC_API_URI, :authorization => auth)
+client = Com::Gilt::Apidoc::V0::Client.new(ApidocCli::Env::APIDOC_API_URI, :authorization => auth)
 
 command = ARGV.shift.to_s.strip
 
