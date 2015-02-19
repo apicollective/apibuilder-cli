@@ -106,9 +106,8 @@ elsif command == "update"
   end
 
   target_dir = File.dirname(path)
-  config = ApidocCli::AppConfig.new(:path => path)
   version = "latest"
-  config.projects.each do |project|
+  ApidocCli::AppConfig.new(:path => path).projects.each do |project|
     project.each_generator do |generator, target|
       target_path = File.join(target_dir, target)
       puts "#{project.org}/#{project.name}/#{version}/#{generator} => #{target_path}"
