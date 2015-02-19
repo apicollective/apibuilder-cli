@@ -26,10 +26,13 @@
 #  - Returns the code for gilt/apidoc version 'latest' using the
 #    codegenerator 'scala_models'
 #
+# apidoc-cli update [--path path]
+#  - Reads a config file, optionally specified by path
+#    parameter. Invokes the apidoc code generators specified in the
+#    configuration file.
+#
 
 load File.join(File.dirname(__FILE__), 'apidoc-cli-config')
-
-
 
 env = {
   :profile => ApidocCli::Util.read_non_empty_string(ENV['PROFILE']),
@@ -93,6 +96,21 @@ elsif command == "code"
     exit(1)
   end
 
+elsif command == "update"
+  args = ApidocCli::Args.parse(ARGV.join(" "))
+  path = File.expand_path(args[:path] || ApidocCli::AppConfig::DEFAULT_FILENAME)
+  if !File.exists?(path)
+    puts "File #{path} does not exit"
+    exit(1)
+  else
+    config = ApidocCli::AppConfig.new(:path => path)
+    config.projects.each do |project|
+      puts "project: #{project.name}"
+      project.each_generator do |generator, target|
+        puts " -- generator[#{generator}] => #{target}"
+      end
+    end
+  end
 
 elsif command == ""
   puts "command is required"
