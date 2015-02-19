@@ -4,7 +4,7 @@ module ApidocCli
   class Config
 
     DEFAULT_PROFILE = "default" unless defined?(DEFAULT_PROFILE)
-    DEFAULT_PATH = "~/.apidoc-cli/config" unless defined?(DEFAULT_PATH)
+    DEFAULT_PATH = "~/.apidoc/config" unless defined?(DEFAULT_PATH)
 
     attr_reader :default
 

@@ -713,6 +713,10 @@ module Com
               @@_versions_create ||= Publication.new('versions.create')
             end
 
+            def to_hash
+              value
+            end
+
           end
 
           class Visibility
@@ -756,6 +760,10 @@ module Com
             # Anybody, including non logged in users, can view this application
             def Visibility.public
               @@_public ||= Visibility.new('public')
+            end
+
+            def to_hash
+              value
             end
 
           end
@@ -1614,7 +1622,7 @@ module Com
               @application = HttpClient::Preconditions.assert_class('application', opts[:application].nil? ? nil : (opts[:application].is_a?(Com::Gilt::Apidoc::V0::Models::Reference) ? opts.delete(:application) : Com::Gilt::Apidoc::V0::Models::Reference.new(opts.delete(:application))), Com::Gilt::Apidoc::V0::Models::Reference)
               @version = HttpClient::Preconditions.assert_class('version', opts.delete(:version), String)
               @original = HttpClient::Preconditions.assert_class('original', opts.delete(:original), String)
-              @service = HttpClient::Preconditions.assert_class('service', HttpClient::Helper.to_object(opts.delete(:service)), Hash)
+              @service = HttpClient::Preconditions.assert_class('service', opts[:service].nil? ? nil : (opts[:service].is_a?(Com::Gilt::Apidoc::Spec::V0::Models::Service) ? opts.delete(:service) : Com::Gilt::Apidoc::Spec::V0::Models::Service.new(opts.delete(:service))), Com::Gilt::Apidoc::Spec::V0::Models::Service)
             end
 
             def to_json
@@ -1632,7 +1640,7 @@ module Com
                 :application => application.nil? ? nil : application.to_hash,
                 :version => version,
                 :original => original,
-                :service => service
+                :service => service.nil? ? nil : service.to_hash
               }
             end
 
@@ -2093,7 +2101,7 @@ module Com
             TRUE_STRINGS = ['t', 'true', 'y', 'yes', 'on', '1', 'trueclass'] unless defined?(TRUE_STRINGS)
             FALSE_STRINGS = ['f', 'false', 'n', 'no', 'off', '0', 'falseclass'] unless defined?(FALSE_STRINGS)
 
-            def Helper.to_boolean(field_name, value, opts={})
+            def Helper.to_boolean(field_name, value)
               string = value.to_s.strip.downcase
               if TRUE_STRINGS.include?(string)
                 true
