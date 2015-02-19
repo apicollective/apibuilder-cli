@@ -107,13 +107,33 @@ elsif command == "update"
 
   target_dir = File.dirname(path)
   version = "latest"
-  ApidocCli::AppConfig.new(:path => path).projects.each do |project|
+
+  updates = {}
+  ApidocCli::AppConfig.new(:path => path).projects.map do |project|
     project.each_generator do |generator, target|
       target_path = File.join(target_dir, target)
-      puts "#{project.org}/#{project.name}/#{version}/#{generator} => #{target_path}"
+      puts "Checking #{project.org}/#{project.name}/#{version}/#{generator} => #{target_path}"
       code = client.code.get_by_org_key_and_application_key_and_version_and_generator_key(project.org, project.name, "latest", generator)
-      # TODO: Write to file if different... batch all downloads to a tmp directory
+      source = code.source.strip
+
+      is_different = if File.exists?(target_path)
+                       tmp = ApidocCli::Util.write_to_temp_file(source)
+                       diff = `diff #{tmp} #{target_path}`.strip
+                       diff != ""
+                     else
+                       true
+                     end
+
+      if is_different
+        updates[target_path] = source
+      end
     end
+  end
+
+  puts ""
+  updates.each do |path, source|
+    puts "Updating #{path}"
+    ApidocCli::Util.write_to_file(path, source)
   end
 
 elsif command == ""

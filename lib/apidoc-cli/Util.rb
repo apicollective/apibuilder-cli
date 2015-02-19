@@ -2,6 +2,19 @@ module ApidocCli
 
   module Util
 
+    # Writes contents to a temp file, returning the path
+    def Util.write_to_temp_file(contents)
+      tmp = Tempfile.new('apidoc-cli')
+      Util.write_to_file(tmp.path, contents)
+    end
+
+    def Util.write_to_file(path, contents)
+      File.open(path, "w") do |out|
+        out << contents
+      end
+      path
+    end
+
     # Returns the trimmed value if not empty. If empty (or nil) returns nil
     def Util.read_non_empty_string(value)
       trimmed = value.to_s.strip

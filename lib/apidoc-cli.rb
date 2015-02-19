@@ -1,4 +1,5 @@
 require 'yaml'
+require 'tempfile'
 
 dir = File.dirname(__FILE__)
 lib_dir = File.join(dir, "apidoc-cli")
