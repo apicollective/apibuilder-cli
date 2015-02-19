@@ -1,0 +1,3 @@
+gilt:
+  apidoc:
+    ruby_client: lib/apidoc-cli/com_gilt_apidoc_v0_client.rb
