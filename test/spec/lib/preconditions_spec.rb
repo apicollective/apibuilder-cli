@@ -1,6 +1,6 @@
 load File.join(File.dirname(__FILE__), '../../init.rb')
 
-RSpec.describe ApidocCli::Preconditions do
+describe ApidocCli::Preconditions do
 
   it "ApidocCli::Preconditions.check_argument" do
     ApidocCli::Preconditions.check_argument(true, "Noop")
