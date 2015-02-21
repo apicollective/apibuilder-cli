@@ -7,7 +7,7 @@ def run(command)
   system(command)
 end
 
-gem_home = File.join(File.dirname(__FILE__), '../gems')
+gem_home = File.join(File.dirname(__FILE__), '../gems').sub(/^\.\//, '')
 rspec = File.join(gem_home, 'bin/rspec')
 if !File.exists?(rspec)
   run("export GEM_HOME=%s && gem install rspec --version 3.2.0 --no-rdoc --no-ri --install-dir %s" % [gem_home, gem_home])
