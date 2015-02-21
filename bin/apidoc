@@ -38,10 +38,10 @@ env = {
   :profile => ApidocCli::Util.read_non_empty_string(ENV['PROFILE']),
   :limit => ApidocCli::Util.read_non_empty_integer(ENV['LIMIT']),
   :offset => ApidocCli::Util.read_non_empty_integer(ENV['OFFSET'])
-}.select { |k, v| !v.nil? }
+}
 
 config = ApidocCli::Config.new
-profile_config = config.profile(env[:profile] || config.default.profile)
+profile_config = env[:profile] ? config.profile(env[:profile]) : config.default_profile
 auth = if profile_config && profile_config.token
          Com::Gilt::Apidoc::V0::HttpClient::Authorization.basic(profile_config.token)
        else
