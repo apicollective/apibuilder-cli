@@ -8,7 +8,7 @@
 
 load File.join(File.dirname(__FILE__), 'apidoc-cli-config')
 
-args = ApidocCli::Args.parse(ARGV.join(" "))
+args = ApidocCli::Args.parse(ARGV)
 
 path = File.expand_path(args[:path] || ApidocCli::Config::DEFAULT_PATH)
 

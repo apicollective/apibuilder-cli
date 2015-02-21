@@ -97,7 +97,7 @@ elsif command == "code"
   end
 
 elsif command == "update"
-  args = ApidocCli::Args.parse(ARGV.join(" "))
+  args = ApidocCli::Args.parse(ARGV)
   path = File.expand_path(args[:path] || ApidocCli::AppConfig::DEFAULT_FILENAME)
 
   if !File.exists?(path)

@@ -11,7 +11,7 @@
 
 load File.join(File.dirname(__FILE__), 'apidoc-cli-config')
 
-args = ApidocCli::Args.parse(ARGV.join(" "))
+args = ApidocCli::Args.parse(ARGV)
 
 if args[:profile].nil?
   puts "profile is required"

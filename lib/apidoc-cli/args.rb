@@ -7,17 +7,17 @@ module ApidocCli
     # Simple command line argument parsers to avoid pulling in external
     # dependency. Returns a hash
     #
-    # Example: "--organization foo"
+    # Example: ["--organization", "foo"]
     #  returns: { :organization => "foo" }
-    def Args.parse(value)
+    def Args.parse(values)
       args = {}
 
       index = 0
-      while index < ARGV.size do
-        arg = ARGV[index]
+      while index < values.size do
+        arg = values[index]
         if md = arg.match(/^\-\-(.+)/)
           name = md[1].to_s.strip
-          value = ARGV[index+1].to_s.strip
+          value = values[index+1].to_s.strip
           index += 1
           if value != ""
             args[name.to_sym] = value
