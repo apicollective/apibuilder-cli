@@ -6,14 +6,12 @@ module ApidocCli
     DEFAULT_PROFILE = "default" unless defined?(DEFAULT_PROFILE)
     DEFAULT_PATH = "~/.apidoc/config" unless defined?(DEFAULT_PATH)
 
-    attr_reader :default
-
     def initialize(opts={})
       @path = Preconditions.assert_class(opts.delete(:path) || File.expand_path(DEFAULT_PATH), String)
       Preconditions.check_state(File.exists?(@path), "Apidoc CLI config file[#{@path}] not found")
 
       reading = nil
-      @default = Default.new
+      @default = nil
       @profiles = []
 
       IO.readlines(@path).each_with_index do |line, i|
@@ -54,6 +52,10 @@ module ApidocCli
         end
 
       end
+
+      if @default && profile(@default.profile).nil?
+        raise "Default profile[#{@default.profile}] is not defined"
+      end
     end
 
     # returns a sorted list of the profile
@@ -64,6 +66,14 @@ module ApidocCli
     # Returns the Profile instance w/ the specified name
     def profile(name)
       @profiles.find { |p| p.name == name }
+    end
+
+    def default_profile
+      if @default
+        profile(@default.profile)
+      else
+        nil
+      end
     end
 
   end
