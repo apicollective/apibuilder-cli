@@ -110,21 +110,14 @@ elsif command == "update"
 
   updates = {}
   ApidocCli::AppConfig.new(:path => path).projects.map do |project|
-    project.each_generator do |generator, target|
-      target_path = File.join(target_dir, target)
-      puts "Checking #{project.org}/#{project.name}/#{version}/#{generator} => #{target_path}"
-      code = client.code.get_by_org_key_and_application_key_and_version_and_generator_key(project.org, project.name, "latest", generator)
+    project.generators.each do |generator|
+      target_path = File.join(target_dir, generator.target)
+      puts "Checking #{project.org}/#{project.name}/#{version}/#{generator.name} => #{target_path}"
+      code = client.code.get_by_org_key_and_application_key_and_version_and_generator_key(project.org, project.name, "latest", generator.name)
       source = code.source.strip
 
-      is_different = if File.exists?(target_path)
-                       tmp = ApidocCli::Util.write_to_temp_file(source)
-                       diff = `diff #{tmp} #{target_path}`.strip
-                       diff != ""
-                     else
-                       true
-                     end
-
-      if is_different
+      existing_source = File.exists?(target_path) ? IO.read(target_path).strip : ""
+      if source != existing_source
         updates[target_path] = source
       end
     end
