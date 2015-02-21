@@ -14,29 +14,37 @@ module ApidocCli
       yaml = YAML.load(IO.read(@path))
       @projects = yaml.map do |org_key, project_map|
         project_map.map do |project_name, data|
-          Project.new(org_key, project_name, data)
+          generators = data.map do |name, target|
+            Generator.new(name, target)
+          end
+          project = Project.new(org_key, project_name, generators)
         end
       end.flatten
     end
 
-  end
+    class Project
 
-  class Project
+      attr_reader :org, :name, :generators
 
-    attr_reader :org, :name
+      def initialize(org, name, generators)
+        @org = Preconditions.assert_class(org, String)
+        @name = Preconditions.assert_class(name, String)
+        @generators = Preconditions.assert_class(generators, Array)
+        Preconditions.check_state(!generators.empty?, "Must have at least one generator")
+        Preconditions.assert_class(generators.first, Generator)
+      end
 
-    def initialize(org, name, data)
-      @org = Preconditions.assert_class(org, String)
-      @name = Preconditions.assert_class(name, String)
-      @data = Preconditions.assert_class(data, Hash)
     end
 
-    # Yields the name of the generator and the path relative to the
-    # location of the .apidoc file.
-    def each_generator
-      @data.each do |generator, target|
-        yield generator, target
+    class Generator
+
+      attr_reader :name, :target
+
+      def initialize(name, target)
+        @name = Preconditions.assert_class(name, String)
+        @target = Preconditions.assert_class(target, String)
       end
+
     end
 
   end
