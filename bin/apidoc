@@ -108,7 +108,7 @@ elsif command == "update"
   target_dir = File.dirname(path)
   version = "latest"
 
-  updates = {}
+  updates = []
   ApidocCli::AppConfig.new(:path => path).projects.map do |project|
     project.generators.each do |generator|
       target_path = File.join(target_dir, generator.target)
@@ -121,15 +121,18 @@ elsif command == "update"
         puts " -- unchanged"
       else
         puts " -- changed"
-        updates[target_path] = source
+        updates << { :source => source, :generator => generator.name, :target => target_path }
       end
     end
   end
 
   puts ""
-  updates.each do |path, source|
-    puts "Updating #{path}"
-    ApidocCli::Util.write_to_file(path, source)
+  if !updates.empty?
+    puts "Copying updated code"
+    updates.each do |data|
+      puts " -- #{data[:generator]} => #{data[:target]}"
+      ApidocCli::Util.write_to_file(data[:target], data[:source])
+    end
   end
 
 elsif command == ""
