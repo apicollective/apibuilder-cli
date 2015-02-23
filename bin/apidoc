@@ -109,18 +109,20 @@ elsif command == "update"
   version = "latest"
 
   updates = []
+  puts "Fetching code from #{ApidocCli::Env::APIDOC_API_URI}"
+
   ApidocCli::AppConfig.new(:path => path).projects.map do |project|
     project.generators.each do |generator|
       target_path = File.join(target_dir, generator.target)
-      puts "Fetching #{project.org}/#{project.name}/#{version}/#{generator.name}"
+      print "  - #{project.org}/#{project.name}/#{version}/#{generator.name}... "
       code = client.code.get_by_org_key_and_application_key_and_version_and_generator_key(project.org, project.name, "latest", generator.name)
       source = code.source.strip
 
       existing_source = File.exists?(target_path) ? IO.read(target_path).strip : ""
       if source == existing_source
-        puts " -- unchanged"
+        puts "unchanged"
       else
-        puts " -- changed"
+        puts "changed"
         updates << { :source => source, :generator => generator.name, :target => target_path }
       end
     end
@@ -130,7 +132,7 @@ elsif command == "update"
   if !updates.empty?
     puts "Copying updated code"
     updates.each do |data|
-      puts " -- #{data[:generator]} => #{data[:target]}"
+      puts " - #{data[:generator]} => #{data[:target]}"
       ApidocCli::Util.write_to_file(data[:target], data[:source])
     end
   end
