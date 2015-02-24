@@ -32,16 +32,24 @@ describe ApidocCli::AppConfig do
 code:
   gilt:
     apidoc:
-      play_2_3_client: generated/app/ApidocClient.scala
-      play_2_x_routes: api/conf/routes
+      version: latest
+      generators:
+        - play_2_3_client: generated/app/ApidocClient.scala
+        - play_2_x_routes: api/conf/routes
     apidoc-spec:
-      play_2_3_client: generated/app/ApidocSpec.scala
+      version: latest
+      generators:
+        - play_2_3_client: generated/app/ApidocSpec.scala
     apidoc-generator:
-      play_2_3_client: generated/app/ApidocGenerator.scala
+      version: latest
+      generators:
+        - play_2_3_client: generated/app/ApidocGenerator.scala
 
   foo:
     bar:
-      ruby_client: /tmp/client.rb
+      version: latest
+      generators:
+        - ruby_client: /tmp/client.rb
       """.strip)
     end
 

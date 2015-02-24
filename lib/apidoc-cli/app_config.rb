@@ -14,7 +14,15 @@ module ApidocCli
       yaml = YAML.load(IO.read(@path))
       code_projects = (yaml["code"] || {}).map do |org_key, project_map|
         project_map.map do |project_name, data|
-          generators = data.map do |name, target|
+          version = data['version'].to_s.strip
+          if version == ""
+            raise "File[#{@path}] Missing version for org[#{org_key}] project[#{project_name}]"
+          end
+
+          generators = data['generators'].map do |name_target|
+            # Hash has one element
+            name = name_target.keys.first
+            target = name_target[name]
             Generator.new(name, target)
           end
           project = Project.new(org_key, project_name, generators)

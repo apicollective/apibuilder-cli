@@ -77,24 +77,36 @@ path defaults to .apidoc in the current directory.
 
 The configuration file is a YAML file that follows the convention:
 
-    org:
-      project:
-        generator: target path
+    command:
+      org:
+        project:
+          version: <version>
+          generators:
+            - <generator name>: <path>
+            - <generator name>: <path>
+            - <generator name>: <path>
 
 Example File:
 
-    gilt:
-      apidoc:
-        play_2_3_client: generated/app/ApidocClient.scala
-        play_2_x_routes: api/conf/routes
-      apidoc-spec:
-        play_2_3_client: generated/app/ApidocSpec.scala
-      apidoc-generator:
-        play_2_3_client: generated/app/ApidocGenerator.scala
+    code:
+      gilt:
+        apidoc:
+          version: latest
+          generators:
+            - play_2_3_client: generated/app/ApidocClient.scala
+            - play_2_x_routes: api/conf/routes
+        apidoc-spec:
+          version: latest
+          generators:
+            - play_2_3_client: generated/app/ApidocSpec.scala
+        apidoc-generator:
+          version: latest
+          generators:
+            - play_2_3_client: generated/app/ApidocGenerator.scala
     
 # Environment Variables
 
-    APIDOC_API_URI: Change the URI of the apidoc REST API:
+    APIDOC_API_URI: Change the URI of the apidoc REST API
 
 
 
