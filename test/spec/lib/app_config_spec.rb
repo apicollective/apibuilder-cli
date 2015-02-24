@@ -29,31 +29,32 @@ describe ApidocCli::AppConfig do
 
     before do
       @sample_file = ApidocCli::Util.write_to_temp_file("""
-gilt:
-  apidoc:
-    play_2_3_client: generated/app/ApidocClient.scala
-    play_2_x_routes: api/conf/routes
-  apidoc-spec:
-    play_2_3_client: generated/app/ApidocSpec.scala
-  apidoc-generator:
-    play_2_3_client: generated/app/ApidocGenerator.scala
+code:
+  gilt:
+    apidoc:
+      play_2_3_client: generated/app/ApidocClient.scala
+      play_2_x_routes: api/conf/routes
+    apidoc-spec:
+      play_2_3_client: generated/app/ApidocSpec.scala
+    apidoc-generator:
+      play_2_3_client: generated/app/ApidocGenerator.scala
 
-foo:
-  bar:
-    ruby_client: /tmp/client.rb
+  foo:
+    bar:
+      ruby_client: /tmp/client.rb
       """.strip)
     end
 
     it "reads file" do
       app_config = ApidocCli::AppConfig.new(:path => @sample_file)
-      expect(app_config.projects.map(&:name).sort).to eq(["apidoc", "apidoc-generator", "apidoc-spec", "bar"])
+      expect(app_config.code.projects.map(&:name).sort).to eq(["apidoc", "apidoc-generator", "apidoc-spec", "bar"])
 
-      apidoc = app_config.projects.find { |p| p.name == "apidoc" }
+      apidoc = app_config.code.projects.find { |p| p.name == "apidoc" }
       expect(apidoc.org).to eq("gilt")
       expect(apidoc.name).to eq("apidoc")
       expect(apidoc.generators.map(&:name).sort).to eq(["play_2_3_client", "play_2_x_routes"])
 
-      bar = app_config.projects.find { |p| p.name == "bar" }
+      bar = app_config.code.projects.find { |p| p.name == "bar" }
       expect(bar.org).to eq("foo")
       expect(bar.name).to eq("bar")
       expect(bar.generators.map(&:name).sort).to eq(["ruby_client"])

@@ -26,6 +26,11 @@
 #  - Returns the code for gilt/apidoc version 'latest' using the
 #    codegenerator 'scala_models'
 #
+# apidoc-cli upload api/api.json gilt apidoc [--version 1.5.0-dev]
+#  - Uploads the file api/api.json to the gilt org, apidoc application.
+#    The uploaded file will be the specified version, defaulting to a
+#    development version of the latest version of this application.
+#
 # apidoc-cli update [--path path]
 #  - Reads a config file, optionally specified by path
 #    parameter. Invokes the apidoc code generators specified in the
@@ -87,14 +92,55 @@ elsif command == "code"
   version = ARGV.shift.to_s.strip
   generator = ARGV.shift.to_s.strip
 
-  if org != "" && application != "" && version != "" && generator != ""
-    code = client.code.get_by_org_key_and_application_key_and_version_and_generator_key(org, application, version, generator)
-    puts code.source
-
-  else
+  if org == "" || application == "" || version == "" || generator == ""
     puts "org, application, version, and generator are required"
     exit(1)
   end
+
+  code = client.code.get_by_org_key_and_application_key_and_version_and_generator_key(org, application, version, generator)
+  puts code.source
+
+elsif command == "upload"
+  path = ARGV.shift.to_s.strip
+  org = ARGV.shift.to_s.strip
+  application = ARGV.shift.to_s.strip
+
+  args = ApidocCli::Args.parse(ARGV)
+  version = args[:version]
+
+  if path == "" || org == "" || application == ""
+    puts "path, org, and application are required"
+    exit(1)
+  end
+
+  if !File.exists?(path)
+    puts "File[#{path}] does not exist"
+    exit(1)
+  end
+
+  if version == ""
+    puts "version is required (note: future versions may automatically default the version)"
+    exit(1)
+  end
+
+  form = Com::Gilt::Apidoc::V0::Models::VersionForm.new(:service_form => IO.read(path))
+
+  print "Uploading #{path} to #{ApidocCli::Env::APIDOC_API_URI}/#{org}/#{application}/#{version} ... "
+  begin
+    client.versions.put_by_org_key_and_application_key_and_version(org, application, version, form)
+    puts "success"
+  rescue Com::Gilt::Apidoc::V0::HttpClient::ServerError => e
+    puts "1 or more errors:"
+    JSON.parse(e.body).each do |error|
+      if error['code'] == "validation_error"
+        puts " - %s" % error['message']
+      else
+        puts " - %s: %s" % [error['code'], error['message']]
+      end
+    end
+  end
+
+
 
 elsif command == "update"
   args = ApidocCli::Args.parse(ARGV)
@@ -111,7 +157,9 @@ elsif command == "update"
   updates = []
   puts "Fetching code from #{ApidocCli::Env::APIDOC_API_URI}"
 
-  ApidocCli::AppConfig.new(:path => path).projects.map do |project|
+  app_config = ApidocCli::AppConfig.new(:path => path)
+
+  app_config.code.projects.map do |project|
     project.generators.each do |generator|
       target_path = File.join(target_dir, generator.target)
       print "  - #{project.org}/#{project.name}/#{version}/#{generator.name}... "
