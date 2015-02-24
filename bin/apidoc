@@ -28,8 +28,8 @@
 #
 # apidoc-cli upload api/api.json gilt apidoc [--version 1.5.0-dev]
 #  - Uploads the file api/api.json to the gilt org, apidoc application.
-#    The uploaded file will be the specified version, defaulting to a
-#    development version of the latest version of this application.
+#    The uploaded file will be the specified version, defaulting to
+#    the output from git describe.
 #
 # apidoc-cli update [--path path]
 #  - Reads a config file, optionally specified by path
@@ -101,14 +101,14 @@ elsif command == "code"
   puts code.source
 
 elsif command == "upload"
-  path = ARGV.shift.to_s.strip
   org = ARGV.shift.to_s.strip
   application = ARGV.shift.to_s.strip
+  path = ARGV.shift.to_s.strip
 
   args = ApidocCli::Args.parse(ARGV)
-  version = args[:version]
+  version = args[:version].to_s.strip
 
-  if path == "" || org == "" || application == ""
+  if org == "" || application == "" || path == ""
     puts "path, org, and application are required"
     exit(1)
   end
@@ -119,11 +119,30 @@ elsif command == "upload"
   end
 
   if version == ""
-    puts "version is required (note: future versions may automatically default the version)"
-    exit(1)
+    version = `git describe`.strip
+    if version == ""
+      puts "version is required (note: future versions may automatically default the version)"
+      exit(1)
+    end
   end
 
   form = Com::Gilt::Apidoc::V0::Models::VersionForm.new(:service_form => IO.read(path))
+
+  # TODO: Upload want to upload this version if it is different from
+  # the last uploaded version. should be able to download 'latest'
+  # version and do a string compare to "original" attribute.
+  begin
+    existing = client.versions.get_by_org_key_and_application_key_and_version(org, application, "latest")
+    tmp = "/tmp/foo.json"
+    ApidocCli::Util.write_to_file(tmp, existing.original)
+    puts "Wrote original to #{tmp}" # TODO: Test if same somehow
+  rescue Com::Gilt::Apidoc::V0::HttpClient::ServerError => e
+    if e.code == 404
+      # We don't have any versions
+    else
+      raise e
+    end
+  end
 
   print "Uploading #{path} to #{ApidocCli::Env::APIDOC_API_URI}/#{org}/#{application}/#{version} ... "
   begin
@@ -139,8 +158,6 @@ elsif command == "upload"
       end
     end
   end
-
-
 
 elsif command == "update"
   args = ApidocCli::Args.parse(ARGV)
