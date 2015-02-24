@@ -1,3 +1,5 @@
 gilt:
   apidoc:
     ruby_client: lib/apidoc-cli/com_gilt_apidoc_v0_client.rb
+  apidoc-spec:
+    ruby_client: lib/apidoc-cli/com_gilt_apidoc_spec_v0_client.rb
