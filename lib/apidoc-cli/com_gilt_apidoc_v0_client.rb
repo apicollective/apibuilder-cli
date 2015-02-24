@@ -44,71 +44,71 @@ module Com
           end
 
           def applications
-            @applications ||= Com::Gilt::Apidoc::V0::Clients::Applications.new(self)
+            @applications ||= ::Com::Gilt::Apidoc::V0::Clients::Applications.new(self)
           end
 
           def code
-            @code ||= Com::Gilt::Apidoc::V0::Clients::Code.new(self)
+            @code ||= ::Com::Gilt::Apidoc::V0::Clients::Code.new(self)
           end
 
           def domains
-            @domains ||= Com::Gilt::Apidoc::V0::Clients::Domains.new(self)
+            @domains ||= ::Com::Gilt::Apidoc::V0::Clients::Domains.new(self)
           end
 
           def email_verification_confirmation_forms
-            @email_verification_confirmation_forms ||= Com::Gilt::Apidoc::V0::Clients::EmailVerificationConfirmationForms.new(self)
+            @email_verification_confirmation_forms ||= ::Com::Gilt::Apidoc::V0::Clients::EmailVerificationConfirmationForms.new(self)
           end
 
           def generators
-            @generators ||= Com::Gilt::Apidoc::V0::Clients::Generators.new(self)
+            @generators ||= ::Com::Gilt::Apidoc::V0::Clients::Generators.new(self)
           end
 
           def healthchecks
-            @healthchecks ||= Com::Gilt::Apidoc::V0::Clients::Healthchecks.new(self)
+            @healthchecks ||= ::Com::Gilt::Apidoc::V0::Clients::Healthchecks.new(self)
           end
 
           def memberships
-            @memberships ||= Com::Gilt::Apidoc::V0::Clients::Memberships.new(self)
+            @memberships ||= ::Com::Gilt::Apidoc::V0::Clients::Memberships.new(self)
           end
 
           def membership_requests
-            @membership_requests ||= Com::Gilt::Apidoc::V0::Clients::MembershipRequests.new(self)
+            @membership_requests ||= ::Com::Gilt::Apidoc::V0::Clients::MembershipRequests.new(self)
           end
 
           def organizations
-            @organizations ||= Com::Gilt::Apidoc::V0::Clients::Organizations.new(self)
+            @organizations ||= ::Com::Gilt::Apidoc::V0::Clients::Organizations.new(self)
           end
 
           def password_resets
-            @password_resets ||= Com::Gilt::Apidoc::V0::Clients::PasswordResets.new(self)
+            @password_resets ||= ::Com::Gilt::Apidoc::V0::Clients::PasswordResets.new(self)
           end
 
           def password_reset_requests
-            @password_reset_requests ||= Com::Gilt::Apidoc::V0::Clients::PasswordResetRequests.new(self)
+            @password_reset_requests ||= ::Com::Gilt::Apidoc::V0::Clients::PasswordResetRequests.new(self)
           end
 
           def subscriptions
-            @subscriptions ||= Com::Gilt::Apidoc::V0::Clients::Subscriptions.new(self)
+            @subscriptions ||= ::Com::Gilt::Apidoc::V0::Clients::Subscriptions.new(self)
           end
 
           def tokens
-            @tokens ||= Com::Gilt::Apidoc::V0::Clients::Tokens.new(self)
+            @tokens ||= ::Com::Gilt::Apidoc::V0::Clients::Tokens.new(self)
           end
 
           def users
-            @users ||= Com::Gilt::Apidoc::V0::Clients::Users.new(self)
+            @users ||= ::Com::Gilt::Apidoc::V0::Clients::Users.new(self)
           end
 
           def validations
-            @validations ||= Com::Gilt::Apidoc::V0::Clients::Validations.new(self)
+            @validations ||= ::Com::Gilt::Apidoc::V0::Clients::Validations.new(self)
           end
 
           def versions
-            @versions ||= Com::Gilt::Apidoc::V0::Clients::Versions.new(self)
+            @versions ||= ::Com::Gilt::Apidoc::V0::Clients::Versions.new(self)
           end
 
           def watches
-            @watches ||= Com::Gilt::Apidoc::V0::Clients::Watches.new(self)
+            @watches ||= ::Com::Gilt::Apidoc::V0::Clients::Watches.new(self)
           end
         end
 
@@ -117,7 +117,7 @@ module Com
           class Applications
 
             def initialize(client)
-              @client = HttpClient::Preconditions.assert_class('client', client, Com::Gilt::Apidoc::V0::Client)
+              @client = HttpClient::Preconditions.assert_class('client', client, ::Com::Gilt::Apidoc::V0::Client)
             end
 
             # Search all applications. Results are always paginated.
@@ -130,29 +130,29 @@ module Com
                 :limit => HttpClient::Preconditions.assert_class_or_nil('limit', opts.delete(:limit), Integer),
                 :offset => HttpClient::Preconditions.assert_class_or_nil('offset', opts.delete(:offset), Integer)
               }.delete_if { |k, v| v.nil? }
-              @client.request("/#{CGI.escape(org_key)}").with_query(query).get.map { |hash| Com::Gilt::Apidoc::V0::Models::Application.new(hash) }
+              @client.request("/#{CGI.escape(org_key)}").with_query(query).get.map { |hash| ::Com::Gilt::Apidoc::V0::Models::Application.new(hash) }
             end
 
             # Create an application.
             def post_by_org_key(org_key, application_form)
               HttpClient::Preconditions.assert_class('org_key', org_key, String)
-              HttpClient::Preconditions.assert_class('application_form', application_form, Com::Gilt::Apidoc::V0::Models::ApplicationForm)
-              @client.request("/#{CGI.escape(org_key)}").with_json(application_form.to_json).post { |hash| Com::Gilt::Apidoc::V0::Models::Application.new(hash) }
+              HttpClient::Preconditions.assert_class('application_form', application_form, ::Com::Gilt::Apidoc::V0::Models::ApplicationForm)
+              @client.request("/#{CGI.escape(org_key)}").with_json(application_form.to_json).post { |hash| ::Com::Gilt::Apidoc::V0::Models::Application.new(hash) }
             end
 
             # Updates an application.
             def put_by_org_key_and_application_key(org_key, application_key, application_form)
               HttpClient::Preconditions.assert_class('org_key', org_key, String)
               HttpClient::Preconditions.assert_class('application_key', application_key, String)
-              HttpClient::Preconditions.assert_class('application_form', application_form, Com::Gilt::Apidoc::V0::Models::ApplicationForm)
-              @client.request("/#{CGI.escape(org_key)}/#{CGI.escape(application_key)}").with_json(application_form.to_json).put { |hash| Com::Gilt::Apidoc::V0::Models::Application.new(hash) }
+              HttpClient::Preconditions.assert_class('application_form', application_form, ::Com::Gilt::Apidoc::V0::Models::ApplicationForm)
+              @client.request("/#{CGI.escape(org_key)}/#{CGI.escape(application_key)}").with_json(application_form.to_json).put { |hash| ::Com::Gilt::Apidoc::V0::Models::Application.new(hash) }
             end
 
             # Deletes a specific application and its associated versions.
             def delete_by_org_key_and_application_key(org_key, application_key)
               HttpClient::Preconditions.assert_class('org_key', org_key, String)
               HttpClient::Preconditions.assert_class('application_key', application_key, String)
-              @client.request("/#{CGI.escape(org_key)}/#{CGI.escape(application_key)}").delete { |hash| Com::Gilt::Apidoc::V0::Models::Value.new(hash) }
+              @client.request("/#{CGI.escape(org_key)}/#{CGI.escape(application_key)}").delete { |hash| ::Com::Gilt::Apidoc::V0::Models::Value.new(hash) }
             end
 
           end
@@ -160,7 +160,7 @@ module Com
           class Code
 
             def initialize(client)
-              @client = HttpClient::Preconditions.assert_class('client', client, Com::Gilt::Apidoc::V0::Client)
+              @client = HttpClient::Preconditions.assert_class('client', client, ::Com::Gilt::Apidoc::V0::Client)
             end
 
             # Generate code for a specific version of an application.
@@ -169,7 +169,7 @@ module Com
               HttpClient::Preconditions.assert_class('application_key', application_key, String)
               HttpClient::Preconditions.assert_class('version', version, String)
               HttpClient::Preconditions.assert_class('generator_key', generator_key, String)
-              @client.request("/#{CGI.escape(org_key)}/#{CGI.escape(application_key)}/#{CGI.escape(version)}/#{CGI.escape(generator_key)}").get { |hash| Com::Gilt::Apidoc::V0::Models::Code.new(hash) }
+              @client.request("/#{CGI.escape(org_key)}/#{CGI.escape(application_key)}/#{CGI.escape(version)}/#{CGI.escape(generator_key)}").get { |hash| ::Com::Gilt::Apidoc::V0::Models::Code.new(hash) }
             end
 
           end
@@ -177,21 +177,21 @@ module Com
           class Domains
 
             def initialize(client)
-              @client = HttpClient::Preconditions.assert_class('client', client, Com::Gilt::Apidoc::V0::Client)
+              @client = HttpClient::Preconditions.assert_class('client', client, ::Com::Gilt::Apidoc::V0::Client)
             end
 
             # Add a domain to this organization
             def post_by_org_key(org_key, domain)
               HttpClient::Preconditions.assert_class('org_key', org_key, String)
-              HttpClient::Preconditions.assert_class('domain', domain, Com::Gilt::Apidoc::V0::Models::Domain)
-              @client.request("/domains/#{CGI.escape(org_key)}").with_json(domain.to_json).post { |hash| Com::Gilt::Apidoc::V0::Models::Domain.new(hash) }
+              HttpClient::Preconditions.assert_class('domain', domain, ::Com::Gilt::Apidoc::V0::Models::Domain)
+              @client.request("/domains/#{CGI.escape(org_key)}").with_json(domain.to_json).post { |hash| ::Com::Gilt::Apidoc::V0::Models::Domain.new(hash) }
             end
 
             # Remove this domain from this organization
             def delete_by_org_key_and_name(org_key, name)
               HttpClient::Preconditions.assert_class('org_key', org_key, String)
               HttpClient::Preconditions.assert_class('name', name, String)
-              @client.request("/domains/#{CGI.escape(org_key)}/#{CGI.escape(name)}").delete { |hash| Com::Gilt::Apidoc::V0::Models::Value.new(hash) }
+              @client.request("/domains/#{CGI.escape(org_key)}/#{CGI.escape(name)}").delete { |hash| ::Com::Gilt::Apidoc::V0::Models::Value.new(hash) }
             end
 
           end
@@ -199,13 +199,13 @@ module Com
           class EmailVerificationConfirmationForms
 
             def initialize(client)
-              @client = HttpClient::Preconditions.assert_class('client', client, Com::Gilt::Apidoc::V0::Client)
+              @client = HttpClient::Preconditions.assert_class('client', client, ::Com::Gilt::Apidoc::V0::Client)
             end
 
             # Validate an email address using a token.
             def post_email_verification_confirmations(email_verification_confirmation_form)
-              HttpClient::Preconditions.assert_class('email_verification_confirmation_form', email_verification_confirmation_form, Com::Gilt::Apidoc::V0::Models::EmailVerificationConfirmationForm)
-              @client.request("/email_verification_confirmations").with_json(email_verification_confirmation_form.to_json).post { |hash| Com::Gilt::Apidoc::V0::Models::Value.new(hash) }
+              HttpClient::Preconditions.assert_class('email_verification_confirmation_form', email_verification_confirmation_form, ::Com::Gilt::Apidoc::V0::Models::EmailVerificationConfirmationForm)
+              @client.request("/email_verification_confirmations").with_json(email_verification_confirmation_form.to_json).post { |hash| ::Com::Gilt::Apidoc::V0::Models::Value.new(hash) }
             end
 
           end
@@ -213,7 +213,7 @@ module Com
           class Generators
 
             def initialize(client)
-              @client = HttpClient::Preconditions.assert_class('client', client, Com::Gilt::Apidoc::V0::Client)
+              @client = HttpClient::Preconditions.assert_class('client', client, ::Com::Gilt::Apidoc::V0::Client)
             end
 
             # List all generators visible by this user
@@ -225,29 +225,29 @@ module Com
                 :limit => HttpClient::Preconditions.assert_class_or_nil('limit', opts.delete(:limit), Integer),
                 :offset => HttpClient::Preconditions.assert_class_or_nil('offset', opts.delete(:offset), Integer)
               }.delete_if { |k, v| v.nil? }
-              @client.request("/generators").with_query(query).get.map { |hash| Com::Gilt::Apidoc::V0::Models::Generator.new(hash) }
+              @client.request("/generators").with_query(query).get.map { |hash| ::Com::Gilt::Apidoc::V0::Models::Generator.new(hash) }
             end
 
             def get_by_key(key)
               HttpClient::Preconditions.assert_class('key', key, String)
-              @client.request("/generators/#{CGI.escape(key)}").get { |hash| Com::Gilt::Apidoc::V0::Models::Generator.new(hash) }
+              @client.request("/generators/#{CGI.escape(key)}").get { |hash| ::Com::Gilt::Apidoc::V0::Models::Generator.new(hash) }
             end
 
             def post(generator_create_form)
-              HttpClient::Preconditions.assert_class('generator_create_form', generator_create_form, Com::Gilt::Apidoc::V0::Models::GeneratorCreateForm)
-              @client.request("/generators").with_json(generator_create_form.to_json).post { |hash| Com::Gilt::Apidoc::V0::Models::Generator.new(hash) }
+              HttpClient::Preconditions.assert_class('generator_create_form', generator_create_form, ::Com::Gilt::Apidoc::V0::Models::GeneratorCreateForm)
+              @client.request("/generators").with_json(generator_create_form.to_json).post { |hash| ::Com::Gilt::Apidoc::V0::Models::Generator.new(hash) }
             end
 
             def put_by_key(key, generator_update_form)
               HttpClient::Preconditions.assert_class('key', key, String)
-              HttpClient::Preconditions.assert_class('generator_update_form', generator_update_form, Com::Gilt::Apidoc::V0::Models::GeneratorUpdateForm)
-              @client.request("/generators/#{CGI.escape(key)}").with_json(generator_update_form.to_json).put { |hash| Com::Gilt::Apidoc::V0::Models::Generator.new(hash) }
+              HttpClient::Preconditions.assert_class('generator_update_form', generator_update_form, ::Com::Gilt::Apidoc::V0::Models::GeneratorUpdateForm)
+              @client.request("/generators/#{CGI.escape(key)}").with_json(generator_update_form.to_json).put { |hash| ::Com::Gilt::Apidoc::V0::Models::Generator.new(hash) }
             end
 
             # Deletes a generator.
             def delete_by_key(key)
               HttpClient::Preconditions.assert_class('key', key, String)
-              @client.request("/generators/#{CGI.escape(key)}").delete { |hash| Com::Gilt::Apidoc::V0::Models::Value.new(hash) }
+              @client.request("/generators/#{CGI.escape(key)}").delete { |hash| ::Com::Gilt::Apidoc::V0::Models::Value.new(hash) }
             end
 
           end
@@ -255,11 +255,11 @@ module Com
           class Healthchecks
 
             def initialize(client)
-              @client = HttpClient::Preconditions.assert_class('client', client, Com::Gilt::Apidoc::V0::Client)
+              @client = HttpClient::Preconditions.assert_class('client', client, ::Com::Gilt::Apidoc::V0::Client)
             end
 
             def get_internal_and_healthcheck
-              @client.request("/_internal_/healthcheck").get { |hash| Com::Gilt::Apidoc::V0::Models::Healthcheck.new(hash) }
+              @client.request("/_internal_/healthcheck").get { |hash| ::Com::Gilt::Apidoc::V0::Models::Healthcheck.new(hash) }
             end
 
           end
@@ -267,7 +267,7 @@ module Com
           class Memberships
 
             def initialize(client)
-              @client = HttpClient::Preconditions.assert_class('client', client, Com::Gilt::Apidoc::V0::Client)
+              @client = HttpClient::Preconditions.assert_class('client', client, ::Com::Gilt::Apidoc::V0::Client)
             end
 
             # Search all memberships. Results are always paginated.
@@ -281,17 +281,17 @@ module Com
                 :limit => HttpClient::Preconditions.assert_class_or_nil('limit', opts.delete(:limit), Integer),
                 :offset => HttpClient::Preconditions.assert_class_or_nil('offset', opts.delete(:offset), Integer)
               }.delete_if { |k, v| v.nil? }
-              @client.request("/memberships").with_query(query).get.map { |hash| Com::Gilt::Apidoc::V0::Models::Membership.new(hash) }
+              @client.request("/memberships").with_query(query).get.map { |hash| ::Com::Gilt::Apidoc::V0::Models::Membership.new(hash) }
             end
 
             def get_by_guid(guid)
               HttpClient::Preconditions.assert_class('guid', guid, String)
-              @client.request("/memberships/#{guid}").get { |hash| Com::Gilt::Apidoc::V0::Models::Membership.new(hash) }
+              @client.request("/memberships/#{guid}").get { |hash| ::Com::Gilt::Apidoc::V0::Models::Membership.new(hash) }
             end
 
             def delete_by_guid(guid)
               HttpClient::Preconditions.assert_class('guid', guid, String)
-              @client.request("/memberships/#{guid}").delete { |hash| Com::Gilt::Apidoc::V0::Models::Value.new(hash) }
+              @client.request("/memberships/#{guid}").delete { |hash| ::Com::Gilt::Apidoc::V0::Models::Value.new(hash) }
             end
 
           end
@@ -299,7 +299,7 @@ module Com
           class MembershipRequests
 
             def initialize(client)
-              @client = HttpClient::Preconditions.assert_class('client', client, Com::Gilt::Apidoc::V0::Client)
+              @client = HttpClient::Preconditions.assert_class('client', client, ::Com::Gilt::Apidoc::V0::Client)
             end
 
             # Search all membership requests. Results are always paginated.
@@ -313,13 +313,13 @@ module Com
                 :limit => HttpClient::Preconditions.assert_class_or_nil('limit', opts.delete(:limit), Integer),
                 :offset => HttpClient::Preconditions.assert_class_or_nil('offset', opts.delete(:offset), Integer)
               }.delete_if { |k, v| v.nil? }
-              @client.request("/membership_requests").with_query(query).get.map { |hash| Com::Gilt::Apidoc::V0::Models::MembershipRequest.new(hash) }
+              @client.request("/membership_requests").with_query(query).get.map { |hash| ::Com::Gilt::Apidoc::V0::Models::MembershipRequest.new(hash) }
             end
 
             # Create a membership request
             def post(hash)
               HttpClient::Preconditions.assert_class('hash', hash, Hash)
-              @client.request("/membership_requests").with_json(hash.to_json).post { |hash| Com::Gilt::Apidoc::V0::Models::MembershipRequest.new(hash) }
+              @client.request("/membership_requests").with_json(hash.to_json).post { |hash| ::Com::Gilt::Apidoc::V0::Models::MembershipRequest.new(hash) }
             end
 
             # Accepts this membership request. User will become a member of the specified
@@ -327,7 +327,7 @@ module Com
             def post_accept_by_guid(guid, hash)
               HttpClient::Preconditions.assert_class('guid', guid, String)
               HttpClient::Preconditions.assert_class('hash', hash, Hash)
-              @client.request("/membership_requests/#{guid}/accept").with_json(hash.to_json).post { |hash| Com::Gilt::Apidoc::V0::Models::Value.new(hash) }
+              @client.request("/membership_requests/#{guid}/accept").with_json(hash.to_json).post { |hash| ::Com::Gilt::Apidoc::V0::Models::Value.new(hash) }
             end
 
             # Declines this membership request. User will NOT become a member of the
@@ -335,7 +335,7 @@ module Com
             def post_decline_by_guid(guid, hash)
               HttpClient::Preconditions.assert_class('guid', guid, String)
               HttpClient::Preconditions.assert_class('hash', hash, Hash)
-              @client.request("/membership_requests/#{guid}/decline").with_json(hash.to_json).post { |hash| Com::Gilt::Apidoc::V0::Models::Value.new(hash) }
+              @client.request("/membership_requests/#{guid}/decline").with_json(hash.to_json).post { |hash| ::Com::Gilt::Apidoc::V0::Models::Value.new(hash) }
             end
 
           end
@@ -343,7 +343,7 @@ module Com
           class Organizations
 
             def initialize(client)
-              @client = HttpClient::Preconditions.assert_class('client', client, Com::Gilt::Apidoc::V0::Client)
+              @client = HttpClient::Preconditions.assert_class('client', client, ::Com::Gilt::Apidoc::V0::Client)
             end
 
             # Search all organizations. Results are always paginated.
@@ -358,32 +358,32 @@ module Com
                 :limit => HttpClient::Preconditions.assert_class_or_nil('limit', opts.delete(:limit), Integer),
                 :offset => HttpClient::Preconditions.assert_class_or_nil('offset', opts.delete(:offset), Integer)
               }.delete_if { |k, v| v.nil? }
-              @client.request("/organizations").with_query(query).get.map { |hash| Com::Gilt::Apidoc::V0::Models::Organization.new(hash) }
+              @client.request("/organizations").with_query(query).get.map { |hash| ::Com::Gilt::Apidoc::V0::Models::Organization.new(hash) }
             end
 
             # Returns the organization with this key.
             def get_by_key(key)
               HttpClient::Preconditions.assert_class('key', key, String)
-              @client.request("/organizations/#{CGI.escape(key)}").get { |hash| Com::Gilt::Apidoc::V0::Models::Organization.new(hash) }
+              @client.request("/organizations/#{CGI.escape(key)}").get { |hash| ::Com::Gilt::Apidoc::V0::Models::Organization.new(hash) }
             end
 
             # Create a new organization.
             def post(organization_form)
-              HttpClient::Preconditions.assert_class('organization_form', organization_form, Com::Gilt::Apidoc::V0::Models::OrganizationForm)
-              @client.request("/organizations").with_json(organization_form.to_json).post { |hash| Com::Gilt::Apidoc::V0::Models::Organization.new(hash) }
+              HttpClient::Preconditions.assert_class('organization_form', organization_form, ::Com::Gilt::Apidoc::V0::Models::OrganizationForm)
+              @client.request("/organizations").with_json(organization_form.to_json).post { |hash| ::Com::Gilt::Apidoc::V0::Models::Organization.new(hash) }
             end
 
             # Update an organization.
             def put_by_key(key, organization_form)
               HttpClient::Preconditions.assert_class('key', key, String)
-              HttpClient::Preconditions.assert_class('organization_form', organization_form, Com::Gilt::Apidoc::V0::Models::OrganizationForm)
-              @client.request("/organizations/#{CGI.escape(key)}").with_json(organization_form.to_json).put { |hash| Com::Gilt::Apidoc::V0::Models::Organization.new(hash) }
+              HttpClient::Preconditions.assert_class('organization_form', organization_form, ::Com::Gilt::Apidoc::V0::Models::OrganizationForm)
+              @client.request("/organizations/#{CGI.escape(key)}").with_json(organization_form.to_json).put { |hash| ::Com::Gilt::Apidoc::V0::Models::Organization.new(hash) }
             end
 
             # Deletes an organization and all of its associated applications.
             def delete_by_key(key)
               HttpClient::Preconditions.assert_class('key', key, String)
-              @client.request("/organizations/#{CGI.escape(key)}").delete { |hash| Com::Gilt::Apidoc::V0::Models::Value.new(hash) }
+              @client.request("/organizations/#{CGI.escape(key)}").delete { |hash| ::Com::Gilt::Apidoc::V0::Models::Value.new(hash) }
             end
 
           end
@@ -391,15 +391,15 @@ module Com
           class PasswordResets
 
             def initialize(client)
-              @client = HttpClient::Preconditions.assert_class('client', client, Com::Gilt::Apidoc::V0::Client)
+              @client = HttpClient::Preconditions.assert_class('client', client, ::Com::Gilt::Apidoc::V0::Client)
             end
 
             # Change the password for this token. If the token is invalid, has been used,
             # or otherwise no longer can be applied, errors will be returned as 409s. A
             # 204 represents that the user has successfully changed their password.
             def post(password_reset)
-              HttpClient::Preconditions.assert_class('password_reset', password_reset, Com::Gilt::Apidoc::V0::Models::PasswordReset)
-              @client.request("/password_resets").with_json(password_reset.to_json).post { |hash| Com::Gilt::Apidoc::V0::Models::PasswordResetSuccess.new(hash) }
+              HttpClient::Preconditions.assert_class('password_reset', password_reset, ::Com::Gilt::Apidoc::V0::Models::PasswordReset)
+              @client.request("/password_resets").with_json(password_reset.to_json).post { |hash| ::Com::Gilt::Apidoc::V0::Models::PasswordResetSuccess.new(hash) }
             end
 
           end
@@ -407,14 +407,14 @@ module Com
           class PasswordResetRequests
 
             def initialize(client)
-              @client = HttpClient::Preconditions.assert_class('client', client, Com::Gilt::Apidoc::V0::Client)
+              @client = HttpClient::Preconditions.assert_class('client', client, ::Com::Gilt::Apidoc::V0::Client)
             end
 
             # Create a new password reset. This will send the user an email with a link to
             # reset their password.
             def post(password_reset_request)
-              HttpClient::Preconditions.assert_class('password_reset_request', password_reset_request, Com::Gilt::Apidoc::V0::Models::PasswordResetRequest)
-              @client.request("/password_reset_requests").with_json(password_reset_request.to_json).post { |hash| Com::Gilt::Apidoc::V0::Models::Value.new(hash) }
+              HttpClient::Preconditions.assert_class('password_reset_request', password_reset_request, ::Com::Gilt::Apidoc::V0::Models::PasswordResetRequest)
+              @client.request("/password_reset_requests").with_json(password_reset_request.to_json).post { |hash| ::Com::Gilt::Apidoc::V0::Models::Value.new(hash) }
             end
 
           end
@@ -422,7 +422,7 @@ module Com
           class Subscriptions
 
             def initialize(client)
-              @client = HttpClient::Preconditions.assert_class('client', client, Com::Gilt::Apidoc::V0::Client)
+              @client = HttpClient::Preconditions.assert_class('client', client, ::Com::Gilt::Apidoc::V0::Client)
             end
 
             # Search subscriptions. Always paginated.
@@ -432,28 +432,28 @@ module Com
                 :guid => HttpClient::Preconditions.assert_class_or_nil('guid', HttpClient::Helper.to_uuid(opts.delete(:guid)), String),
                 :organization_key => HttpClient::Preconditions.assert_class_or_nil('organization_key', opts.delete(:organization_key), String),
                 :user_guid => HttpClient::Preconditions.assert_class_or_nil('user_guid', HttpClient::Helper.to_uuid(opts.delete(:user_guid)), String),
-                :publication => HttpClient::Preconditions.assert_class_or_nil('publication', opts[:publication].nil? ? nil : (opts[:publication].is_a?(Com::Gilt::Apidoc::V0::Models::Publication) ? opts.delete(:publication) : Com::Gilt::Apidoc::V0::Models::Publication.apply(opts.delete(:publication))), Com::Gilt::Apidoc::V0::Models::Publication),
+                :publication => HttpClient::Preconditions.assert_class_or_nil('publication', opts[:publication].nil? ? nil : (opts[:publication].is_a?(::Com::Gilt::Apidoc::V0::Models::Publication) ? opts.delete(:publication) : ::Com::Gilt::Apidoc::V0::Models::Publication.apply(opts.delete(:publication))), ::Com::Gilt::Apidoc::V0::Models::Publication),
                 :limit => HttpClient::Preconditions.assert_class_or_nil('limit', opts.delete(:limit), Integer),
                 :offset => HttpClient::Preconditions.assert_class_or_nil('offset', opts.delete(:offset), Integer)
               }.delete_if { |k, v| v.nil? }
-              @client.request("/subscriptions").with_query(query).get.map { |hash| Com::Gilt::Apidoc::V0::Models::Subscription.new(hash) }
+              @client.request("/subscriptions").with_query(query).get.map { |hash| ::Com::Gilt::Apidoc::V0::Models::Subscription.new(hash) }
             end
 
             # Returns information about a specific subscription.
             def get_by_guid(guid)
               HttpClient::Preconditions.assert_class('guid', guid, String)
-              @client.request("/subscriptions/#{guid}").get { |hash| Com::Gilt::Apidoc::V0::Models::Subscription.new(hash) }
+              @client.request("/subscriptions/#{guid}").get { |hash| ::Com::Gilt::Apidoc::V0::Models::Subscription.new(hash) }
             end
 
             # Create a new subscription.
             def post(subscription_form)
-              HttpClient::Preconditions.assert_class('subscription_form', subscription_form, Com::Gilt::Apidoc::V0::Models::SubscriptionForm)
-              @client.request("/subscriptions").with_json(subscription_form.to_json).post { |hash| Com::Gilt::Apidoc::V0::Models::Subscription.new(hash) }
+              HttpClient::Preconditions.assert_class('subscription_form', subscription_form, ::Com::Gilt::Apidoc::V0::Models::SubscriptionForm)
+              @client.request("/subscriptions").with_json(subscription_form.to_json).post { |hash| ::Com::Gilt::Apidoc::V0::Models::Subscription.new(hash) }
             end
 
             def delete_by_guid(guid)
               HttpClient::Preconditions.assert_class('guid', guid, String)
-              @client.request("/subscriptions/#{guid}").delete { |hash| Com::Gilt::Apidoc::V0::Models::Value.new(hash) }
+              @client.request("/subscriptions/#{guid}").delete { |hash| ::Com::Gilt::Apidoc::V0::Models::Value.new(hash) }
             end
 
           end
@@ -461,7 +461,7 @@ module Com
           class Tokens
 
             def initialize(client)
-              @client = HttpClient::Preconditions.assert_class('client', client, Com::Gilt::Apidoc::V0::Client)
+              @client = HttpClient::Preconditions.assert_class('client', client, ::Com::Gilt::Apidoc::V0::Client)
             end
 
             def get_users_by_user_guid(user_guid, incoming={})
@@ -472,24 +472,24 @@ module Com
                 :limit => HttpClient::Preconditions.assert_class_or_nil('limit', opts.delete(:limit), Integer),
                 :offset => HttpClient::Preconditions.assert_class_or_nil('offset', opts.delete(:offset), Integer)
               }.delete_if { |k, v| v.nil? }
-              @client.request("/tokens/users/#{user_guid}").with_query(query).get.map { |hash| Com::Gilt::Apidoc::V0::Models::Token.new(hash) }
+              @client.request("/tokens/users/#{user_guid}").with_query(query).get.map { |hash| ::Com::Gilt::Apidoc::V0::Models::Token.new(hash) }
             end
 
             # Used to fetch the clear text token.
             def get_cleartext_by_guid(guid)
               HttpClient::Preconditions.assert_class('guid', guid, String)
-              @client.request("/tokens/#{guid}/cleartext").get { |hash| Com::Gilt::Apidoc::V0::Models::CleartextToken.new(hash) }
+              @client.request("/tokens/#{guid}/cleartext").get { |hash| ::Com::Gilt::Apidoc::V0::Models::CleartextToken.new(hash) }
             end
 
             # Create a new API token for this user
             def post(token_form)
-              HttpClient::Preconditions.assert_class('token_form', token_form, Com::Gilt::Apidoc::V0::Models::TokenForm)
-              @client.request("/tokens").with_json(token_form.to_json).post { |hash| Com::Gilt::Apidoc::V0::Models::Token.new(hash) }
+              HttpClient::Preconditions.assert_class('token_form', token_form, ::Com::Gilt::Apidoc::V0::Models::TokenForm)
+              @client.request("/tokens").with_json(token_form.to_json).post { |hash| ::Com::Gilt::Apidoc::V0::Models::Token.new(hash) }
             end
 
             def delete_by_guid(guid)
               HttpClient::Preconditions.assert_class('guid', guid, String)
-              @client.request("/tokens/#{guid}").delete { |hash| Com::Gilt::Apidoc::V0::Models::Value.new(hash) }
+              @client.request("/tokens/#{guid}").delete { |hash| ::Com::Gilt::Apidoc::V0::Models::Value.new(hash) }
             end
 
           end
@@ -497,7 +497,7 @@ module Com
           class Users
 
             def initialize(client)
-              @client = HttpClient::Preconditions.assert_class('client', client, Com::Gilt::Apidoc::V0::Client)
+              @client = HttpClient::Preconditions.assert_class('client', client, ::Com::Gilt::Apidoc::V0::Client)
             end
 
             # Search for a specific user. You must specify at least 1 parameter - either a
@@ -509,13 +509,13 @@ module Com
                 :email => HttpClient::Preconditions.assert_class_or_nil('email', opts.delete(:email), String),
                 :token => HttpClient::Preconditions.assert_class_or_nil('token', opts.delete(:token), String)
               }.delete_if { |k, v| v.nil? }
-              @client.request("/users").with_query(query).get.map { |hash| Com::Gilt::Apidoc::V0::Models::User.new(hash) }
+              @client.request("/users").with_query(query).get.map { |hash| ::Com::Gilt::Apidoc::V0::Models::User.new(hash) }
             end
 
             # Returns information about the user with this guid.
             def get_by_guid(guid)
               HttpClient::Preconditions.assert_class('guid', guid, String)
-              @client.request("/users/#{guid}").get { |hash| Com::Gilt::Apidoc::V0::Models::User.new(hash) }
+              @client.request("/users/#{guid}").get { |hash| ::Com::Gilt::Apidoc::V0::Models::User.new(hash) }
             end
 
             # Used to authenticate a user with an email address and password. Successful
@@ -524,20 +524,20 @@ module Com
             # user_authorization_failed.
             def post_authenticate(hash)
               HttpClient::Preconditions.assert_class('hash', hash, Hash)
-              @client.request("/users/authenticate").with_json(hash.to_json).post { |hash| Com::Gilt::Apidoc::V0::Models::User.new(hash) }
+              @client.request("/users/authenticate").with_json(hash.to_json).post { |hash| ::Com::Gilt::Apidoc::V0::Models::User.new(hash) }
             end
 
             # Create a new user.
-            def post(hash)
-              HttpClient::Preconditions.assert_class('hash', hash, Hash)
-              @client.request("/users").with_json(hash.to_json).post { |hash| Com::Gilt::Apidoc::V0::Models::User.new(hash) }
+            def post(user_form)
+              HttpClient::Preconditions.assert_class('user_form', user_form, ::Com::Gilt::Apidoc::V0::Models::UserForm)
+              @client.request("/users").with_json(user_form.to_json).post { |hash| ::Com::Gilt::Apidoc::V0::Models::User.new(hash) }
             end
 
             # Updates information about the user with the specified guid.
             def put_by_guid(guid, hash)
               HttpClient::Preconditions.assert_class('guid', guid, String)
               HttpClient::Preconditions.assert_class('hash', hash, Hash)
-              @client.request("/users/#{guid}").with_json(hash.to_json).put { |hash| Com::Gilt::Apidoc::V0::Models::User.new(hash) }
+              @client.request("/users/#{guid}").with_json(hash.to_json).put { |hash| ::Com::Gilt::Apidoc::V0::Models::User.new(hash) }
             end
 
           end
@@ -545,12 +545,12 @@ module Com
           class Validations
 
             def initialize(client)
-              @client = HttpClient::Preconditions.assert_class('client', client, Com::Gilt::Apidoc::V0::Client)
+              @client = HttpClient::Preconditions.assert_class('client', client, ::Com::Gilt::Apidoc::V0::Client)
             end
 
             def post(value)
               HttpClient::Preconditions.assert_class('value', value, String)
-              @client.request("/validations").with_body(value).post { |hash| Com::Gilt::Apidoc::V0::Models::Validation.new(hash) }
+              @client.request("/validations").with_body(value).post { |hash| ::Com::Gilt::Apidoc::V0::Models::Validation.new(hash) }
             end
 
           end
@@ -558,7 +558,7 @@ module Com
           class Versions
 
             def initialize(client)
-              @client = HttpClient::Preconditions.assert_class('client', client, Com::Gilt::Apidoc::V0::Client)
+              @client = HttpClient::Preconditions.assert_class('client', client, ::Com::Gilt::Apidoc::V0::Client)
             end
 
             # Search all versions of this application. Results are always paginated.
@@ -570,7 +570,7 @@ module Com
                 :limit => HttpClient::Preconditions.assert_class_or_nil('limit', opts.delete(:limit), Integer),
                 :offset => HttpClient::Preconditions.assert_class_or_nil('offset', opts.delete(:offset), Integer)
               }.delete_if { |k, v| v.nil? }
-              @client.request("/#{CGI.escape(org_key)}/#{CGI.escape(application_key)}").with_query(query).get.map { |hash| Com::Gilt::Apidoc::V0::Models::Version.new(hash) }
+              @client.request("/#{CGI.escape(org_key)}/#{CGI.escape(application_key)}").with_query(query).get.map { |hash| ::Com::Gilt::Apidoc::V0::Models::Version.new(hash) }
             end
 
             # Retrieve a specific version of an application.
@@ -578,15 +578,15 @@ module Com
               HttpClient::Preconditions.assert_class('org_key', org_key, String)
               HttpClient::Preconditions.assert_class('application_key', application_key, String)
               HttpClient::Preconditions.assert_class('version', version, String)
-              @client.request("/#{CGI.escape(org_key)}/#{CGI.escape(application_key)}/#{CGI.escape(version)}").get { |hash| Com::Gilt::Apidoc::V0::Models::Version.new(hash) }
+              @client.request("/#{CGI.escape(org_key)}/#{CGI.escape(application_key)}/#{CGI.escape(version)}").get { |hash| ::Com::Gilt::Apidoc::V0::Models::Version.new(hash) }
             end
 
             # Create a new version for an application
             def post_by_org_key_and_version(org_key, version, version_form)
               HttpClient::Preconditions.assert_class('org_key', org_key, String)
               HttpClient::Preconditions.assert_class('version', version, String)
-              HttpClient::Preconditions.assert_class('version_form', version_form, Com::Gilt::Apidoc::V0::Models::VersionForm)
-              @client.request("/#{CGI.escape(org_key)}/#{CGI.escape(version)}").with_json(version_form.to_json).post { |hash| Com::Gilt::Apidoc::V0::Models::Version.new(hash) }
+              HttpClient::Preconditions.assert_class('version_form', version_form, ::Com::Gilt::Apidoc::V0::Models::VersionForm)
+              @client.request("/#{CGI.escape(org_key)}/#{CGI.escape(version)}").with_json(version_form.to_json).post { |hash| ::Com::Gilt::Apidoc::V0::Models::Version.new(hash) }
             end
 
             # Upsert a version of an application
@@ -594,8 +594,8 @@ module Com
               HttpClient::Preconditions.assert_class('org_key', org_key, String)
               HttpClient::Preconditions.assert_class('application_key', application_key, String)
               HttpClient::Preconditions.assert_class('version', version, String)
-              HttpClient::Preconditions.assert_class('version_form', version_form, Com::Gilt::Apidoc::V0::Models::VersionForm)
-              @client.request("/#{CGI.escape(org_key)}/#{CGI.escape(application_key)}/#{CGI.escape(version)}").with_json(version_form.to_json).put { |hash| Com::Gilt::Apidoc::V0::Models::Version.new(hash) }
+              HttpClient::Preconditions.assert_class('version_form', version_form, ::Com::Gilt::Apidoc::V0::Models::VersionForm)
+              @client.request("/#{CGI.escape(org_key)}/#{CGI.escape(application_key)}/#{CGI.escape(version)}").with_json(version_form.to_json).put { |hash| ::Com::Gilt::Apidoc::V0::Models::Version.new(hash) }
             end
 
             # Deletes a specific version.
@@ -603,7 +603,7 @@ module Com
               HttpClient::Preconditions.assert_class('org_key', org_key, String)
               HttpClient::Preconditions.assert_class('application_key', application_key, String)
               HttpClient::Preconditions.assert_class('version', version, String)
-              @client.request("/#{CGI.escape(org_key)}/#{CGI.escape(application_key)}/#{CGI.escape(version)}").delete { |hash| Com::Gilt::Apidoc::V0::Models::Value.new(hash) }
+              @client.request("/#{CGI.escape(org_key)}/#{CGI.escape(application_key)}/#{CGI.escape(version)}").delete { |hash| ::Com::Gilt::Apidoc::V0::Models::Value.new(hash) }
             end
 
           end
@@ -611,7 +611,7 @@ module Com
           class Watches
 
             def initialize(client)
-              @client = HttpClient::Preconditions.assert_class('client', client, Com::Gilt::Apidoc::V0::Client)
+              @client = HttpClient::Preconditions.assert_class('client', client, ::Com::Gilt::Apidoc::V0::Client)
             end
 
             # Search watches. Always paginated.
@@ -625,13 +625,13 @@ module Com
                 :limit => HttpClient::Preconditions.assert_class_or_nil('limit', opts.delete(:limit), Integer),
                 :offset => HttpClient::Preconditions.assert_class_or_nil('offset', opts.delete(:offset), Integer)
               }.delete_if { |k, v| v.nil? }
-              @client.request("/watches").with_query(query).get.map { |hash| Com::Gilt::Apidoc::V0::Models::Watch.new(hash) }
+              @client.request("/watches").with_query(query).get.map { |hash| ::Com::Gilt::Apidoc::V0::Models::Watch.new(hash) }
             end
 
             # Returns information about a specific watch.
             def get_by_guid(guid)
               HttpClient::Preconditions.assert_class('guid', guid, String)
-              @client.request("/watches/#{guid}").get { |hash| Com::Gilt::Apidoc::V0::Models::Watch.new(hash) }
+              @client.request("/watches/#{guid}").get { |hash| ::Com::Gilt::Apidoc::V0::Models::Watch.new(hash) }
             end
 
             # Quick check if a user is watching a specific application.
@@ -642,18 +642,18 @@ module Com
                 :organization_key => HttpClient::Preconditions.assert_class('organization_key', opts.delete(:organization_key), String),
                 :application_key => HttpClient::Preconditions.assert_class('application_key', opts.delete(:application_key), String)
               }.delete_if { |k, v| v.nil? }
-              @client.request("/watches/check").with_query(query).get { |hash| Com::Gilt::Apidoc::V0::Models::Value.new(hash) }
+              @client.request("/watches/check").with_query(query).get { |hash| ::Com::Gilt::Apidoc::V0::Models::Value.new(hash) }
             end
 
             # Create a new watch.
             def post(watch_form)
-              HttpClient::Preconditions.assert_class('watch_form', watch_form, Com::Gilt::Apidoc::V0::Models::WatchForm)
-              @client.request("/watches").with_json(watch_form.to_json).post { |hash| Com::Gilt::Apidoc::V0::Models::Watch.new(hash) }
+              HttpClient::Preconditions.assert_class('watch_form', watch_form, ::Com::Gilt::Apidoc::V0::Models::WatchForm)
+              @client.request("/watches").with_json(watch_form.to_json).post { |hash| ::Com::Gilt::Apidoc::V0::Models::Watch.new(hash) }
             end
 
             def delete_by_guid(guid)
               HttpClient::Preconditions.assert_class('guid', guid, String)
-              @client.request("/watches/#{guid}").delete { |hash| Com::Gilt::Apidoc::V0::Models::Value.new(hash) }
+              @client.request("/watches/#{guid}").delete { |hash| ::Com::Gilt::Apidoc::V0::Models::Value.new(hash) }
             end
 
           end
@@ -776,10 +776,10 @@ module Com
             def initialize(incoming={})
               opts = HttpClient::Helper.symbolize_keys(incoming)
               @guid = HttpClient::Preconditions.assert_class('guid', HttpClient::Helper.to_uuid(opts.delete(:guid)), String)
-              @organization = HttpClient::Preconditions.assert_class('organization', opts[:organization].nil? ? nil : (opts[:organization].is_a?(Com::Gilt::Apidoc::V0::Models::Reference) ? opts.delete(:organization) : Com::Gilt::Apidoc::V0::Models::Reference.new(opts.delete(:organization))), Com::Gilt::Apidoc::V0::Models::Reference)
+              @organization = HttpClient::Preconditions.assert_class('organization', opts[:organization].nil? ? nil : (opts[:organization].is_a?(::Com::Gilt::Apidoc::V0::Models::Reference) ? opts.delete(:organization) : ::Com::Gilt::Apidoc::V0::Models::Reference.new(opts.delete(:organization))), ::Com::Gilt::Apidoc::V0::Models::Reference)
               @name = HttpClient::Preconditions.assert_class('name', opts.delete(:name), String)
               @key = HttpClient::Preconditions.assert_class('key', opts.delete(:key), String)
-              @visibility = HttpClient::Preconditions.assert_class('visibility', opts[:visibility].nil? ? nil : (opts[:visibility].is_a?(Com::Gilt::Apidoc::V0::Models::Visibility) ? opts.delete(:visibility) : Com::Gilt::Apidoc::V0::Models::Visibility.apply(opts.delete(:visibility))), Com::Gilt::Apidoc::V0::Models::Visibility)
+              @visibility = HttpClient::Preconditions.assert_class('visibility', opts[:visibility].nil? ? nil : (opts[:visibility].is_a?(::Com::Gilt::Apidoc::V0::Models::Visibility) ? opts.delete(:visibility) : ::Com::Gilt::Apidoc::V0::Models::Visibility.apply(opts.delete(:visibility))), ::Com::Gilt::Apidoc::V0::Models::Visibility)
               @description = HttpClient::Preconditions.assert_class_or_nil('description', opts.delete(:description), String)
             end
 
@@ -813,7 +813,7 @@ module Com
               @name = HttpClient::Preconditions.assert_class('name', opts.delete(:name), String)
               @key = HttpClient::Preconditions.assert_class_or_nil('key', opts.delete(:key), String)
               @description = HttpClient::Preconditions.assert_class_or_nil('description', opts.delete(:description), String)
-              @visibility = HttpClient::Preconditions.assert_class('visibility', opts[:visibility].nil? ? nil : (opts[:visibility].is_a?(Com::Gilt::Apidoc::V0::Models::Visibility) ? opts.delete(:visibility) : Com::Gilt::Apidoc::V0::Models::Visibility.apply(opts.delete(:visibility))), Com::Gilt::Apidoc::V0::Models::Visibility)
+              @visibility = HttpClient::Preconditions.assert_class('visibility', opts[:visibility].nil? ? nil : (opts[:visibility].is_a?(::Com::Gilt::Apidoc::V0::Models::Visibility) ? opts.delete(:visibility) : ::Com::Gilt::Apidoc::V0::Models::Visibility.apply(opts.delete(:visibility))), ::Com::Gilt::Apidoc::V0::Models::Visibility)
             end
 
             def to_json
@@ -842,9 +842,9 @@ module Com
             def initialize(incoming={})
               opts = HttpClient::Helper.symbolize_keys(incoming)
               @created_at = HttpClient::Preconditions.assert_class('created_at', HttpClient::Helper.to_date_time_iso8601(opts.delete(:created_at)), DateTime)
-              @created_by = HttpClient::Preconditions.assert_class('created_by', opts[:created_by].nil? ? nil : (opts[:created_by].is_a?(Com::Gilt::Apidoc::V0::Models::ReferenceGuid) ? opts.delete(:created_by) : Com::Gilt::Apidoc::V0::Models::ReferenceGuid.new(opts.delete(:created_by))), Com::Gilt::Apidoc::V0::Models::ReferenceGuid)
+              @created_by = HttpClient::Preconditions.assert_class('created_by', opts[:created_by].nil? ? nil : (opts[:created_by].is_a?(::Com::Gilt::Apidoc::V0::Models::ReferenceGuid) ? opts.delete(:created_by) : ::Com::Gilt::Apidoc::V0::Models::ReferenceGuid.new(opts.delete(:created_by))), ::Com::Gilt::Apidoc::V0::Models::ReferenceGuid)
               @updated_at = HttpClient::Preconditions.assert_class('updated_at', HttpClient::Helper.to_date_time_iso8601(opts.delete(:updated_at)), DateTime)
-              @updated_by = HttpClient::Preconditions.assert_class('updated_by', opts[:updated_by].nil? ? nil : (opts[:updated_by].is_a?(Com::Gilt::Apidoc::V0::Models::ReferenceGuid) ? opts.delete(:updated_by) : Com::Gilt::Apidoc::V0::Models::ReferenceGuid.new(opts.delete(:updated_by))), Com::Gilt::Apidoc::V0::Models::ReferenceGuid)
+              @updated_by = HttpClient::Preconditions.assert_class('updated_by', opts[:updated_by].nil? ? nil : (opts[:updated_by].is_a?(::Com::Gilt::Apidoc::V0::Models::ReferenceGuid) ? opts.delete(:updated_by) : ::Com::Gilt::Apidoc::V0::Models::ReferenceGuid.new(opts.delete(:updated_by))), ::Com::Gilt::Apidoc::V0::Models::ReferenceGuid)
             end
 
             def to_json
@@ -899,7 +899,7 @@ module Com
 
             def initialize(incoming={})
               opts = HttpClient::Helper.symbolize_keys(incoming)
-              @generator = HttpClient::Preconditions.assert_class('generator', opts[:generator].nil? ? nil : (opts[:generator].is_a?(Com::Gilt::Apidoc::V0::Models::Generator) ? opts.delete(:generator) : Com::Gilt::Apidoc::V0::Models::Generator.new(opts.delete(:generator))), Com::Gilt::Apidoc::V0::Models::Generator)
+              @generator = HttpClient::Preconditions.assert_class('generator', opts[:generator].nil? ? nil : (opts[:generator].is_a?(::Com::Gilt::Apidoc::V0::Models::Generator) ? opts.delete(:generator) : ::Com::Gilt::Apidoc::V0::Models::Generator.new(opts.delete(:generator))), ::Com::Gilt::Apidoc::V0::Models::Generator)
               @source = HttpClient::Preconditions.assert_class('source', opts.delete(:source), String)
             end
 
@@ -1019,8 +1019,8 @@ module Com
               @name = HttpClient::Preconditions.assert_class('name', opts.delete(:name), String)
               @language = HttpClient::Preconditions.assert_class_or_nil('language', opts.delete(:language), String)
               @description = HttpClient::Preconditions.assert_class_or_nil('description', opts.delete(:description), String)
-              @visibility = HttpClient::Preconditions.assert_class('visibility', opts[:visibility].nil? ? nil : (opts[:visibility].is_a?(Com::Gilt::Apidoc::V0::Models::Visibility) ? opts.delete(:visibility) : Com::Gilt::Apidoc::V0::Models::Visibility.apply(opts.delete(:visibility))), Com::Gilt::Apidoc::V0::Models::Visibility)
-              @owner = HttpClient::Preconditions.assert_class('owner', opts[:owner].nil? ? nil : (opts[:owner].is_a?(Com::Gilt::Apidoc::V0::Models::User) ? opts.delete(:owner) : Com::Gilt::Apidoc::V0::Models::User.new(opts.delete(:owner))), Com::Gilt::Apidoc::V0::Models::User)
+              @visibility = HttpClient::Preconditions.assert_class('visibility', opts[:visibility].nil? ? nil : (opts[:visibility].is_a?(::Com::Gilt::Apidoc::V0::Models::Visibility) ? opts.delete(:visibility) : ::Com::Gilt::Apidoc::V0::Models::Visibility.apply(opts.delete(:visibility))), ::Com::Gilt::Apidoc::V0::Models::Visibility)
+              @owner = HttpClient::Preconditions.assert_class('owner', opts[:owner].nil? ? nil : (opts[:owner].is_a?(::Com::Gilt::Apidoc::V0::Models::User) ? opts.delete(:owner) : ::Com::Gilt::Apidoc::V0::Models::User.new(opts.delete(:owner))), ::Com::Gilt::Apidoc::V0::Models::User)
               @enabled = HttpClient::Preconditions.assert_boolean('enabled', opts.delete(:enabled))
             end
 
@@ -1057,7 +1057,7 @@ module Com
               opts = HttpClient::Helper.symbolize_keys(incoming)
               @key = HttpClient::Preconditions.assert_class('key', opts.delete(:key), String)
               @uri = HttpClient::Preconditions.assert_class('uri', opts.delete(:uri), String)
-              @visibility = HttpClient::Preconditions.assert_class('visibility', opts[:visibility].nil? ? nil : (opts[:visibility].is_a?(Com::Gilt::Apidoc::V0::Models::Visibility) ? opts.delete(:visibility) : Com::Gilt::Apidoc::V0::Models::Visibility.apply(opts.delete(:visibility))), Com::Gilt::Apidoc::V0::Models::Visibility)
+              @visibility = HttpClient::Preconditions.assert_class('visibility', opts[:visibility].nil? ? nil : (opts[:visibility].is_a?(::Com::Gilt::Apidoc::V0::Models::Visibility) ? opts.delete(:visibility) : ::Com::Gilt::Apidoc::V0::Models::Visibility.apply(opts.delete(:visibility))), ::Com::Gilt::Apidoc::V0::Models::Visibility)
             end
 
             def to_json
@@ -1111,7 +1111,7 @@ module Com
 
             def initialize(incoming={})
               opts = HttpClient::Helper.symbolize_keys(incoming)
-              @visibility = HttpClient::Preconditions.assert_class_or_nil('visibility', opts[:visibility].nil? ? nil : (opts[:visibility].is_a?(Com::Gilt::Apidoc::V0::Models::Visibility) ? opts.delete(:visibility) : Com::Gilt::Apidoc::V0::Models::Visibility.apply(opts.delete(:visibility))), Com::Gilt::Apidoc::V0::Models::Visibility)
+              @visibility = HttpClient::Preconditions.assert_class_or_nil('visibility', opts[:visibility].nil? ? nil : (opts[:visibility].is_a?(::Com::Gilt::Apidoc::V0::Models::Visibility) ? opts.delete(:visibility) : ::Com::Gilt::Apidoc::V0::Models::Visibility.apply(opts.delete(:visibility))), ::Com::Gilt::Apidoc::V0::Models::Visibility)
               @enabled = HttpClient::Preconditions.assert_boolean_or_nil('enabled', opts.delete(:enabled))
             end
 
@@ -1167,8 +1167,8 @@ module Com
             def initialize(incoming={})
               opts = HttpClient::Helper.symbolize_keys(incoming)
               @guid = HttpClient::Preconditions.assert_class('guid', HttpClient::Helper.to_uuid(opts.delete(:guid)), String)
-              @user = HttpClient::Preconditions.assert_class('user', opts[:user].nil? ? nil : (opts[:user].is_a?(Com::Gilt::Apidoc::V0::Models::User) ? opts.delete(:user) : Com::Gilt::Apidoc::V0::Models::User.new(opts.delete(:user))), Com::Gilt::Apidoc::V0::Models::User)
-              @organization = HttpClient::Preconditions.assert_class('organization', opts[:organization].nil? ? nil : (opts[:organization].is_a?(Com::Gilt::Apidoc::V0::Models::Organization) ? opts.delete(:organization) : Com::Gilt::Apidoc::V0::Models::Organization.new(opts.delete(:organization))), Com::Gilt::Apidoc::V0::Models::Organization)
+              @user = HttpClient::Preconditions.assert_class('user', opts[:user].nil? ? nil : (opts[:user].is_a?(::Com::Gilt::Apidoc::V0::Models::User) ? opts.delete(:user) : ::Com::Gilt::Apidoc::V0::Models::User.new(opts.delete(:user))), ::Com::Gilt::Apidoc::V0::Models::User)
+              @organization = HttpClient::Preconditions.assert_class('organization', opts[:organization].nil? ? nil : (opts[:organization].is_a?(::Com::Gilt::Apidoc::V0::Models::Organization) ? opts.delete(:organization) : ::Com::Gilt::Apidoc::V0::Models::Organization.new(opts.delete(:organization))), ::Com::Gilt::Apidoc::V0::Models::Organization)
               @role = HttpClient::Preconditions.assert_class('role', opts.delete(:role), String)
             end
 
@@ -1202,8 +1202,8 @@ module Com
             def initialize(incoming={})
               opts = HttpClient::Helper.symbolize_keys(incoming)
               @guid = HttpClient::Preconditions.assert_class('guid', HttpClient::Helper.to_uuid(opts.delete(:guid)), String)
-              @user = HttpClient::Preconditions.assert_class('user', opts[:user].nil? ? nil : (opts[:user].is_a?(Com::Gilt::Apidoc::V0::Models::User) ? opts.delete(:user) : Com::Gilt::Apidoc::V0::Models::User.new(opts.delete(:user))), Com::Gilt::Apidoc::V0::Models::User)
-              @organization = HttpClient::Preconditions.assert_class('organization', opts[:organization].nil? ? nil : (opts[:organization].is_a?(Com::Gilt::Apidoc::V0::Models::Organization) ? opts.delete(:organization) : Com::Gilt::Apidoc::V0::Models::Organization.new(opts.delete(:organization))), Com::Gilt::Apidoc::V0::Models::Organization)
+              @user = HttpClient::Preconditions.assert_class('user', opts[:user].nil? ? nil : (opts[:user].is_a?(::Com::Gilt::Apidoc::V0::Models::User) ? opts.delete(:user) : ::Com::Gilt::Apidoc::V0::Models::User.new(opts.delete(:user))), ::Com::Gilt::Apidoc::V0::Models::User)
+              @organization = HttpClient::Preconditions.assert_class('organization', opts[:organization].nil? ? nil : (opts[:organization].is_a?(::Com::Gilt::Apidoc::V0::Models::Organization) ? opts.delete(:organization) : ::Com::Gilt::Apidoc::V0::Models::Organization.new(opts.delete(:organization))), ::Com::Gilt::Apidoc::V0::Models::Organization)
               @role = HttpClient::Preconditions.assert_class('role', opts.delete(:role), String)
             end
 
@@ -1237,8 +1237,8 @@ module Com
               @key = HttpClient::Preconditions.assert_class('key', opts.delete(:key), String)
               @name = HttpClient::Preconditions.assert_class('name', opts.delete(:name), String)
               @namespace = HttpClient::Preconditions.assert_class('namespace', opts.delete(:namespace), String)
-              @visibility = HttpClient::Preconditions.assert_class('visibility', opts[:visibility].nil? ? nil : (opts[:visibility].is_a?(Com::Gilt::Apidoc::V0::Models::Visibility) ? opts.delete(:visibility) : Com::Gilt::Apidoc::V0::Models::Visibility.apply(opts.delete(:visibility))), Com::Gilt::Apidoc::V0::Models::Visibility)
-              @domains = (opts.delete(:domains) || []).map { |el| el.nil? ? nil : (el.is_a?(Com::Gilt::Apidoc::V0::Models::Domain) ? el : Com::Gilt::Apidoc::V0::Models::Domain.new(el)) }
+              @visibility = HttpClient::Preconditions.assert_class('visibility', opts[:visibility].nil? ? nil : (opts[:visibility].is_a?(::Com::Gilt::Apidoc::V0::Models::Visibility) ? opts.delete(:visibility) : ::Com::Gilt::Apidoc::V0::Models::Visibility.apply(opts.delete(:visibility))), ::Com::Gilt::Apidoc::V0::Models::Visibility)
+              @domains = (opts.delete(:domains) || []).map { |el| el.nil? ? nil : (el.is_a?(::Com::Gilt::Apidoc::V0::Models::Domain) ? el : ::Com::Gilt::Apidoc::V0::Models::Domain.new(el)) }
             end
 
             def to_json
@@ -1271,7 +1271,7 @@ module Com
               @name = HttpClient::Preconditions.assert_class('name', opts.delete(:name), String)
               @key = HttpClient::Preconditions.assert_class_or_nil('key', opts.delete(:key), String)
               @namespace = HttpClient::Preconditions.assert_class('namespace', opts.delete(:namespace), String)
-              @visibility = HttpClient::Preconditions.assert_class_or_nil('visibility', opts[:visibility].nil? ? nil : (opts[:visibility].is_a?(Com::Gilt::Apidoc::V0::Models::Visibility) ? opts.delete(:visibility) : Com::Gilt::Apidoc::V0::Models::Visibility.apply(opts.delete(:visibility))), Com::Gilt::Apidoc::V0::Models::Visibility)
+              @visibility = HttpClient::Preconditions.assert_class_or_nil('visibility', opts[:visibility].nil? ? nil : (opts[:visibility].is_a?(::Com::Gilt::Apidoc::V0::Models::Visibility) ? opts.delete(:visibility) : ::Com::Gilt::Apidoc::V0::Models::Visibility.apply(opts.delete(:visibility))), ::Com::Gilt::Apidoc::V0::Models::Visibility)
               @domains = (opts.delete(:domains) || []).map { |v| HttpClient::Preconditions.assert_class_or_nil('domains', v, String)}
             end
 
@@ -1437,9 +1437,9 @@ module Com
             def initialize(incoming={})
               opts = HttpClient::Helper.symbolize_keys(incoming)
               @guid = HttpClient::Preconditions.assert_class('guid', HttpClient::Helper.to_uuid(opts.delete(:guid)), String)
-              @organization = HttpClient::Preconditions.assert_class('organization', opts[:organization].nil? ? nil : (opts[:organization].is_a?(Com::Gilt::Apidoc::V0::Models::Organization) ? opts.delete(:organization) : Com::Gilt::Apidoc::V0::Models::Organization.new(opts.delete(:organization))), Com::Gilt::Apidoc::V0::Models::Organization)
-              @user = HttpClient::Preconditions.assert_class('user', opts[:user].nil? ? nil : (opts[:user].is_a?(Com::Gilt::Apidoc::V0::Models::User) ? opts.delete(:user) : Com::Gilt::Apidoc::V0::Models::User.new(opts.delete(:user))), Com::Gilt::Apidoc::V0::Models::User)
-              @publication = HttpClient::Preconditions.assert_class('publication', opts[:publication].nil? ? nil : (opts[:publication].is_a?(Com::Gilt::Apidoc::V0::Models::Publication) ? opts.delete(:publication) : Com::Gilt::Apidoc::V0::Models::Publication.apply(opts.delete(:publication))), Com::Gilt::Apidoc::V0::Models::Publication)
+              @organization = HttpClient::Preconditions.assert_class('organization', opts[:organization].nil? ? nil : (opts[:organization].is_a?(::Com::Gilt::Apidoc::V0::Models::Organization) ? opts.delete(:organization) : ::Com::Gilt::Apidoc::V0::Models::Organization.new(opts.delete(:organization))), ::Com::Gilt::Apidoc::V0::Models::Organization)
+              @user = HttpClient::Preconditions.assert_class('user', opts[:user].nil? ? nil : (opts[:user].is_a?(::Com::Gilt::Apidoc::V0::Models::User) ? opts.delete(:user) : ::Com::Gilt::Apidoc::V0::Models::User.new(opts.delete(:user))), ::Com::Gilt::Apidoc::V0::Models::User)
+              @publication = HttpClient::Preconditions.assert_class('publication', opts[:publication].nil? ? nil : (opts[:publication].is_a?(::Com::Gilt::Apidoc::V0::Models::Publication) ? opts.delete(:publication) : ::Com::Gilt::Apidoc::V0::Models::Publication.apply(opts.delete(:publication))), ::Com::Gilt::Apidoc::V0::Models::Publication)
             end
 
             def to_json
@@ -1469,7 +1469,7 @@ module Com
               opts = HttpClient::Helper.symbolize_keys(incoming)
               @organization_key = HttpClient::Preconditions.assert_class('organization_key', opts.delete(:organization_key), String)
               @user_guid = HttpClient::Preconditions.assert_class('user_guid', HttpClient::Helper.to_uuid(opts.delete(:user_guid)), String)
-              @publication = HttpClient::Preconditions.assert_class('publication', opts[:publication].nil? ? nil : (opts[:publication].is_a?(Com::Gilt::Apidoc::V0::Models::Publication) ? opts.delete(:publication) : Com::Gilt::Apidoc::V0::Models::Publication.apply(opts.delete(:publication))), Com::Gilt::Apidoc::V0::Models::Publication)
+              @publication = HttpClient::Preconditions.assert_class('publication', opts[:publication].nil? ? nil : (opts[:publication].is_a?(::Com::Gilt::Apidoc::V0::Models::Publication) ? opts.delete(:publication) : ::Com::Gilt::Apidoc::V0::Models::Publication.apply(opts.delete(:publication))), ::Com::Gilt::Apidoc::V0::Models::Publication)
             end
 
             def to_json
@@ -1498,10 +1498,10 @@ module Com
             def initialize(incoming={})
               opts = HttpClient::Helper.symbolize_keys(incoming)
               @guid = HttpClient::Preconditions.assert_class('guid', HttpClient::Helper.to_uuid(opts.delete(:guid)), String)
-              @user = HttpClient::Preconditions.assert_class('user', opts[:user].nil? ? nil : (opts[:user].is_a?(Com::Gilt::Apidoc::V0::Models::User) ? opts.delete(:user) : Com::Gilt::Apidoc::V0::Models::User.new(opts.delete(:user))), Com::Gilt::Apidoc::V0::Models::User)
+              @user = HttpClient::Preconditions.assert_class('user', opts[:user].nil? ? nil : (opts[:user].is_a?(::Com::Gilt::Apidoc::V0::Models::User) ? opts.delete(:user) : ::Com::Gilt::Apidoc::V0::Models::User.new(opts.delete(:user))), ::Com::Gilt::Apidoc::V0::Models::User)
               @masked_token = HttpClient::Preconditions.assert_class('masked_token', opts.delete(:masked_token), String)
               @description = HttpClient::Preconditions.assert_class_or_nil('description', opts.delete(:description), String)
-              @audit = HttpClient::Preconditions.assert_class('audit', opts[:audit].nil? ? nil : (opts[:audit].is_a?(Com::Gilt::Apidoc::V0::Models::Audit) ? opts.delete(:audit) : Com::Gilt::Apidoc::V0::Models::Audit.new(opts.delete(:audit))), Com::Gilt::Apidoc::V0::Models::Audit)
+              @audit = HttpClient::Preconditions.assert_class('audit', opts[:audit].nil? ? nil : (opts[:audit].is_a?(::Com::Gilt::Apidoc::V0::Models::Audit) ? opts.delete(:audit) : ::Com::Gilt::Apidoc::V0::Models::Audit.new(opts.delete(:audit))), ::Com::Gilt::Apidoc::V0::Models::Audit)
             end
 
             def to_json
@@ -1581,6 +1581,35 @@ module Com
 
           end
 
+          class UserForm
+
+            attr_reader :email, :password, :name
+
+            def initialize(incoming={})
+              opts = HttpClient::Helper.symbolize_keys(incoming)
+              @email = HttpClient::Preconditions.assert_class('email', opts.delete(:email), String)
+              @password = HttpClient::Preconditions.assert_class('password', opts.delete(:password), String)
+              @name = HttpClient::Preconditions.assert_class_or_nil('name', opts.delete(:name), String)
+            end
+
+            def to_json
+              JSON.dump(to_hash)
+            end
+
+            def copy(incoming={})
+              UserForm.new(to_hash.merge(HttpClient::Helper.symbolize_keys(incoming)))
+            end
+
+            def to_hash
+              {
+                :email => email,
+                :password => password,
+                :name => name
+              }
+            end
+
+          end
+
           # Used only to validate json files - used as a resource where http status code
           # defines success
           class Validation
@@ -1618,11 +1647,11 @@ module Com
             def initialize(incoming={})
               opts = HttpClient::Helper.symbolize_keys(incoming)
               @guid = HttpClient::Preconditions.assert_class('guid', HttpClient::Helper.to_uuid(opts.delete(:guid)), String)
-              @organization = HttpClient::Preconditions.assert_class('organization', opts[:organization].nil? ? nil : (opts[:organization].is_a?(Com::Gilt::Apidoc::V0::Models::Reference) ? opts.delete(:organization) : Com::Gilt::Apidoc::V0::Models::Reference.new(opts.delete(:organization))), Com::Gilt::Apidoc::V0::Models::Reference)
-              @application = HttpClient::Preconditions.assert_class('application', opts[:application].nil? ? nil : (opts[:application].is_a?(Com::Gilt::Apidoc::V0::Models::Reference) ? opts.delete(:application) : Com::Gilt::Apidoc::V0::Models::Reference.new(opts.delete(:application))), Com::Gilt::Apidoc::V0::Models::Reference)
+              @organization = HttpClient::Preconditions.assert_class('organization', opts[:organization].nil? ? nil : (opts[:organization].is_a?(::Com::Gilt::Apidoc::V0::Models::Reference) ? opts.delete(:organization) : ::Com::Gilt::Apidoc::V0::Models::Reference.new(opts.delete(:organization))), ::Com::Gilt::Apidoc::V0::Models::Reference)
+              @application = HttpClient::Preconditions.assert_class('application', opts[:application].nil? ? nil : (opts[:application].is_a?(::Com::Gilt::Apidoc::V0::Models::Reference) ? opts.delete(:application) : ::Com::Gilt::Apidoc::V0::Models::Reference.new(opts.delete(:application))), ::Com::Gilt::Apidoc::V0::Models::Reference)
               @version = HttpClient::Preconditions.assert_class('version', opts.delete(:version), String)
               @original = HttpClient::Preconditions.assert_class('original', opts.delete(:original), String)
-              @service = HttpClient::Preconditions.assert_class('service', opts[:service].nil? ? nil : (opts[:service].is_a?(Com::Gilt::Apidoc::Spec::V0::Models::Service) ? opts.delete(:service) : Com::Gilt::Apidoc::Spec::V0::Models::Service.new(opts.delete(:service))), Com::Gilt::Apidoc::Spec::V0::Models::Service)
+              @service = HttpClient::Preconditions.assert_class('service', opts[:service].nil? ? nil : (opts[:service].is_a?(::Com::Gilt::Apidoc::Spec::V0::Models::Service) ? opts.delete(:service) : ::Com::Gilt::Apidoc::Spec::V0::Models::Service.new(opts.delete(:service))), ::Com::Gilt::Apidoc::Spec::V0::Models::Service)
             end
 
             def to_json
@@ -1653,7 +1682,7 @@ module Com
             def initialize(incoming={})
               opts = HttpClient::Helper.symbolize_keys(incoming)
               @service_form = HttpClient::Preconditions.assert_class('service_form', opts.delete(:service_form), String)
-              @visibility = HttpClient::Preconditions.assert_class_or_nil('visibility', opts[:visibility].nil? ? nil : (opts[:visibility].is_a?(Com::Gilt::Apidoc::V0::Models::Visibility) ? opts.delete(:visibility) : Com::Gilt::Apidoc::V0::Models::Visibility.apply(opts.delete(:visibility))), Com::Gilt::Apidoc::V0::Models::Visibility)
+              @visibility = HttpClient::Preconditions.assert_class_or_nil('visibility', opts[:visibility].nil? ? nil : (opts[:visibility].is_a?(::Com::Gilt::Apidoc::V0::Models::Visibility) ? opts.delete(:visibility) : ::Com::Gilt::Apidoc::V0::Models::Visibility.apply(opts.delete(:visibility))), ::Com::Gilt::Apidoc::V0::Models::Visibility)
             end
 
             def to_json
@@ -1682,9 +1711,9 @@ module Com
             def initialize(incoming={})
               opts = HttpClient::Helper.symbolize_keys(incoming)
               @guid = HttpClient::Preconditions.assert_class('guid', HttpClient::Helper.to_uuid(opts.delete(:guid)), String)
-              @user = HttpClient::Preconditions.assert_class('user', opts[:user].nil? ? nil : (opts[:user].is_a?(Com::Gilt::Apidoc::V0::Models::User) ? opts.delete(:user) : Com::Gilt::Apidoc::V0::Models::User.new(opts.delete(:user))), Com::Gilt::Apidoc::V0::Models::User)
-              @organization = HttpClient::Preconditions.assert_class('organization', opts[:organization].nil? ? nil : (opts[:organization].is_a?(Com::Gilt::Apidoc::V0::Models::Organization) ? opts.delete(:organization) : Com::Gilt::Apidoc::V0::Models::Organization.new(opts.delete(:organization))), Com::Gilt::Apidoc::V0::Models::Organization)
-              @application = HttpClient::Preconditions.assert_class('application', opts[:application].nil? ? nil : (opts[:application].is_a?(Com::Gilt::Apidoc::V0::Models::Application) ? opts.delete(:application) : Com::Gilt::Apidoc::V0::Models::Application.new(opts.delete(:application))), Com::Gilt::Apidoc::V0::Models::Application)
+              @user = HttpClient::Preconditions.assert_class('user', opts[:user].nil? ? nil : (opts[:user].is_a?(::Com::Gilt::Apidoc::V0::Models::User) ? opts.delete(:user) : ::Com::Gilt::Apidoc::V0::Models::User.new(opts.delete(:user))), ::Com::Gilt::Apidoc::V0::Models::User)
+              @organization = HttpClient::Preconditions.assert_class('organization', opts[:organization].nil? ? nil : (opts[:organization].is_a?(::Com::Gilt::Apidoc::V0::Models::Organization) ? opts.delete(:organization) : ::Com::Gilt::Apidoc::V0::Models::Organization.new(opts.delete(:organization))), ::Com::Gilt::Apidoc::V0::Models::Organization)
+              @application = HttpClient::Preconditions.assert_class('application', opts[:application].nil? ? nil : (opts[:application].is_a?(::Com::Gilt::Apidoc::V0::Models::Application) ? opts.delete(:application) : ::Com::Gilt::Apidoc::V0::Models::Application.new(opts.delete(:application))), ::Com::Gilt::Apidoc::V0::Models::Application)
             end
 
             def to_json
