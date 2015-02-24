@@ -19,13 +19,10 @@ module ApidocCli
             raise "File[#{@path}] Missing version for org[#{org_key}] project[#{project_name}]"
           end
 
-          generators = data['generators'].map do |name_target|
-            # Hash has one element
-            name = name_target.keys.first
-            target = name_target[name]
+          generators = data['generators'].map do |name, target|
             Generator.new(name, target)
           end
-          project = Project.new(org_key, project_name, generators)
+          project = Project.new(org_key, project_name, version, generators)
         end
       end.flatten
 
@@ -45,11 +42,12 @@ module ApidocCli
 
     class Project
 
-      attr_reader :org, :name, :generators
+      attr_reader :org, :name, :version, :generators
 
-      def initialize(org, name, generators)
+      def initialize(org, name, version, generators)
         @org = Preconditions.assert_class(org, String)
         @name = Preconditions.assert_class(name, String)
+        @version = Preconditions.assert_class(version, String)
         @generators = Preconditions.assert_class(generators, Array)
         Preconditions.check_state(!generators.empty?, "Must have at least one generator")
         Preconditions.assert_class(generators.first, Generator)

@@ -3,8 +3,8 @@ code:
     apidoc:
       version: latest
       generators:
-        - ruby_client: lib/apidoc-cli/com_gilt_apidoc_v0_client.rb
+        ruby_client: lib/apidoc-cli/com_gilt_apidoc_v0_client.rb
     apidoc-spec:
       version: latest
       generators:
-        - ruby_client: lib/apidoc-cli/com_gilt_apidoc_spec_v0_client.rb
+        ruby_client: lib/apidoc-cli/com_gilt_apidoc_spec_v0_client.rb

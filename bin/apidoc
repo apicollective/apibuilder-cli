@@ -152,7 +152,6 @@ elsif command == "update"
   end
 
   target_dir = File.dirname(path)
-  version = "latest"
 
   updates = []
   puts "Fetching code from #{ApidocCli::Env::APIDOC_API_URI}"
@@ -162,16 +161,26 @@ elsif command == "update"
   app_config.code.projects.map do |project|
     project.generators.each do |generator|
       target_path = File.join(target_dir, generator.target)
-      print "  - #{project.org}/#{project.name}/#{version}/#{generator.name}... "
-      code = client.code.get_by_org_key_and_application_key_and_version_and_generator_key(project.org, project.name, "latest", generator.name)
-      source = code.source.strip
+      print "  - #{project.org}/#{project.name}/#{project.version}/#{generator.name} ... "
 
-      existing_source = File.exists?(target_path) ? IO.read(target_path).strip : ""
-      if source == existing_source
-        puts "unchanged"
-      else
-        puts "changed"
-        updates << { :source => source, :generator => generator.name, :target => target_path }
+      begin
+        code = client.code.get_by_org_key_and_application_key_and_version_and_generator_key(project.org, project.name, project.version, generator.name)
+        source = code.source.strip
+
+        existing_source = File.exists?(target_path) ? IO.read(target_path).strip : ""
+        if source == existing_source
+          puts "unchanged"
+        else
+          puts "changed"
+          updates << { :source => source, :generator => generator.name, :target => target_path }
+        end
+      rescue Com::Gilt::Apidoc::V0::HttpClient::ServerError => e
+        if e.code == 404
+          puts "not found"
+        else
+          puts ""
+          raise e
+        end
       end
     end
   end

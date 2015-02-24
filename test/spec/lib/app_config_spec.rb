@@ -17,9 +17,10 @@ describe ApidocCli::AppConfig do
     it "constructor" do
       generators = [ApidocCli::AppConfig::Generator.new("ruby_client", "/tmp/client.rb")]
 
-      project = ApidocCli::AppConfig::Project.new("gilt", "apidoc", generators)
+      project = ApidocCli::AppConfig::Project.new("gilt", "apidoc", "0.1.2", generators)
       expect(project.org).to eq("gilt")
       expect(project.name).to eq("apidoc")
+      expect(project.version).to eq("0.1.2")
       expect(project.generators.map(&:name)).to eq(["ruby_client"])
     end
 
@@ -34,22 +35,22 @@ code:
     apidoc:
       version: latest
       generators:
-        - play_2_3_client: generated/app/ApidocClient.scala
-        - play_2_x_routes: api/conf/routes
+        play_2_3_client: generated/app/ApidocClient.scala
+        play_2_x_routes: api/conf/routes
     apidoc-spec:
       version: latest
       generators:
-        - play_2_3_client: generated/app/ApidocSpec.scala
+        play_2_3_client: generated/app/ApidocSpec.scala
     apidoc-generator:
       version: latest
       generators:
-        - play_2_3_client: generated/app/ApidocGenerator.scala
+        play_2_3_client: generated/app/ApidocGenerator.scala
 
   foo:
     bar:
-      version: latest
+      version: 0.0.1
       generators:
-        - ruby_client: /tmp/client.rb
+        ruby_client: /tmp/client.rb
       """.strip)
     end
 
@@ -60,11 +61,13 @@ code:
       apidoc = app_config.code.projects.find { |p| p.name == "apidoc" }
       expect(apidoc.org).to eq("gilt")
       expect(apidoc.name).to eq("apidoc")
+      expect(apidoc.version).to eq("latest")
       expect(apidoc.generators.map(&:name).sort).to eq(["play_2_3_client", "play_2_x_routes"])
 
       bar = app_config.code.projects.find { |p| p.name == "bar" }
       expect(bar.org).to eq("foo")
       expect(bar.name).to eq("bar")
+      expect(bar.version).to eq("0.0.1")
       expect(bar.generators.map(&:name).sort).to eq(["ruby_client"])
     end
 
