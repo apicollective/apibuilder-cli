@@ -46,15 +46,22 @@ env = {
 
 config = ApidocCli::Config.new
 profile_config = env[:profile] ? config.profile(env[:profile]) : config.default_profile
+
+if profile_config.nil? && env[:profile]
+  puts ""
+  puts "ERROR: Profile[#{env[:profile]}] not found in #{ApidocCli::Config::DEFAULT_PATH}"
+  puts ""
+  exit(1)
+end
+
 auth = if profile_config && profile_config.token
          Com::Gilt::Apidoc::V0::HttpClient::Authorization.basic(profile_config.token)
        else
          nil
        end
 
-
-
-client = Com::Gilt::Apidoc::V0::Client.new(profile_config.api_uri, :authorization => auth)
+api_uri = profile_config ? profile_config.api_uri : ApidocCli::Config::DEFAULT_API_URI
+client = Com::Gilt::Apidoc::V0::Client.new(api_uri, :authorization => auth)
 
 command = ARGV.shift.to_s.strip
 
@@ -75,6 +82,19 @@ if command == "list"
     else
       client.applications.get_by_org_key(org, :limit => env[:limit], :offset => env[:offset]).each do |app|
         puts app.key
+      end
+    end
+
+  elsif resource == "versions"
+    org = ARGV.shift.to_s.strip
+    application = ARGV.shift.to_s.strip
+
+    if org == "" || application == ""
+      puts "organization and application are required"
+      exit(1)
+    else
+      client.versions.get_by_org_key_and_application_key(org, application, :limit => env[:limit], :offset => env[:offset]).each do |v|
+        puts v.version
       end
     end
 
@@ -122,11 +142,11 @@ elsif command == "upload"
   if version == ""
     default_version = `git describe`.strip
 
-    print "What version would you like to use?"
+    print "Version"
     if default_version != ""
-      print " Defaults to #{default_version}"
+      print " [#{default_version}]"
     end
-    puts ""
+    print ": "
 
     version = nil
     while version.nil?
@@ -157,7 +177,7 @@ elsif command == "upload"
     end
   end
 
-  print "Uploading #{path} to #{profile_config.api_uri}/#{org}/#{application}/#{version} ... "
+  print "Uploading #{path} to #{api_uri}/#{org}/#{application}/#{version} ... "
   begin
     client.versions.put_by_org_key_and_application_key_and_version(org, application, version, form)
     puts "success"
@@ -184,7 +204,7 @@ elsif command == "update"
   target_dir = File.dirname(path)
 
   updates = []
-  puts "Fetching code from #{profile_config.api_uri}"
+  puts "Fetching code from #{api_uri}"
 
   app_config = ApidocCli::AppConfig.new(:path => path)
 

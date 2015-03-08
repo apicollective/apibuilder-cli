@@ -1,42 +1,23 @@
 # apidoc-cli
 Command line interface to apidoc
 
-# Configuration File
+# Setup for public APIs
 
-The apidoc configuration file is modeled after the AWS configuration
-file and hopefully is both familiar and obvious.
+No setup needed - just use the apidoc command directly (see below)
 
-The file itself should be placed in ~/.apidoc/config
+# Setup for private APIs
 
-If you are accessing non public applications in apidoc, you will first need to create [an API token](http://www.apidoc.me/tokens/).
+1. [Create a token](http://www.apidoc.me/tokens/) for your user account
 
-To generate a configuration file:
-
-    bin/generate-config --profile <profile name> --token <token>
-
-Example:
-
-    bin/generate-config --profile gilt --token abc123
-
-Example File:
+2. Create a configuration file in ~/.apidoc/config
+   Example File:
 
     [default]
-    profile = gilt
-
-    [profile gilt]
     token = abc123
 
-    [profile localhost]
-    api_uri = http://localhost:9001
-    token = bar
-
-To verify that your configuration file is valid:
+3. Verify that your configuration file is valid:
 
     bin/read-config
-
-or
-
-    bin/read-config --path <path to config file>
 
 # Commands
 
@@ -49,6 +30,10 @@ List all organizations that you have access to:
 List all applications that belong to a specific organization:
 
     bin/apidoc list applications <organization key>
+
+List all versions of a particular application
+
+    bin/apidoc list versions <organization key> <application key>
     
 Note since the GET requests in apidoc are paginated, you might need to
 paginate. Where pagination is required, we use two environment
@@ -109,6 +94,3 @@ Example File:
 
     PROFILE: Select a specific profile to use, read from the .apidoc
              configuration file
-
-
-

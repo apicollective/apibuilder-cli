@@ -3,7 +3,6 @@ module ApidocCli
 
   class Config
 
-    DEFAULT_PROFILE = "default" unless defined?(DEFAULT_PROFILE)
     DEFAULT_PATH = "~/.apidoc/config" unless defined?(DEFAULT_PATH)
     DEFAULT_API_URI = "http://api.apidoc.me" unless defined?(DEFAULT_API_URI)
 
@@ -11,8 +10,6 @@ module ApidocCli
       @path = Preconditions.assert_class(opts.delete(:path) || File.expand_path(DEFAULT_PATH), String)
       Preconditions.check_state(File.exists?(@path), "Apidoc CLI config file[#{@path}] not found")
 
-      reading = nil
-      @default = nil
       @profiles = []
 
       IO.readlines(@path).each_with_index do |line, i|
@@ -27,35 +24,24 @@ module ApidocCli
           value = parts[1].to_s.strip
           reading = key
 
-          if key == "default"
-            Preconditions.check_state(value == "", "%s:%s value attribute[%s] not supported for key default" % [@path, i+1, value])
-            @default = Default.new
-
-          elsif key == "profile"
+          if key == "profile"
             Preconditions.check_state(value != "", "%s:%s profile attribute missing name" % [@path, i+1])
             Preconditions.check_state(profile(value).nil?, "%s:%s duplicate profile[%s]" % [@path, i+1, value])
-            @profiles << Profile.new(value)
-
-          else
+          elsif key != "default"
             raise "%s:%s unknown configuration key[%s]" % [@path, i+1, key]
           end
+
+          profile_name = (key == "default") ? "default" : value
+          @profiles << Profile.new(profile_name)
 
         else
           name, value = stripped.split(/\s*=\s*/, 2).map(&:strip)
 
           if name != "" && value != ""
-            if reading == "default"
-              @default.add(name, value)
-            elsif reading == "profile"
-              @profiles[-1].add(name, value)
-            end
+            @profiles[-1].add(name, value)
           end
         end
 
-      end
-
-      if @default && profile(@default.profile).nil?
-        raise "Default profile[#{@default.profile}] is not defined"
       end
     end
 
@@ -70,11 +56,7 @@ module ApidocCli
     end
 
     def default_profile
-      if @default
-        profile(@default.profile)
-      else
-        nil
-      end
+      profile("default")
     end
 
   end
@@ -122,7 +104,7 @@ module ApidocCli
     end
 
     def api_uri
-      @data[:api_uri] || DEFAULT_API_URI
+      @data[:api_uri] || ApidocCli::Config::DEFAULT_API_URI
     end
 
   end

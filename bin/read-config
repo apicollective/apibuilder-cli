@@ -3,7 +3,7 @@
 # Used to read a config file, primarily to test that the file is well formed
 #
 # read-config [--path path]
-#   path: defaults to ~/.apidoc-cli/config
+#   path: defaults to ~/.apidoc/config
 #
 
 load File.join(File.dirname(__FILE__), 'apidoc-cli-config')
@@ -15,21 +15,11 @@ path = File.expand_path(args[:path] || ApidocCli::Config::DEFAULT_PATH)
 if File.exists?(path)
   config = ApidocCli::Config.new(:path => path)
 
-  puts "Default:"
-  if d = config.default
-    puts "  profile: #{d.profile}"
-  else
-    puts "  profile: none"
-  end
-
   config.profiles.each do |profile|
     puts ""
     puts "Profile #{profile.name}:"
-    if profile.token
-      puts "  token: " + ApidocCli::Util.mask(profile.token)
-    else
-      puts "  token: none"
-    end
+    puts "  api_uri: " + profile.api_uri
+    puts "    token: " + (profile.token ? ApidocCli::Util.mask(profile.token) : "none")
   end
 
 else
