@@ -12,12 +12,12 @@ No setup needed - just use the apidoc command directly (see below)
 2. Create a configuration file in ~/.apidoc/config
    Example File:
 
-    [default]
-    token = abc123
+        [default]
+        token = <your API token>
 
 3. Verify that your configuration file is valid:
 
-    bin/read-config
+        bin/read-config
 
 # Commands
 
@@ -55,11 +55,11 @@ To view a list of available generators visit [apidoc.me/generators](http://www.a
 
 ## update
 
-Invoke code generator based on configuration from a yaml file.
+Invoke code generator based on configuration from a yaml configuration file
 
     bin/apidoc update [--path path]
     
-path defaults to .apidoc in the current directory.
+        path defaults to .apidoc in the current directory.
 
 The configuration file is a YAML file that follows the convention:
 
