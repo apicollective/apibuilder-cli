@@ -5,6 +5,7 @@ module ApidocCli
 
     DEFAULT_PROFILE = "default" unless defined?(DEFAULT_PROFILE)
     DEFAULT_PATH = "~/.apidoc/config" unless defined?(DEFAULT_PATH)
+    DEFAULT_API_URI = "http://api.apidoc.me" unless defined?(DEFAULT_API_URI)
 
     def initialize(opts={})
       @path = Preconditions.assert_class(opts.delete(:path) || File.expand_path(DEFAULT_PATH), String)
@@ -100,7 +101,7 @@ module ApidocCli
 
   class Profile
 
-    attr_reader :name
+    attr_reader :name, :api_uri
 
     def initialize(name)
       @name = Preconditions.assert_class(name, String)
@@ -118,6 +119,10 @@ module ApidocCli
 
     def token
       @data[:token]
+    end
+
+    def api_uri
+      @data[:api_uri] || DEFAULT_API_URI
     end
 
   end

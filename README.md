@@ -26,7 +26,8 @@ Example File:
     [profile gilt]
     token = abc123
 
-    [profile foo]
+    [profile localhost]
+    api_uri = http://localhost:9001
     token = bar
 
 To verify that your configuration file is valid:
@@ -106,7 +107,8 @@ Example File:
     
 # Environment Variables
 
-    APIDOC_API_URI: Change the URI of the apidoc REST API
+    PROFILE: Select a specific profile to use, read from the .apidoc
+             configuration file
 
 
 

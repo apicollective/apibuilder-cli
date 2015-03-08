@@ -7,7 +7,6 @@
 #  PROFILE=gilt apidoc-cli <command> <arguments>
 #
 # Environment variables:
-#    APIDOC_API_URI: The URI of the apidoc api. Defaults to http://api.apidoc.me
 #    PROFILE: will default to the 'default' specified in your configuration file
 #
 # The arguments vary by the command
@@ -53,7 +52,9 @@ auth = if profile_config && profile_config.token
          nil
        end
 
-client = Com::Gilt::Apidoc::V0::Client.new(ApidocCli::Env::APIDOC_API_URI, :authorization => auth)
+
+
+client = Com::Gilt::Apidoc::V0::Client.new(profile_config.api_uri, :authorization => auth)
 
 command = ARGV.shift.to_s.strip
 
@@ -126,6 +127,8 @@ elsif command == "upload"
     end
   end
 
+  puts version
+  exit(1)
   form = Com::Gilt::Apidoc::V0::Models::VersionForm.new(:service_form => IO.read(path))
 
   # TODO: Upload want to upload this version if it is different from
@@ -144,7 +147,7 @@ elsif command == "upload"
     end
   end
 
-  print "Uploading #{path} to #{ApidocCli::Env::APIDOC_API_URI}/#{org}/#{application}/#{version} ... "
+  print "Uploading #{path} to #{profile_config.api_uri}/#{org}/#{application}/#{version} ... "
   begin
     client.versions.put_by_org_key_and_application_key_and_version(org, application, version, form)
     puts "success"
@@ -171,7 +174,7 @@ elsif command == "update"
   target_dir = File.dirname(path)
 
   updates = []
-  puts "Fetching code from #{ApidocCli::Env::APIDOC_API_URI}"
+  puts "Fetching code from #{profile_config.api_uri}"
 
   app_config = ApidocCli::AppConfig.new(:path => path)
 
