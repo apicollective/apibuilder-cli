@@ -120,15 +120,25 @@ elsif command == "upload"
   end
 
   if version == ""
-    version = `git describe`.strip
-    if version == ""
-      puts "version is required (note: future versions may automatically default the version)"
-      exit(1)
+    default_version = `git describe`.strip
+
+    print "What version would you like to use?"
+    if default_version != ""
+      print " Defaults to #{default_version}"
+    end
+    puts ""
+
+    version = nil
+    while version.nil?
+      answer = gets
+      if answer.strip == "" && default_version != ""
+        version = default_version
+      else
+        version = answer
+      end
     end
   end
 
-  puts version
-  exit(1)
   form = Com::Gilt::Apidoc::V0::Models::VersionForm.new(:service_form => IO.read(path))
 
   # TODO: Upload want to upload this version if it is different from
