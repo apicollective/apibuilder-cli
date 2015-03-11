@@ -25,7 +25,7 @@
 #  - Returns the code for gilt/apidoc version 'latest' using the
 #    codegenerator 'scala_models'
 #
-# apidoc-cli upload api/api.json gilt apidoc [--version 1.5.0-dev]
+# apidoc-cli upload gilt apidoc api/api.json [--version 1.5.0-dev]
 #  - Uploads the file api/api.json to the gilt org, apidoc application.
 #    The uploaded file will be the specified version, defaulting to
 #    the output from git describe.
@@ -130,7 +130,7 @@ elsif command == "upload"
   version = args[:version].to_s.strip
 
   if org == "" || application == "" || path == ""
-    puts "path, org, and application are required"
+    puts "org, application, path are required"
     exit(1)
   end
 
