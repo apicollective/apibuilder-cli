@@ -18,9 +18,16 @@ module ApidocCli
         if md = arg.match(/^\-\-(.+)/)
           name = md[1].to_s.strip
           value = values[index+1].to_s.strip
-          index += 1
-          if value != ""
-            args[name.to_sym] = value
+
+          if value.match(/^\-\-(.+)/)
+            args[name.to_sym] = nil
+          else
+            index += 1
+            if value == ""
+              args[name.to_sym] = nil
+            else
+              args[name.to_sym] = value
+            end
           end
         end
         index += 1
