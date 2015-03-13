@@ -159,7 +159,8 @@ elsif command == "upload"
     end
   end
 
-  form = Com::Gilt::Apidoc::V0::Models::VersionForm.new(:service_form => IO.read(path))
+  original_form = Com::Gilt::Apidoc::V0::Models::OriginalForm.new(:data => IO.read(path))
+  form = Com::Gilt::Apidoc::V0::Models::VersionForm.new(:original_form => original_form)
 
   # TODO: Upload want to upload this version if it is different from
   # the last uploaded version. should be able to download 'latest'
