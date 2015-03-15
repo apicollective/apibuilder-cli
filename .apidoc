@@ -1,9 +1,9 @@
 code:
   gilt:
-    apidoc:
+    apidoc-api:
       version: latest
       generators:
-        ruby_client: lib/apidoc-cli/com_gilt_apidoc_v0_client.rb
+        ruby_client: lib/apidoc-cli/com_gilt_apidoc_api_v0_client.rb
     apidoc-spec:
       version: latest
       generators:
