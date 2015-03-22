@@ -21,6 +21,11 @@
 #  - Pagination is implemented with environment variables LIMIT and OFFSET. Example:
 #    LIMIT=10 OFFSET=0 apidoc-cli list applications gilt
 #
+# apidoc-cli list versions gilt apidoc
+#  - Returns a list of all of the versions for the specific org and application.
+#  - Pagination is implemented with environment variables LIMIT and OFFSET. Example:
+#    LIMIT=10 OFFSET=0 apidoc-cli list applications gilt
+#
 # apidoc-cli code gilt apidoc latest scala_models
 #  - Returns the code for gilt/apidoc version 'latest' using the
 #    codegenerator 'scala_models'
@@ -150,11 +155,11 @@ elsif command == "upload"
 
     version = nil
     while version.nil?
-      answer = gets
+      answer = $stdin.gets
       if answer.strip == "" && default_version != ""
         version = default_version
       else
-        version = answer
+        version = answer.strip
       end
     end
   end
