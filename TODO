@@ -1,13 +1,3 @@
-Add an .apidoc configuration file that keeps track of which code we want where
+Check for updates of apidoc-cli itself:
 
-Possible format:
-
-apidoc:
-  ruby_client: client-tests/ruby_client.rb
-  ruby_client: client-tests/ruby_client.rb
-  play_2_3_client: generated/app/ApidocClient.scala
-  play_2_x_routes: api/conf/routes
-apidoc-spec:
-  play_2_3_client: generated/app/ApidocSpec.scala
-apidoc-generator:
-  play_2_3_client: generated/app/ApidocGenerator.scala
+  curl "https://api.github.com/repos/gilt/apidoc-cli/tags"
