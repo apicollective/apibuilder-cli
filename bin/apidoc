@@ -49,24 +49,7 @@ env = {
   :offset => ApidocCli::Util.read_non_empty_integer(ENV['OFFSET'])
 }
 
-config = ApidocCli::Config.new
-profile_config = env[:profile] ? config.profile(env[:profile]) : config.default_profile
-
-if profile_config.nil? && env[:profile]
-  puts ""
-  puts "ERROR: Profile[#{env[:profile]}] not found in #{ApidocCli::Config::DEFAULT_PATH}"
-  puts ""
-  exit(1)
-end
-
-auth = if profile_config && profile_config.token
-         Com::Gilt::Apidoc::Api::V0::HttpClient::Authorization.basic(profile_config.token)
-       else
-         nil
-       end
-
-api_uri = profile_config ? profile_config.api_uri : ApidocCli::Config::DEFAULT_API_URI
-client = Com::Gilt::Apidoc::Api::V0::Client.new(api_uri, :authorization => auth)
+client = ApidocCli::Config.client_from_profile(:profile => env[:profile])
 
 command = ARGV.shift.to_s.strip
 
@@ -183,7 +166,7 @@ elsif command == "upload"
     end
   end
 
-  print "Uploading #{path} to #{api_uri}/#{org}/#{application}/#{version} ... "
+  print "Uploading #{path} to #{client.uri}/#{org}/#{application}/#{version} ... "
   begin
     client.versions.put_by_org_key_and_application_key_and_version(org, application, version, form)
     puts "success"
@@ -210,7 +193,7 @@ elsif command == "update"
   target_dir = File.dirname(path)
 
   updates = []
-  puts "Fetching code from #{api_uri}"
+  puts "Fetching code from #{client.uri}"
 
   app_config = ApidocCli::AppConfig.new(:path => path)
 

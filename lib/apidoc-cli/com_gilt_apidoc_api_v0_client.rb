@@ -30,6 +30,8 @@ module Com
 
             end
 
+            attr_reader :url
+
             def initialize(url, opts={})
               @url = HttpClient::Preconditions.assert_class('url', url, String)
               @authorization = HttpClient::Preconditions.assert_class_or_nil('authorization', opts.delete(:authorization), HttpClient::Authorization)

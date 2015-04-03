@@ -5,6 +5,30 @@ module ApidocCli
 
     DEFAULT_PATH = "~/.apidoc/config" unless defined?(DEFAULT_PATH)
     DEFAULT_API_URI = "http://api.apidoc.me" unless defined?(DEFAULT_API_URI)
+    DEFAULT_PROFILE_NAME = "default"
+
+    def Config.client_from_profile(opts={})
+      profile = Preconditions.assert_class_or_nil(opts.delete(:profile), String) || "default"
+      Preconditions.assert_empty_opts(opts)
+
+      config = ApidocCli::Config.new
+      profile_config = profile ? config.profile(profile) : config.default_profile
+
+      if profile_config.nil? && profile
+        raise "Profile[#{profile}] not found in #{config.path}"
+      end
+
+      auth = if profile_config && profile_config.token
+         Com::Gilt::Apidoc::Api::V0::HttpClient::Authorization.basic(profile_config.token)
+       else
+         nil
+       end
+
+      api_uri = profile_config ? profile_config.api_uri : DEFAULT_API_URI
+      Com::Gilt::Apidoc::Api::V0::Client.new(api_uri, :authorization => auth)
+    end
+
+    attr_reader :path
 
     def initialize(opts={})
       @path = Preconditions.assert_class(opts.delete(:path) || File.expand_path(DEFAULT_PATH), String)
@@ -56,7 +80,7 @@ module ApidocCli
     end
 
     def default_profile
-      profile("default")
+      profile(DEFAULT_PROFILE_NAME)
     end
 
   end
