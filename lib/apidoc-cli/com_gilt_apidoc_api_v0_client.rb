@@ -2070,27 +2070,32 @@ module Com
               end
 
               def http_request(request)
-                response = new_http_client.request(request)
+                response = begin
+                             new_http_client.request(request)
+                           rescue SocketError => e
+                             raise Exception.new("Error accessing uri[#{@uri}]: #{e}", e)
+                           end
 
                 case response
                 when Net::HTTPSuccess
                   response.body
                 else
                   body = response.body rescue nil
-                  raise HttpClient::ServerError.new(response.code.to_i, response.message, :body => body)
+                  raise HttpClient::ServerError.new(response.code.to_i, response.message, :body => body, :uri => @uri)
                 end
               end
             end
 
             class ServerError < StandardError
 
-              attr_reader :code, :details, :body
+              attr_reader :code, :details, :body, :uri
 
               def initialize(code, details, incoming={})
                 opts = HttpClient::Helper.symbolize_keys(incoming)
                 @code = HttpClient::Preconditions.assert_class('code', code, Integer)
                 @details = HttpClient::Preconditions.assert_class('details', details, String)
                 @body = HttpClient::Preconditions.assert_class_or_nil('body', opts.delete(:body), String)
+                @uri = HttpClient::Preconditions.assert_class_or_nil('uri', opts.delete(:uri), String)
                 HttpClient::Preconditions.assert_empty_opts(opts)
                 super(self.message)
               end
