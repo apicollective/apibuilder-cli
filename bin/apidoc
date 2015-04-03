@@ -193,7 +193,7 @@ elsif command == "update"
   target_dir = File.dirname(path)
 
   updates = []
-  puts "Fetching code from #{client.uri}"
+  puts "Fetching code from #{client.url}"
 
   app_config = ApidocCli::AppConfig.new(:path => path)
 
