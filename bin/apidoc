@@ -166,7 +166,7 @@ elsif command == "upload"
     end
   end
 
-  print "Uploading #{path} to #{client.uri}/#{org}/#{application}/#{version} ... "
+  print "Uploading #{path} to #{client.url}/#{org}/#{application}/#{version} ... "
   begin
     client.versions.put_by_org_key_and_application_key_and_version(org, application, version, form)
     puts "success"
