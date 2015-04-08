@@ -106,8 +106,18 @@ elsif command == "code"
     exit(1)
   end
 
-  code = client.code.get_by_org_key_and_application_key_and_version_and_generator_key(org, application, version, generator)
-  puts code.source
+  begin
+    code = client.code.get_by_org_key_and_application_key_and_version_and_generator_key(org, application, version, generator)
+    puts code.source
+  rescue Com::Gilt::Apidoc::Api::V0::HttpClient::ServerError => e
+    if e.code == 404
+      $stderr.puts "  ERROR: 404 when accessing URI: #{e.uri}"
+    elsif e.code == 409
+      $stderr.puts "  ERROR: 409: " + e.details
+    else
+      raise e
+    end
+  end
 
 elsif command == "upload"
   org = ARGV.shift.to_s.strip
