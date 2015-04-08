@@ -134,6 +134,7 @@ module Com
                 query = {
                   :name => HttpClient::Preconditions.assert_class_or_nil('name', opts.delete(:name), String),
                   :key => HttpClient::Preconditions.assert_class_or_nil('key', opts.delete(:key), String),
+                  :has_version => HttpClient::Preconditions.assert_boolean_or_nil('has_version', opts.delete(:has_version)),
                   :limit => HttpClient::Preconditions.assert_class('limit', opts.delete(:limit) || 25, Integer),
                   :offset => HttpClient::Preconditions.assert_class('offset', opts.delete(:offset) || 0, Integer)
                 }.delete_if { |k, v| v.nil? }
@@ -831,7 +832,7 @@ module Com
             # An application has a name and multiple versions of its API.
             class Application
 
-              attr_reader :guid, :organization, :name, :key, :has_version, :visibility, :description
+              attr_reader :guid, :organization, :name, :key, :visibility, :description
 
               def initialize(incoming={})
                 opts = HttpClient::Helper.symbolize_keys(incoming)
@@ -839,7 +840,6 @@ module Com
                 @organization = HttpClient::Preconditions.assert_class('organization', opts[:organization].nil? ? nil : (opts[:organization].is_a?(::Com::Gilt::Apidoc::Api::V0::Models::Reference) ? opts.delete(:organization) : ::Com::Gilt::Apidoc::Api::V0::Models::Reference.new(opts.delete(:organization))), ::Com::Gilt::Apidoc::Api::V0::Models::Reference)
                 @name = HttpClient::Preconditions.assert_class('name', opts.delete(:name), String)
                 @key = HttpClient::Preconditions.assert_class('key', opts.delete(:key), String)
-                @has_version = HttpClient::Preconditions.assert_boolean_or_nil('has_version', opts.delete(:has_version))
                 @visibility = HttpClient::Preconditions.assert_class('visibility', opts[:visibility].nil? ? nil : (opts[:visibility].is_a?(::Com::Gilt::Apidoc::Api::V0::Models::Visibility) ? opts.delete(:visibility) : ::Com::Gilt::Apidoc::Api::V0::Models::Visibility.apply(opts.delete(:visibility))), ::Com::Gilt::Apidoc::Api::V0::Models::Visibility)
                 @description = HttpClient::Preconditions.assert_class_or_nil('description', opts.delete(:description), String)
               end
@@ -858,7 +858,6 @@ module Com
                   :organization => organization.nil? ? nil : organization.to_hash,
                   :name => name,
                   :key => key,
-                  :has_version => has_version,
                   :visibility => visibility.nil? ? nil : visibility.value,
                   :description => description
                 }

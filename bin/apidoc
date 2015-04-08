@@ -19,7 +19,7 @@
 # apidoc-cli list applications gilt
 #  - Returns a list of the applications for the organization gilt
 #  - Pagination is implemented with environment variables LIMIT and OFFSET. Example:
-#    LIMIT=10 OFFSET=0 apidoc-cli list applications gilt
+#    HAS_VERSION=t LIMIT=10 OFFSET=0 apidoc-cli list applications gilt
 #
 # apidoc-cli list versions gilt apidoc
 #  - Returns a list of all of the versions for the specific org and application.
@@ -46,7 +46,8 @@ load File.join(File.dirname(__FILE__), 'apidoc-cli-config')
 env = {
   :profile => ApidocCli::Util.read_non_empty_string(ENV['PROFILE']),
   :limit => ApidocCli::Util.read_non_empty_integer(ENV['LIMIT']),
-  :offset => ApidocCli::Util.read_non_empty_integer(ENV['OFFSET'])
+  :offset => ApidocCli::Util.read_non_empty_integer(ENV['OFFSET']),
+  :has_version => ApidocCli::Util.read_non_empty_string(ENV['HAS_VERSION'])
 }
 
 client = ApidocCli::Config.client_from_profile(:profile => env[:profile])
@@ -68,7 +69,11 @@ if command == "list"
       puts "organization is required"
       exit(1)
     else
-      client.applications.get_by_org_key(org, :limit => env[:limit], :offset => env[:offset]).each do |app|
+      client.applications.get_by_org_key(org,
+                                         :limit => env[:limit],
+                                         :offset => env[:offset],
+                                         :has_version => Com::Gilt::Apidoc::Api::V0::HttpClient::Helper.to_boolean('has_version', env[:has_version])
+                                         ).each do |app|
         puts app.key
       end
     end
