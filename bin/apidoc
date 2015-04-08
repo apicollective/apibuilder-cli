@@ -118,7 +118,8 @@ elsif command == "code"
     if e.code == 404
       $stderr.puts "  ERROR: 404 when accessing URI: #{e.uri}"
     elsif e.code == 409
-      $stderr.puts "  ERROR: 409: " + e.details
+      errors = JSON.parse(e.body).map { |h| h["message"] }.join(", ")
+      $stderr.puts "  ERROR: 409: " + errors
     else
       raise e
     end
