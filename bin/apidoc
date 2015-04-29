@@ -3,39 +3,39 @@
 # CLI to apidoc
 #
 # Usage:
-#  apidoc-cli <command> <arguments>
-#  PROFILE=gilt apidoc-cli <command> <arguments>
+#  apidoc <command> <arguments>
+#  PROFILE=gilt apidoc <command> <arguments>
 #
 # Environment variables:
 #    PROFILE: will default to the 'default' specified in your configuration file
 #
 # The arguments vary by the command
 #
-# apidoc-cli list organizations
+# apidoc list organizations
 #  - Returns a list of all of the organizations that you have access to
 #  - Pagination is implemented with environment variables LIMIT and OFFSET. Example:
-#    LIMIT=10 OFFSET=0 apidoc-cli list organizations
+#    LIMIT=10 OFFSET=0 apidoc list organizations
 #
-# apidoc-cli list applications gilt
+# apidoc list applications gilt
 #  - Returns a list of the applications for the organization gilt
 #  - Pagination is implemented with environment variables LIMIT and OFFSET. Example:
-#    HAS_VERSION=t LIMIT=10 OFFSET=0 apidoc-cli list applications gilt
+#    HAS_VERSION=t LIMIT=10 OFFSET=0 apidoc list applications gilt
 #
-# apidoc-cli list versions gilt apidoc
+# apidoc list versions gilt apidoc
 #  - Returns a list of all of the versions for the specific org and application.
 #  - Pagination is implemented with environment variables LIMIT and OFFSET. Example:
-#    LIMIT=10 OFFSET=0 apidoc-cli list applications gilt
+#    LIMIT=10 OFFSET=0 apidoc list applications gilt
 #
-# apidoc-cli code gilt apidoc latest scala_models
+# apidoc code gilt apidoc latest scala_models
 #  - Returns the code for gilt/apidoc version 'latest' using the
 #    codegenerator 'scala_models'
 #
-# apidoc-cli upload gilt apidoc api/api.json [--version 1.5.0-dev]
+# apidoc upload gilt apidoc api/api.json [--version 1.5.0-dev]
 #  - Uploads the file api/api.json to the gilt org, apidoc application.
 #    The uploaded file will be the specified version, defaulting to
 #    the output from git describe.
 #
-# apidoc-cli update [--path path]
+# apidoc update [--path path]
 #  - Reads a config file, optionally specified by path
 #    parameter. Invokes the apidoc code generators specified in the
 #    configuration file.
