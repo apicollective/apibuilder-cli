@@ -43,12 +43,18 @@ end
 ApidocCli::Preconditions.check_state(found, "Failed to update #{version_path}")
 
 puts "Update version in #{version_path}"
-File.open(version_path, "w") { |out| out << new_version }
+File.open(version_path, "w") { |out| out << new_contents }
 
-ApidocCli::Library.system_or_error("git commit -m 'autocommit: Update version to %s' %s" % version_path)
+def system_or_error(cmd)
+  if !cmd
+    raise "Error running command: #{cmd}"
+  end
+end
+
+system_or_error("git commit -m 'autocommit: Update version to %s' %s" % version_path)
 
 puts "Creating git tag[%s]" % new_version
-ApidocCli::Library.system_or_error("git tag -a -m '%s' %s" % [new_version, new_version])
+system_or_error("git tag -a -m '%s' %s" % [new_version, new_version])
 
 puts "Release tag[%s] created. Need to:" % new_version
 puts "  git push origin"
