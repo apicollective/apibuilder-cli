@@ -9,6 +9,23 @@ module ApidocCli
       "#{VERSION}"
     end
 
+    def Version.latest
+      url = 'https://api.github.com/repos/gilt/apidoc-cli/tags?per_page=1'
+      version = if result = `curl --silent "#{url}"`.strip
+                  if hash = JSON.parse(result).first
+                    if hash.is_a?(Hash)
+                      hash['name']
+                    end
+                  end
+                end
+
+      if version
+        version
+      else
+        raise "ERROR: Failed to fetch version version from URI: #{url}\n#{result}"
+      end
+    end
+
   end
 
 end

@@ -90,6 +90,20 @@ Example File:
           generators:
             play_2_3_client: generated/app/ApidocGenerator.scala
     
+## cli itself
+
+Display the current version of the CLI.
+
+    bin/apidoc cli version
+
+Display the latest available version of the CLI.
+
+    bin/apidoc cli latest
+
+Upgrade to the latest version
+
+    bin/apidoc cli upgrade
+
 # Environment Variables
 
     PROFILE: Select a specific profile to use, read from the .apidoc

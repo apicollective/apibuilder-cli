@@ -40,6 +40,15 @@
 #    parameter. Invokes the apidoc code generators specified in the
 #    configuration file.
 #
+# apidoc cli version
+#  - Displays the current version of the CLI
+#
+# apidoc cli version latest
+#  - Displays the latest available version of the CLI
+#
+# apidoc cli upgrade
+#  - Upgrade the CLI to the latest version
+#
 
 load File.join(File.dirname(__FILE__), 'apidoc-cli-config')
 
@@ -247,6 +256,34 @@ elsif command == "update"
       puts " - #{data[:generator]} => #{data[:target]}"
       ApidocCli::Util.write_to_file(data[:target], data[:source])
     end
+  end
+
+elsif command == "cli"
+  subcommand = ARGV.shift.to_s.strip
+
+  if subcommand == "version"
+    puts ApidocCli::Version.current
+
+  elsif subcommand == "latest"
+    puts ApidocCli::Version.latest
+
+  elsif subcommand == "upgrade"
+    current = ApidocCli::Version.current
+    latest = ApidocCli::Version.latest
+    if current == latest
+      puts "you already have the latest version[#{current}] installed"
+    else
+      ["git fetch", "git checkout #{latest}"].each do |cmd|
+        puts cmd
+        `#{cmd}`
+      end
+
+      puts "apidoc-cli upgraded to latest version"
+    end
+
+  else
+    puts "cli subcommand is required"
+    exit(1)
   end
 
 elsif command == ""
