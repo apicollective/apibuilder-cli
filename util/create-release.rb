@@ -46,12 +46,12 @@ puts "Update version in #{version_path}"
 File.open(version_path, "w") { |out| out << new_contents }
 
 def system_or_error(cmd)
-  if !cmd
+  if !system(cmd)
     raise "Error running command: #{cmd}"
   end
 end
 
-system_or_error("git commit -m 'autocommit: Update version to %s' %s" % version_path)
+system_or_error("git commit -m 'autocommit: Update version to %s' %s" % [new_version, version_path])
 
 puts "Creating git tag[%s]" % new_version
 system_or_error("git tag -a -m '%s' %s" % [new_version, new_version])

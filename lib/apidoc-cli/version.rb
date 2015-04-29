@@ -2,7 +2,7 @@ module ApidocCli
 
   module Version
 
-    VERSION = '0.0.1' # Updated automatically by util/create-release.rb
+    VERSION = '0.0.2' # Automatically updated by util/create-release.rb
 
     # Writes contents to a temp file, returning the path
     def Version.current
