@@ -1,0 +1,3 @@
+config file:
+  - parse out leading/trailing single and double quotes
+  - catch invalid keys (e.g. api_url instead of api_uri)
