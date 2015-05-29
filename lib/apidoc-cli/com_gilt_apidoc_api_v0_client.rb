@@ -1180,9 +1180,9 @@ module Com
 
               def initialize(incoming={})
                 opts = HttpClient::Helper.symbolize_keys(incoming)
-                @created_at = HttpClient::Preconditions.assert_class('created_at', HttpClient::Helper.to_date_time_iso8601(opts.delete(:created_at)), String)
+                @created_at = HttpClient::Preconditions.assert_class('created_at', HttpClient::Helper.to_date_time_iso8601(opts.delete(:created_at)), DateTime)
                 @created_by = (x = opts.delete(:created_by); x.is_a?(::Com::Gilt::Apidoc::Api::V0::Models::ReferenceGuid) ? x : ::Com::Gilt::Apidoc::Api::V0::Models::ReferenceGuid.new(x))
-                @updated_at = HttpClient::Preconditions.assert_class('updated_at', HttpClient::Helper.to_date_time_iso8601(opts.delete(:updated_at)), String)
+                @updated_at = HttpClient::Preconditions.assert_class('updated_at', HttpClient::Helper.to_date_time_iso8601(opts.delete(:updated_at)), DateTime)
                 @updated_by = (x = opts.delete(:updated_by); x.is_a?(::Com::Gilt::Apidoc::Api::V0::Models::ReferenceGuid) ? x : ::Com::Gilt::Apidoc::Api::V0::Models::ReferenceGuid.new(x))
               end
 
@@ -1218,7 +1218,7 @@ module Com
                 @from_version = (x = opts.delete(:from_version); x.is_a?(::Com::Gilt::Apidoc::Api::V0::Models::ChangeVersion) ? x : ::Com::Gilt::Apidoc::Api::V0::Models::ChangeVersion.new(x))
                 @to_version = (x = opts.delete(:to_version); x.is_a?(::Com::Gilt::Apidoc::Api::V0::Models::ChangeVersion) ? x : ::Com::Gilt::Apidoc::Api::V0::Models::ChangeVersion.new(x))
                 @diff = (x = opts.delete(:diff); x.is_a?(::Com::Gilt::Apidoc::Api::V0::Models::Diff) ? x : ::Com::Gilt::Apidoc::Api::V0::Models::Diff.from_json(x))
-                @changed_at = HttpClient::Preconditions.assert_class('changed_at', HttpClient::Helper.to_date_time_iso8601(opts.delete(:changed_at)), String)
+                @changed_at = HttpClient::Preconditions.assert_class('changed_at', HttpClient::Helper.to_date_time_iso8601(opts.delete(:changed_at)), DateTime)
                 @changed_by = (x = opts.delete(:changed_by); x.is_a?(::Com::Gilt::Apidoc::Api::V0::Models::UserSummary) ? x : ::Com::Gilt::Apidoc::Api::V0::Models::UserSummary.new(x))
                 @audit = (x = opts.delete(:audit); x.is_a?(::Com::Gilt::Apidoc::Api::V0::Models::Audit) ? x : ::Com::Gilt::Apidoc::Api::V0::Models::Audit.new(x))
               end
