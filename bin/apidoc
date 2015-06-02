@@ -153,7 +153,7 @@ elsif command == "upload"
   end
 
   if version == ""
-    default_version = `git describe`.strip
+    default_version = `git describe`.strip.sub(/\-.+/, '-dev')
 
     print "Version"
     if default_version != ""
