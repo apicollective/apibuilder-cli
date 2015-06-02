@@ -175,22 +175,6 @@ elsif command == "upload"
   original_form = Com::Gilt::Apidoc::Api::V0::Models::OriginalForm.new(:data => IO.read(path))
   form = Com::Gilt::Apidoc::Api::V0::Models::VersionForm.new(:original_form => original_form)
 
-  # TODO: Upload want to upload this version if it is different from
-  # the last uploaded version. should be able to download 'latest'
-  # version and do a string compare to "original" attribute.
-  begin
-    existing = client.versions.get_by_org_key_and_application_key_and_version(org, application, "latest")
-    tmp = "/tmp/foo.json"
-    ApidocCli::Util.write_to_file(tmp, existing.original)
-    puts "Wrote original to #{tmp}" # TODO: Test if same somehow
-  rescue Com::Gilt::Apidoc::Api::V0::HttpClient::ServerError => e
-    if e.code == 404
-      # We don't have any versions
-    else
-      raise e
-    end
-  end
-
   print "Uploading #{path} to #{client.url}/#{org}/#{application}/#{version} ... "
   begin
     client.versions.put_by_org_key_and_application_key_and_version(org, application, version, form)
