@@ -153,7 +153,10 @@ elsif command == "upload"
   end
 
   if version == ""
-    default_version = `git describe`.strip.sub(/\-.+/, '-dev')
+    default_version = `git describe`.strip
+    if md = default_version.match(/(\w?\d+\.\d+)\.(\d+)\-.+/)
+      default_version = "%s.%s-dev" % [md[1], md[2].to_i + 1]
+    end
 
     print "Version"
     if default_version != ""
