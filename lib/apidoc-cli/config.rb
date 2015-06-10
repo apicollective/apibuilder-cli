@@ -19,13 +19,13 @@ module ApidocCli
       end
 
       auth = if profile_config && profile_config.token
-         Com::Gilt::Apidoc::Api::V0::HttpClient::Authorization.basic(profile_config.token)
+         Com::Bryzek::Apidoc::Api::V0::HttpClient::Authorization.basic(profile_config.token)
        else
          nil
        end
 
       api_uri = profile_config ? profile_config.api_uri : DEFAULT_API_URI
-      Com::Gilt::Apidoc::Api::V0::Client.new(api_uri, :authorization => auth)
+      Com::Bryzek::Apidoc::Api::V0::Client.new(api_uri, :authorization => auth)
     end
 
     attr_reader :path

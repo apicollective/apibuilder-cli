@@ -17,8 +17,8 @@ describe ApidocCli::AppConfig do
     it "constructor" do
       generators = [ApidocCli::AppConfig::Generator.new("ruby_client", "/tmp/client.rb")]
 
-      project = ApidocCli::AppConfig::Project.new("gilt", "apidoc", "0.1.2", generators)
-      expect(project.org).to eq("gilt")
+      project = ApidocCli::AppConfig::Project.new("bryzek", "apidoc", "0.1.2", generators)
+      expect(project.org).to eq("bryzek")
       expect(project.name).to eq("apidoc")
       expect(project.version).to eq("0.1.2")
       expect(project.generators.map(&:name)).to eq(["ruby_client"])
@@ -31,7 +31,7 @@ describe ApidocCli::AppConfig do
     before do
       @sample_file = ApidocCli::Util.write_to_temp_file("""
 code:
-  gilt:
+  bryzek:
     apidoc:
       version: latest
       generators:
@@ -59,7 +59,7 @@ code:
       expect(app_config.code.projects.map(&:name).sort).to eq(["apidoc", "apidoc-generator", "apidoc-spec", "bar"])
 
       apidoc = app_config.code.projects.find { |p| p.name == "apidoc" }
-      expect(apidoc.org).to eq("gilt")
+      expect(apidoc.org).to eq("bryzek")
       expect(apidoc.name).to eq("apidoc")
       expect(apidoc.version).to eq("latest")
       expect(apidoc.generators.map(&:name).sort).to eq(["play_2_3_client", "play_2_x_routes"])

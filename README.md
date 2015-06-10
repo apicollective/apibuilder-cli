@@ -49,7 +49,7 @@ Invoke a code generator from the command line
     
 For example, to generate a play 2.3 client for the latest version of apidoc itself:
 
-    bin/apidoc code gilt apidoc latest play_2_3_client
+    bin/apidoc code bryzek apidoc latest play_2_3_client
     
 To view a list of available generators visit [apidoc.me/generators](http://www.apidoc.me/generators)
 
@@ -75,7 +75,7 @@ The configuration file is a YAML file that follows the convention:
 Example File:
 
     code:
-      gilt:
+      bryzek:
         apidoc:
           version: latest
           generators:
