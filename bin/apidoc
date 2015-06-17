@@ -122,7 +122,7 @@ elsif command == "code"
 
   begin
     code = client.code.get_by_org_key_and_application_key_and_version_and_generator_key(org, application, version, generator)
-    puts code.source
+    puts code.source.strip
   rescue Com::Bryzek::Apidoc::Api::V0::HttpClient::ServerError => e
     if e.code == 404
       $stderr.puts "  ERROR: 404 when accessing URI: #{e.uri}"

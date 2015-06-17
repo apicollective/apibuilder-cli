@@ -1314,12 +1314,13 @@ module Com
             # Generated source code.
             class Code
 
-              attr_reader :generator, :source
+              attr_reader :generator, :source, :files
 
               def initialize(incoming={})
                 opts = HttpClient::Helper.symbolize_keys(incoming)
                 @generator = (x = opts.delete(:generator); x.is_a?(::Com::Bryzek::Apidoc::Generator::V0::Models::Generator) ? x : ::Com::Bryzek::Apidoc::Generator::V0::Models::Generator.new(x))
                 @source = HttpClient::Preconditions.assert_class('source', opts.delete(:source), String)
+                @files = HttpClient::Preconditions.assert_class('files', (x = opts.delete(:files); x.nil? ? [] : x), Array).map { |v| (x = v; x.is_a?(::Com::Bryzek::Apidoc::Generator::V0::Models::File) ? x : ::Com::Bryzek::Apidoc::Generator::V0::Models::File.new(x)) }
               end
 
               def to_json
@@ -1333,7 +1334,8 @@ module Com
               def to_hash
                 {
                   :generator => generator.to_hash,
-                  :source => source
+                  :source => source,
+                  :files => files.map { |o| o.to_hash }
                 }
               end
 
