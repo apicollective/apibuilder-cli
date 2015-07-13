@@ -45,12 +45,20 @@ variables: LIMIT, OFFSET
 
 Invoke a code generator from the command line
 
-    bin/apidoc <organization key> <application key> <version> <generator>
+    bin/apidoc <organization key> <application key> <version> <generator> [<filename>]
     
 For example, to generate a play 2.3 client for the latest version of apidoc itself:
 
-    bin/apidoc code bryzek apidoc latest play_2_3_client
+    bin/apidoc code bryzek apidoc-api latest play_2_3_client
+
+Each code generator returns a list of files. To download a specific file:
+
+    bin/apidoc code bryzek apidoc-api latest play_2_3_client <filename>
     
+For example:
+
+    bin/apidoc code bryzek apidoc-api latest play_2_3_client BryzekApidocApiClient.scala
+
 To view a list of available generators visit [apidoc.me/generators](http://www.apidoc.me/generators)
 
 ## update

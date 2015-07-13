@@ -114,6 +114,10 @@ elsif command == "code"
   application = ARGV.shift.to_s.strip
   version = ARGV.shift.to_s.strip
   generator = ARGV.shift.to_s.strip
+  filename = ARGV.shift.to_s.strip
+  if filename == ""
+    filename = nil
+  end
 
   if org == "" || application == "" || version == "" || generator == ""
     puts "org, application, version, and generator are required"
@@ -122,7 +126,19 @@ elsif command == "code"
 
   begin
     code = client.code.get_by_org_key_and_application_key_and_version_and_generator_key(org, application, version, generator)
-    puts code.source.strip
+    if filename
+      if file = code.files.find { |f| f.name == filename }
+        puts file.contents
+      else
+        $stderr.puts "  ERROR: Could not find file named #{filename} for generator[#{generator}]. Available filenames: #{code.files.map(&:name).join(", ")}"
+      end
+    else
+      puts "#{generator} Files:"
+      code.files.each do |f|
+        puts " - #{f.name}"
+      end
+    end
+
   rescue Com::Bryzek::Apidoc::Api::V0::HttpClient::ServerError => e
     if e.code == 404
       $stderr.puts "  ERROR: 404 when accessing URI: #{e.uri}"
