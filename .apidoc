@@ -3,12 +3,12 @@ code:
     apidoc-api:
       version: latest
       generators:
-        ruby_client: lib/apidoc-cli/com_bryzek_apidoc_api_v0_client.rb
+        ruby_client: lib/apidoc-cli
     apidoc-generator:
       version: latest
       generators:
-        ruby_client: lib/apidoc-cli/com_bryzek_apidoc_generator_v0_client.rb
+        ruby_client: lib/apidoc-cli
     apidoc-spec:
       version: latest
       generators:
-        ruby_client: lib/apidoc-cli/com_bryzek_apidoc_spec_v0_client.rb
+        ruby_client: lib/apidoc-cli

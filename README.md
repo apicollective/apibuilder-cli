@@ -76,9 +76,9 @@ The configuration file is a YAML file that follows the convention:
         project:
           version: <version>
           generators:
-            <generator name 1>: <path>
-            <generator name 2>: <path>
-            <generator name 3>: <path>
+            <generator name 1>: <path to directory or specific filename>
+            <generator name 2>: <path to directory or specific filename>
+            <generator name 3>: <path to directory or specific filename>
 
 Example File:
 
@@ -87,16 +87,16 @@ Example File:
         apidoc:
           version: latest
           generators:
-            play_2_3_client: generated/app/ApidocClient.scala
+            play_2_3_client: generated/app
             play_2_x_routes: api/conf/routes
         apidoc-spec:
           version: latest
           generators:
-            play_2_3_client: generated/app/ApidocSpec.scala
+            play_2_3_client: generated/app
         apidoc-generator:
           version: latest
           generators:
-            play_2_3_client: generated/app/ApidocGenerator.scala
+            play_2_3_client: generated/app
     
 ## cli itself
 

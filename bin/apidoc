@@ -227,19 +227,19 @@ elsif command == "update"
 
   app_config.code.projects.map do |project|
     project.generators.each do |generator|
-      target_path = File.join(target_dir, generator.target)
       print "  - #{project.org}/#{project.name}/#{project.version}/#{generator.name} ... "
+      base_target_path = File.join(target_dir, generator.target)
 
       begin
-        code = client.code.get_by_org_key_and_application_key_and_version_and_generator_key(project.org, project.name, project.version, generator.name)
-        source = code.source.strip
-
-        existing_source = File.exists?(target_path) ? IO.read(target_path).strip : ""
-        if source == existing_source
-          puts "unchanged"
-        else
-          puts "changed"
-          updates << { :source => source, :generator => generator.name, :target => target_path }
+        client.code.get_by_org_key_and_application_key_and_version_and_generator_key(project.org, project.name, project.version, generator.name).files.each do |file|
+          target_path = File.directory?(base_target_path) ? File.join(base_target_path, file.name) : base_target_path
+          existing_source = File.exists?(target_path) ? IO.read(target_path).strip : ""
+          if file.contents.strip == existing_source.strip
+            puts "unchanged"
+          else
+            puts "changed"
+            updates << { :source => file.contents, :generator => generator.name, :target => target_path }
+          end
         end
       rescue Com::Bryzek::Apidoc::Api::V0::HttpClient::ServerError => e
         if e.code == 404

@@ -59,6 +59,10 @@ module ApidocCli
 
       attr_reader :name, :target
 
+      # @param target The name of a file path or a
+      # directory. Preferred usage is a directory, but paths are
+      # supported based on the initial version of the configuration
+      # files.
       def initialize(name, target)
         @name = Preconditions.assert_class(name, String)
         @target = Preconditions.assert_class(target, String)
