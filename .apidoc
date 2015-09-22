@@ -1,5 +1,9 @@
 code:
   bryzek:
+    apidoc-common:
+      version: latest
+      generators:
+        ruby_client: lib/apidoc-cli
     apidoc-api:
       version: latest
       generators:
