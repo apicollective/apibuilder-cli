@@ -4,10 +4,16 @@ describe ApidocCli::AppConfig do
 
   describe ApidocCli::AppConfig::Generator do
 
-    it "constructor" do
+    it "constructor for a single file" do
       g = ApidocCli::AppConfig::Generator.new("ruby_client", "/tmp/client.rb")
       expect(g.name).to eq("ruby_client")
-      expect(g.target).to eq("/tmp/client.rb")
+      expect(g.targets).to eq(["/tmp/client.rb"])
+    end
+
+    it "constructor for multiple files" do
+      g = ApidocCli::AppConfig::Generator.new("ruby_client", ["/tmp/client.rb", "/tmp/bar"])
+      expect(g.name).to eq("ruby_client")
+      expect(g.targets).to eq(["/tmp/client.rb", "/tmp/bar"])
     end
 
   end

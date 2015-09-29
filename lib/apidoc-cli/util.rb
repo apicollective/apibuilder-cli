@@ -10,6 +10,7 @@ module ApidocCli
 
     # Writes contents to the file at the specified path, returning the path
     def Util.write_to_file(path, contents)
+      Preconditions.assert_class(path, String)
       File.open(path, "w") do |out|
         out << contents
       end

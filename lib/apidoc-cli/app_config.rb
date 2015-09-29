@@ -57,7 +57,7 @@ module ApidocCli
 
     class Generator
 
-      attr_reader :name, :target
+      attr_reader :name, :targets
 
       # @param target The name of a file path or a
       # directory. Preferred usage is a directory, but paths are
@@ -65,7 +65,13 @@ module ApidocCli
       # files.
       def initialize(name, target)
         @name = Preconditions.assert_class(name, String)
-        @target = Preconditions.assert_class(target, String)
+        if target.is_a?(Array)
+          Preconditions.assert_class(target.first, String)
+          @targets = target
+        else
+          Preconditions.assert_class(target, String)
+          @targets = [target]
+        end
       end
 
     end
