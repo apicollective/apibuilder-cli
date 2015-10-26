@@ -8,7 +8,7 @@ module ApidocCli
     DEFAULT_PROFILE_NAME = "default"
 
     def Config.client_from_profile(opts={})
-      profile = Preconditions.assert_class_or_nil(opts.delete(:profile), String) || "default"
+      profile = Preconditions.assert_class_or_nil(opts.delete(:profile), String)
       Preconditions.assert_empty_opts(opts)
 
       config = ApidocCli::Config.new
