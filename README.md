@@ -97,6 +97,17 @@ Example File:
           version: latest
           generators:
             play_2_3_client: generated/app
+
+Apidoc generated sources can specify destination directories. To place files in apidoc sepecified directories use "..." at the end of your path. 
+
+    <generator>: ...           # root dir
+    <generator>: [path]/...    # sub dir
+
+Example:
+
+    app_config: ...       # Destination: config/app.conf (as defined by the app_config generator)
+    app_src: src/...      # Destination: src/com/github/some/project/Filename.scala (as defined by the app_src generator)
+    app_test: test/...    # Destination: test/com/github/some/project/FilenameTest.scala (as defined by the app_test generator)
     
 ## cli itself
 
