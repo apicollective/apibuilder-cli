@@ -236,10 +236,18 @@ elsif command == "update"
 
         begin
           client.code.get_by_org_key_and_application_key_and_version_and_generator_key(project.org, project.name, project.version, generator.name).files.each do |file|
+
+            # ... at the end of path signifies that the path sepecified is the root and directories from apidoc will be used.
+            # Example  <generator>: some/path/...
+            # Files will be put in "some/path/<directories-from-apidoc>"
+            if base_target_path.end_with? "..."
+              base_target_path = File.join(base_target_path.gsub("...", ""), file.dir)
+            end
+
             # check if target path ends with the filename - if not, this is a directory target and need to check if dir exists
             # for example: "play_2_x_routes: api/conf/routes" is a file
             # while "anorm_2_x_parsers: api/app/generated" should be a directory we check if exists
-            Dir.mkdir(base_target_path) unless base_target_path.include?(file.name) || Dir.exists?(base_target_path)
+            FileUtils.mkdir_p(base_target_path) unless base_target_path.include?(file.name) || Dir.exists?(base_target_path)
 
             target_path = File.directory?(base_target_path) ? File.join(base_target_path, file.name) : base_target_path
             existing_source = File.exists?(target_path) ? IO.read(target_path).strip : ""
