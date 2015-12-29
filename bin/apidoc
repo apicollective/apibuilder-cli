@@ -207,6 +207,7 @@ elsif command == "upload"
         puts " - %s: %s" % [error['code'], error['message']]
       end
     end
+    exit(1)
   end
 
 elsif command == "update"
