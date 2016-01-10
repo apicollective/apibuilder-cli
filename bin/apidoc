@@ -63,6 +63,17 @@ client = ApidocCli::Config.client_from_profile(:profile => env[:profile])
 
 command = ARGV.shift.to_s.strip
 
+def all_commands
+  commands = []
+  IO.readlines(__FILE__).each do |l|
+    if md = l.strip.gsub(/\s+/, ' ').sub(/^elsif/, 'if').match(/if command == \"(\w+)\"/)
+      commands << md[1]
+    end
+  end
+  commands
+end
+
+
 if command == "list"
   resource = ARGV.shift.to_s.strip
 
@@ -303,10 +314,16 @@ elsif command == "cli"
   end
 
 elsif command == ""
-  puts "command is required"
+  puts "** ERROR: Missing command is required. Available commands:"
+  all_commands.sort.each do |cmd|
+    puts " - %s" % cmd
+  end
   exit(1)
 
 else
-  puts "unrecognized command[#{command}]"
+  puts "** ERROR: unrecognized command[#{command}].  Available commands:"
+  all_commands.sort.each do |cmd|
+    puts " - %s" % cmd
+  end
   exit(1)
 end
