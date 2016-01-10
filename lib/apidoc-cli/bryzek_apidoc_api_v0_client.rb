@@ -837,18 +837,16 @@ module Com
               end
 
               def to_hash
-                { @name => subtype_to_hash }
+                subtype_to_hash.merge(:type => @name)
               end
 
               def Diff.from_json(hash)
                 HttpClient::Preconditions.assert_class('hash', hash, Hash)
-                hash.map do |union_type_name, data|
-                  case union_type_name
-                    when Types::DIFF_BREAKING; DiffBreaking.new(data)
-                    when Types::DIFF_NON_BREAKING; DiffNonBreaking.new(data)
-                    else DiffUndefinedType.new(:name => union_type_name)
-                  end
-                end.first
+                case HttpClient::Helper.symbolize_keys(hash)[:type]
+                  when Types::DIFF_BREAKING; DiffBreaking.new(hash)
+                  when Types::DIFF_NON_BREAKING; DiffNonBreaking.new(hash)
+                  else DiffUndefinedType.new(:name => union_type_name)
+                end
               end
 
             end
@@ -891,17 +889,15 @@ module Com
               end
 
               def to_hash
-                { @name => subtype_to_hash }
+                subtype_to_hash.merge(:type => @name)
               end
 
               def ItemDetail.from_json(hash)
                 HttpClient::Preconditions.assert_class('hash', hash, Hash)
-                hash.map do |union_type_name, data|
-                  case union_type_name
-                    when Types::APPLICATION_SUMMARY; ApplicationSummary.new(data)
-                    else ItemDetailUndefinedType.new(:name => union_type_name)
-                  end
-                end.first
+                case HttpClient::Helper.symbolize_keys(hash)[:type]
+                  when Types::APPLICATION_SUMMARY; ApplicationSummary.new(hash)
+                  else ItemDetailUndefinedType.new(:name => union_type_name)
+                end
               end
 
             end
