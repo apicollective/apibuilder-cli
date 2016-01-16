@@ -219,6 +219,10 @@ elsif command == "upload"
       end
     end
     exit(1)
+  rescue Exception => e
+    puts ""
+    puts "** ERROR: #{e}"
+    exit(1)
   end
 
 elsif command == "update"
