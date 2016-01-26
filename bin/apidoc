@@ -89,11 +89,11 @@ if command == "list"
       puts "organization is required"
       exit(1)
     else
-      client.applications.get_by_org_key(org,
-                                         :limit => env[:limit],
-                                         :offset => env[:offset],
-                                         :has_version => Com::Bryzek::Apidoc::Api::V0::HttpClient::Helper.to_boolean('has_version', env[:has_version])
-                                         ).each do |app|
+      client.applications.get(org,
+                              :limit => env[:limit],
+                              :offset => env[:offset],
+                              :has_version => Com::Bryzek::Apidoc::Api::V0::HttpClient::Helper.to_boolean('has_version', env[:has_version])
+                             ).each do |app|
         puts app.key
       end
     end
@@ -106,7 +106,7 @@ if command == "list"
       puts "organization and application are required"
       exit(1)
     else
-      client.versions.get_by_org_key_and_application_key(org, application, :limit => env[:limit], :offset => env[:offset]).each do |v|
+      client.versions.get_by_application_key(org, application, :limit => env[:limit], :offset => env[:offset]).each do |v|
         puts v.version
       end
     end
@@ -136,7 +136,7 @@ elsif command == "code"
   end
 
   begin
-    code = client.code.get_by_org_key_and_application_key_and_version_and_generator_key(org, application, version, generator)
+    code = client.code.get(org, application, version, generator)
     if filename
       if file = code.files.find { |f| f.name == filename }
         puts file.contents
@@ -207,7 +207,7 @@ elsif command == "upload"
 
   print "Uploading #{path} to #{client.url}/#{org}/#{application}/#{version} ... "
   begin
-    client.versions.put_by_org_key_and_application_key_and_version(org, application, version, form)
+    client.versions.put_by_application_key_and_version(org, application, version, form)
     puts "success"
   rescue Com::Bryzek::Apidoc::Api::V0::HttpClient::ServerError => e
     puts "1 or more errors:"
@@ -250,7 +250,7 @@ elsif command == "update"
         base_target_path = File.join(target_dir, target)
 
         begin
-          client.code.get_by_org_key_and_application_key_and_version_and_generator_key(project.org, project.name, project.version, generator.name).files.each do |file|
+          client.code.get(project.org, project.name, project.version, generator.name).files.each do |file|
             # check if target path ends with the filename - if not, this is a directory target and need to check if dir exists
             # for example: "play_2_x_routes: api/conf/routes" is a file
             # while "anorm_2_x_parsers: api/app/generated" should be a directory we check if exists
