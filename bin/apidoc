@@ -73,6 +73,45 @@ def all_commands
   commands
 end
 
+# Returns true if the two files are different - this is a diff that
+# excludes changes made only to lines with apidoc version header
+# comments.
+def different?(source, target)
+  if source.strip == target.strip
+    false
+  elsif strip_apidoc_comments(source).strip == strip_apidoc_comments(target).strip
+    false
+  else
+    true
+  end
+end
+
+# Apidoc injects a few comments into the code base to identify
+# versions; we want to exclude those lines for the purposes of seeing
+# if the API has changed as there is no functional change if only
+# these comments have changed. This method strips those values from
+# the provided string.
+def strip_apidoc_comments(value)
+  lines = value.strip.split("\n").map do |l|
+    stripped = l.strip
+    if stripped.match(/^[\*|\#]\s+service version: .+$/i)
+      ""
+    elsif stripped.match(/^[\*|\#]\s+apidoc:/)
+      ""
+    elsif stripped.match(/^val UserAgent = /)
+      ""
+    elsif stripped.match(/^val Version = /)
+      ""
+    elsif stripped.match(/^USER_AGENT = 'apidoc:/)
+      ""
+    elsif stripped.match(/^VERSION = '/)
+      ""
+    else
+      l
+    end
+  end
+  lines.join("\n").strip
+end
 
 if command == "list"
   resource = ARGV.shift.to_s.strip
@@ -261,11 +300,11 @@ elsif command == "update"
             existing_source = File.exists?(target_path) ? IO.read(target_path).strip : ""
 
             print "    " + target_path.sub(/^#{pwd}\/?/, '') + ": "
-            if file.contents.strip == existing_source.strip
-              puts "unchanged"
-            else
+            if different?(file.contents, existing_source.strip)
               puts "changed"
               updates << { :source => file.contents, :generator => generator.name, :target => target_path }
+            else
+              puts "unchanged"
             end
           end
         rescue Com::Bryzek::Apidoc::Api::V0::HttpClient::ServerError => e
