@@ -116,3 +116,14 @@ Upgrade to the latest version
 
     PROFILE: Select a specific profile to use, read from the .apidoc
              configuration file
+
+To setup a configuration profile, add a section to ~/.apidoc/config for each profile:
+
+```
+[default]
+token = xxx
+
+[profile localhost]
+api_uri = http://localhost:9001
+token = yyy
+```
