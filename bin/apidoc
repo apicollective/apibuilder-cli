@@ -180,7 +180,7 @@ elsif command == "download"
     if typ == "original"
       puts app.original.data
     elsif typ == "service"
-      puts JSON.pretty_generate(app.service.to_hash)
+      puts app.service.to_json
     else
       $stderr.puts "  ERROR: invalid type[#{typ}] - must be 'original' or 'service'"
     end
