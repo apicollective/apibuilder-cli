@@ -2957,7 +2957,7 @@ module Com
               end
 
               def Helper.to_object(value)
-                value ? JSON.parse(value) : nil
+                value ? (value.is_a?(Hash) ? value : JSON.parse(value)) : nil
               end
 
               def Helper.to_uuid(value)
