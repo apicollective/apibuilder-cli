@@ -9,20 +9,28 @@ module ApidocCli
 
     def Config.client_from_profile(opts={})
       profile = Preconditions.assert_class_or_nil(opts.delete(:profile), String)
+      token = Preconditions.assert_class_or_nil(opts.delete(:token), String)
       Preconditions.assert_empty_opts(opts)
 
       config = ApidocCli::Config.new
       profile_config = profile ? config.profile(profile) : config.default_profile
 
       if profile_config.nil? && profile
-        raise "Profile[#{profile}] not found in #{config.path}"
+        if profile != DEFAULT_PROFILE_NAME
+          if !File.exists?(config.path)
+            raise "Profile[#{profile}] not found as configuration file #{config.path} does not exist"
+          else
+            raise "Profile[#{profile}] not found in configuration file #{config.path}"
+          end
+        end
       end
 
-      auth = if profile_config && profile_config.token
-         Com::Bryzek::Apidoc::Api::V0::HttpClient::Authorization.basic(profile_config.token)
-       else
-         nil
-       end
+      final_token = token || (profile_config ? profile_config.token : nil)
+      auth = if final_token
+               Com::Bryzek::Apidoc::Api::V0::HttpClient::Authorization.basic(final_token)
+             else
+               nil
+             end
 
       api_uri = profile_config ? profile_config.api_uri : DEFAULT_API_URI
       Com::Bryzek::Apidoc::Api::V0::Client.new(api_uri, :authorization => auth)
@@ -32,11 +40,11 @@ module ApidocCli
 
     def initialize(opts={})
       @path = Preconditions.assert_class(opts.delete(:path) || File.expand_path(DEFAULT_PATH), String)
-      Preconditions.check_state(File.exists?(@path), "Apidoc CLI config file[#{@path}] not found")
-
+      contents = File.exists?(@path) ? IO.readlines(@path) : []
+      
       @profiles = []
 
-      IO.readlines(@path).each_with_index do |line, i|
+      contents.each_with_index do |line, i|
         stripped = line.strip
         if stripped == ""
           next

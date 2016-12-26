@@ -117,6 +117,8 @@ Upgrade to the latest version
     PROFILE: Select a specific profile to use, read from the .apidoc
              configuration file
 
+    APIDOC_TOKEN: If specified, this is the apidoc token we use
+
 To setup a configuration profile, add a section to ~/.apidoc/config for each profile:
 
 ```

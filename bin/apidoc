@@ -5,9 +5,11 @@
 # Usage:
 #  apidoc <command> <arguments>
 #  PROFILE=localhost apidoc <command> <arguments>
+#  APIDOC_TOKEN=xxx apidoc <command> <arguments>
 #
 # Environment variables:
 #    PROFILE: will default to the 'default' specified in your configuration file
+#    APIDOC_TOKEN: If specified, we will use this token to connect to apidoc
 #
 # The arguments vary by the command
 #
@@ -59,12 +61,13 @@ load File.join(File.dirname(__FILE__), 'apidoc-cli-config')
 
 env = {
   :profile => ApidocCli::Util.read_non_empty_string(ENV['PROFILE']),
+  :apidoc_token => ApidocCli::Util.read_non_empty_string(ENV['APIDOC_TOKEN']),
   :limit => ApidocCli::Util.read_non_empty_integer(ENV['LIMIT']),
   :offset => ApidocCli::Util.read_non_empty_integer(ENV['OFFSET']),
   :has_version => ApidocCli::Util.read_non_empty_string(ENV['HAS_VERSION'])
 }
 
-client = ApidocCli::Config.client_from_profile(:profile => env[:profile])
+client = ApidocCli::Config.client_from_profile(:profile => env[:profile], :token => env[:apidoc_token])
 
 command = ARGV.shift.to_s.strip
 
