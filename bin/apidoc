@@ -37,6 +37,9 @@
 #    version of the application. This example would download
 #    http://apidoc.me/bryzek/apidoc-api/latest/original and print to stdout
 #
+# apidoc example bryzek apidoc-api latest type
+#  - Generates an example JSON document for the specified type
+#
 # apidoc upload bryzek apidoc-api api/api.json [--version 1.5.0-dev]
 #  - Uploads the file api/api.json to the bryzek org, apidoc application.
 #    The uploaded file will be the specified version, defaulting to
@@ -187,6 +190,37 @@ elsif command == "download"
     else
       $stderr.puts "  ERROR: invalid type[#{typ}] - must be 'original' or 'service'"
     end
+  rescue Com::Bryzek::Apidoc::Api::V0::HttpClient::ServerError => e
+    if e.code == 401
+      $stderr.puts "  ERROR: %s/%s:%s not authorized" % [org, application, version]
+    elsif e.code == 404
+      $stderr.puts "  ERROR: %s/%s:%s not found" % [org, application, version]
+    else
+      raise e
+    end
+  end
+  
+elsif command == "example"
+  org = ARGV.shift.to_s.strip
+  application = ARGV.shift.to_s.strip
+  version = ARGV.shift.to_s.strip
+  typ = ARGV.shift.to_s.strip
+  optional_fields = ARGV.shift.to_s.strip
+
+  if org == "" || application == "" || version == "" || typ == ""
+    puts "org, application, version, and type are required"
+    exit(1)
+  end
+
+  if optional_fields.empty?
+    optional_fields = false
+  else
+    optional_fields = Com::Bryzek::Apidoc::Spec::V0::HttpClient::Helper.to_boolean("optional_fields", optional_fields)
+  end
+
+  begin
+    example = client.versions.get_example_by_application_key_and_version_and_type_name(org, application, version, typ, :optional_fields => optional_fields)
+    puts example
   rescue Com::Bryzek::Apidoc::Api::V0::HttpClient::ServerError => e
     if e.code == 401
       $stderr.puts "  ERROR: %s/%s:%s not authorized" % [org, application, version]
