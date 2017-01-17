@@ -354,7 +354,7 @@ elsif command == "update"
   app_config = ApidocCli::AppConfig.new(:path => path)
 
   pwd = `pwd`.strip
-  
+
   app_config.code.projects.map do |project|
     project.generators.each do |generator|
       generator.targets.each do |target|
@@ -363,12 +363,14 @@ elsif command == "update"
 
         begin
           client.code.get(project.org, project.name, project.version, generator.name).files.each do |file|
+            final_target_path = app_config.settings.code_create_directories ? File.join(base_target_path, file.dir) : base_target_path
+
             # check if target path ends with the filename - if not, this is a directory target and need to check if dir exists
             # for example: "play_2_x_routes: api/conf/routes" is a file
             # while "anorm_2_x_parsers: api/app/generated" should be a directory we check if exists
-            Dir.mkdir(base_target_path) unless base_target_path.include?(file.name) || Dir.exists?(base_target_path)
+            FileUtils.mkdir_p(final_target_path) unless final_target_path.include?(file.name) || Dir.exists?(final_target_path)
 
-            target_path = File.directory?(base_target_path) ? File.join(base_target_path, file.name) : base_target_path
+            target_path = File.directory?(final_target_path) ? File.join(final_target_path, file.name) : final_target_path
             existing_source = File.exists?(target_path) ? IO.read(target_path).strip : ""
 
             print "    " + target_path.sub(/^#{pwd}\/?/, '') + ": "

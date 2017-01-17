@@ -49,15 +49,15 @@ Invoke a code generator from the command line
     
 For example, to generate a play 2.3 client for the latest version of apidoc itself:
 
-    bin/apidoc code bryzek apidoc-api latest play_2_3_client
+    bin/apidoc code bryzek apidoc-api latest play_2_5_client
 
 Each code generator returns a list of files. To download a specific file:
 
-    bin/apidoc code bryzek apidoc-api latest play_2_3_client <filename>
+    bin/apidoc code bryzek apidoc-api latest play_2_5_client <filename>
     
 For example:
 
-    bin/apidoc code bryzek apidoc-api latest play_2_3_client BryzekApidocApiClient.scala
+    bin/apidoc code bryzek apidoc-api latest play_2_5_client BryzekApidocApiClient.scala
 
 To view a list of available generators visit [apidoc.me/generators](http://www.apidoc.me/generators)
 
@@ -87,17 +87,38 @@ Example File:
         apidoc:
           version: latest
           generators:
-            play_2_3_client: generated/app
+            play_2_5_client: generated/app
             play_2_x_routes: api/conf/routes
         apidoc-spec:
           version: latest
           generators:
-            play_2_3_client: generated/app
+            play_2_5_client: generated/app
         apidoc-generator:
           version: latest
           generators:
-            play_2_3_client: generated/app
-    
+            play_2_5_client: generated/app
+
+In addition, you can specify global settings for how the client behaves:
+
+Example File w/ Settings:
+
+    settings:
+      code.create.directories: true
+
+    code:
+      bryzek:
+        apidoc:
+          version: latest
+          generators:
+            play_2_5_client: generated/app
+
+Supported settings include:
+
+  - code.create.directories: Defaults to false. If true, when you run
+    `apidoc update`, we will create the subdirectories as specified by
+    the code generator.
+
+
 ## cli itself
 
 Display the current version of the CLI.
