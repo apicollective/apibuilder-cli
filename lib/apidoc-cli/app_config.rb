@@ -5,13 +5,16 @@ module ApidocCli
 
     DEFAULT_FILENAME = ".apidoc" unless defined?(DEFAULT_FILENAME)
 
-    attr_reader :code
+    attr_reader :settings, :code
 
     def initialize(opts={})
       @path = Preconditions.assert_class(opts.delete(:path) || DEFAULT_FILEPATH, String)
       Preconditions.check_state(File.exists?(@path), "Apidoc application config file[#{@path}] not found")
 
       yaml = YAML.load(IO.read(@path))
+
+      @settings = Settings.new(yaml['settings'] || {})
+
       code_projects = (yaml["code"] || {}).map do |org_key, project_map|
         project_map.map do |project_name, data|
           version = data['version'].to_s.strip
@@ -40,6 +43,17 @@ module ApidocCli
 
     end
 
+    class Settings
+
+      attr_reader :code_create_directories
+
+      def initialize(data)
+        @code_create_directories = data.has_key?("code.create.directories") ? data.delete("code.create.directories") : false
+        Preconditions.check_state(data.empty?, "Invalid settings: #{data.keys.sort}")
+      end
+
+    end
+    
     class Project
 
       attr_reader :org, :name, :version, :generators
