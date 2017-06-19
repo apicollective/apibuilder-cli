@@ -358,7 +358,7 @@ elsif command == "update"
   app_config.code.projects.map do |project|
     project.generators.each do |generator|
       generator.targets.each do |target|
-        puts "  #{project.org}/#{project.name}/#{project.version}/#{generator.name}..."
+        puts "  #{project.org}/\033[1m#{project.name}\033[0m/#{project.version}/#{generator.name}..."
         base_target_path = File.join(target_dir, target)
 
         begin
@@ -375,7 +375,7 @@ elsif command == "update"
 
             print "    " + target_path.sub(/^#{pwd}\/?/, '') + ": "
             if different?(file.contents, existing_source.strip)
-              puts "changed"
+              puts "\033[1mchanged\033[0m"
               updates << { :source => file.contents, :generator => generator.name, :target => target_path }
             else
               puts "unchanged"
