@@ -358,7 +358,7 @@ elsif command == "update"
   app_config.code.projects.map do |project|
     project.generators.each do |generator|
       generator.targets.each do |target|
-        puts "  #{project.org}/#{project.name}/#{project.version}/#{generator.name}..."
+        puts "  #{project.org}/\033[1m#{project.name}\033[0m/#{project.version}/#{generator.name}..."
         base_target_path = File.join(target_dir, target)
 
         begin
