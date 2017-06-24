@@ -1,15 +1,15 @@
-# Reads the apidoc application configuration file (.apidoc filename by convention)
-module ApidocCli
+# Reads the apibuilder application configuration file (.apibuilder filename by convention)
+module ApibuilderCli
 
   class AppConfig
 
-    DEFAULT_FILENAME = ".apidoc" unless defined?(DEFAULT_FILENAME)
+    DEFAULT_FILENAME = ".apibuilder" unless defined?(DEFAULT_FILENAME)
 
     attr_reader :settings, :code
 
     def initialize(opts={})
       @path = Preconditions.assert_class(opts.delete(:path) || DEFAULT_FILEPATH, String)
-      Preconditions.check_state(File.exists?(@path), "Apidoc application config file[#{@path}] not found")
+      Preconditions.check_state(File.exists?(@path), "Apibuilder application config file[#{@path}] not found")
 
       yaml = YAML.load(IO.read(@path))
 

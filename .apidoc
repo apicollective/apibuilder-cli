@@ -1,18 +1,18 @@
 code:
-  bryzek:
-    apidoc-common:
+  apicollective:
+    apibuilder-common:
       version: latest
       generators:
-        ruby_client: lib/apidoc-cli
-    apidoc-api:
+        ruby_client: lib/apibuilder-cli
+    apibuilder-api:
       version: latest
       generators:
-        ruby_client: lib/apidoc-cli
-    apidoc-generator:
+        ruby_client: lib/apibuilder-cli
+    apibuilder-generator:
       version: latest
       generators:
-        ruby_client: lib/apidoc-cli
-    apidoc-spec:
+        ruby_client: lib/apibuilder-cli
+    apibuilder-spec:
       version: latest
       generators:
-        ruby_client: lib/apidoc-cli
+        ruby_client: lib/apibuilder-cli

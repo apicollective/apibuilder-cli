@@ -3,23 +3,23 @@
 # Used to read a config file, primarily to test that the file is well formed
 #
 # read-config [--path path]
-#   path: defaults to ~/.apidoc/config
+#   path: defaults to ~/.apibuilder/config
 #
 
-load File.join(File.dirname(__FILE__), 'apidoc-cli-config')
+load File.join(File.dirname(__FILE__), 'apibuilder-cli-config')
 
-args = ApidocCli::Args.parse(ARGV)
+args = ApibuilderCli::Args.parse(ARGV)
 
-path = File.expand_path(args[:path] || ApidocCli::Config::DEFAULT_PATH)
+path = File.expand_path(args[:path] || ApibuilderCli::Config::DEFAULT_PATH)
 
 if File.exists?(path)
-  config = ApidocCli::Config.new(:path => path)
+  config = ApibuilderCli::Config.new(:path => path)
 
   config.profiles.each do |profile|
     puts ""
     puts "Profile #{profile.name}:"
     puts "  api_uri: " + profile.api_uri
-    puts "    token: " + (profile.token ? ApidocCli::Util.mask(profile.token) : "none")
+    puts "    token: " + (profile.token ? ApibuilderCli::Util.mask(profile.token) : "none")
   end
 
 else

@@ -1,4 +1,4 @@
-module ApidocCli
+module ApibuilderCli
 
   module Version
 
@@ -10,7 +10,7 @@ module ApidocCli
     end
 
     def Version.latest
-      url = 'https://api.github.com/repos/mbryzek/apidoc-cli/tags?per_page=1'
+      url = 'https://api.github.com/repos/mbryzek/apibuilder-cli/tags?per_page=1'
       version = if result = `curl --silent "#{url}"`.strip
                   if hash = JSON.parse(result).first
                     if hash.is_a?(Hash)

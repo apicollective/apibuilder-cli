@@ -1,10 +1,10 @@
-# Reads the apidoc CLI configuration file
-module ApidocCli
+# Reads the apibuilder CLI configuration file
+module ApibuilderCli
 
   class Config
 
-    DEFAULT_PATH = "~/.apidoc/config" unless defined?(DEFAULT_PATH)
-    DEFAULT_API_URI = "http://api.apidoc.me" unless defined?(DEFAULT_API_URI)
+    DEFAULT_PATH = "~/.apibuilder/config" unless defined?(DEFAULT_PATH)
+    DEFAULT_API_URI = "http://api.apibuilder.me" unless defined?(DEFAULT_API_URI)
     DEFAULT_PROFILE_NAME = "default"
 
     def Config.client_from_profile(opts={})
@@ -12,7 +12,7 @@ module ApidocCli
       token = Preconditions.assert_class_or_nil(opts.delete(:token), String)
       Preconditions.assert_empty_opts(opts)
 
-      config = ApidocCli::Config.new
+      config = ApibuilderCli::Config.new
       profile_config = profile ? config.profile(profile) : config.default_profile
 
       if profile_config.nil? && profile
@@ -27,13 +27,13 @@ module ApidocCli
 
       final_token = token || (profile_config ? profile_config.token : nil)
       auth = if final_token
-               Com::Bryzek::Apidoc::Api::V0::HttpClient::Authorization.basic(final_token)
+               Io::Apibuilder::Api::V0::HttpClient::Authorization.basic(final_token)
              else
                nil
              end
 
       api_uri = profile_config ? profile_config.api_uri : DEFAULT_API_URI
-      Com::Bryzek::Apidoc::Api::V0::Client.new(api_uri, :authorization => auth)
+      Io::Apibuilder::Api::V0::Client.new(api_uri, :authorization => auth)
     end
 
     attr_reader :path
@@ -136,7 +136,7 @@ module ApidocCli
     end
 
     def api_uri
-      @data[:api_uri] || ApidocCli::Config::DEFAULT_API_URI
+      @data[:api_uri] || ApibuilderCli::Config::DEFAULT_API_URI
     end
 
   end
