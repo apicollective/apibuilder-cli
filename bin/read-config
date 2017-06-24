@@ -10,7 +10,7 @@ load File.join(File.dirname(__FILE__), 'apibuilder-cli-config')
 
 args = ApibuilderCli::Args.parse(ARGV)
 
-path = File.expand_path(args[:path] || ApibuilderCli::Config::DEFAULT_PATH)
+path = File.expand_path(args[:path] || ApibuilderCli::Config::default_path)
 
 if File.exists?(path)
   config = ApibuilderCli::Config.new(:path => path)

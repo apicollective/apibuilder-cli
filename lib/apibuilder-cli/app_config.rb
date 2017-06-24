@@ -14,7 +14,9 @@ module ApibuilderCli
         exit(1)
       end
       if path != DEFAULT_FILENAMES.first
-        puts "**WARNING** File %s is now deprecated and should be named %s. To Fix: git mv %s %s" % [path, DEFAULT_FILENAMES.first, path, DEFAULT_FILENAMES.first]
+        puts "******************** WARNING ********************"
+        puts "** File %s is now deprecated and should be named %s\n** To Fix:\n**   git mv %s %s" % [path, DEFAULT_FILENAMES.first, path, DEFAULT_FILENAMES.first]
+        puts "*************************************************"
       end
       path
     end

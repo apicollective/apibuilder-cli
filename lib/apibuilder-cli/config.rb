@@ -3,7 +3,8 @@ module ApibuilderCli
 
   class Config
 
-    DEFAULT_PATHS = ["~/.apibuilder/config", "~/.apidoc/config"] unless defined?(DEFAULT_PATHS)
+    DEFAULT_DIRECTORIES = ["~/.apibuilder", "~/.apidoc"] unless defined?(DEFAULT_DIRECTORIES)
+    DEFAULT_FILENAME = "config" unless defined?(DEFAULT_FILENAME)
     DEFAULT_API_URI = "http://api.apidoc.me" unless defined?(DEFAULT_API_URI)
     DEFAULT_PROFILE_NAME = "default"
 
@@ -39,12 +40,19 @@ module ApibuilderCli
     attr_reader :path
 
     def Config.default_path
-      path = DEFAULT_PATHS.map { |p| File.expand_path(p) }.find { |p| File.exists?(p) }
-      if path.nil?
-        puts "**ERROR** Could not find apibuilder configuration file. Expected file to be located at: %s" % DEFAULT_PATHS.first
+      dir = DEFAULT_DIRECTORIES.find { |p| File.directory?(File.expand_path(p)) }
+      if dir.nil?
+        puts "**ERROR** Could not find apibuilder configuration directory. Expected at: %s" % DEFAULT_DIRECTORIES.first
         exit(1)
       end
-      path
+
+      if dir != DEFAULT_DIRECTORIES.first
+        puts "******************** WARNING ********************"
+        puts "** Directory %s is now deprecated and should be named %s\n** To Fix:\n**   mv %s %s" % [dir, DEFAULT_DIRECTORIES.first, dir, DEFAULT_DIRECTORIES.first]
+        puts "*************************************************"
+      end
+
+      File.expand_path(File.join(dir, DEFAULT_FILENAME))
     end
       
     def initialize(opts={})
