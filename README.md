@@ -1,15 +1,15 @@
-# apidoc-cli
-Command line interface to apidoc
+# apibuilder-cli
+Command line interface to API Builder
 
 # Setup for public APIs
 
-No setup needed - just use the apidoc command directly (see below)
+No setup needed - just use the API Builder command directly (see below)
 
 # Setup for private APIs
 
-1. [Create a token](http://www.apidoc.me/tokens/) for your user account
+1. [Create a token](http://www.apibuilder.io/tokens/) for your user account
 
-2. Create a configuration file in ~/.apidoc/config
+2. Create a configuration file in ~/.apibuilder/config
    Example File:
 
         [default]
@@ -25,49 +25,49 @@ No setup needed - just use the apidoc command directly (see below)
 
 List all organizations that you have access to:
 
-    bin/apidoc list organizations
+    bin/apibuilder list organizations
 
 List all applications that belong to a specific organization:
 
-    bin/apidoc list applications <organization key>
+    bin/apibuilder list applications <organization key>
 
 List all versions of a particular application
 
-    bin/apidoc list versions <organization key> <application key>
+    bin/apibuilder list versions <organization key> <application key>
     
-Note since the GET requests in apidoc are paginated, you might need to
+Note since the GET requests in API Builder are paginated, you might need to
 paginate. Where pagination is required, we use two environment
 variables: LIMIT, OFFSET
 
-    LIMIT=10 OFFSET=10 bin/apidoc list organizations
+    LIMIT=10 OFFSET=10 bin/apibuilder list organizations
     
 ## code
 
 Invoke a code generator from the command line
 
-    bin/apidoc <organization key> <application key> <version> <generator> [<filename>]
+    bin/apibuilder <organization key> <application key> <version> <generator> [<filename>]
     
-For example, to generate a play 2.3 client for the latest version of apidoc itself:
+For example, to generate a play 2.3 client for the latest version of apibuilder itself:
 
-    bin/apidoc code bryzek apidoc-api latest play_2_5_client
+    bin/apibuilder code apicollective apibuilder-api latest play_2_5_client
 
 Each code generator returns a list of files. To download a specific file:
 
-    bin/apidoc code bryzek apidoc-api latest play_2_5_client <filename>
+    bin/apibuilder code apicollective apibuilder-api latest play_2_5_client <filename>
     
 For example:
 
-    bin/apidoc code bryzek apidoc-api latest play_2_5_client BryzekApidocApiClient.scala
+    bin/apibuilder code apicollective apibuilder-api latest play_2_5_client ApibuilderApiClient.scala
 
-To view a list of available generators visit [apidoc.me/generators](http://www.apidoc.me/generators)
+To view a list of available generators visit [apibuilder.io/generators](http://www.apibuilder.io/generators)
 
 ## update
 
 Invoke code generator based on configuration from a yaml configuration file
 
-    bin/apidoc update [--path path]
+    bin/apibuilder update [--path path]
     
-        path defaults to .apidoc in the current directory.
+        path defaults to .apibuilder in the current directory.
 
 The configuration file is a YAML file that follows the convention:
 
@@ -83,17 +83,17 @@ The configuration file is a YAML file that follows the convention:
 Example File:
 
     code:
-      bryzek:
-        apidoc:
+      apicollective:
+        apibuilder:
           version: latest
           generators:
             play_2_5_client: generated/app
             play_2_x_routes: api/conf/routes
-        apidoc-spec:
+        apibuilder-spec:
           version: latest
           generators:
             play_2_5_client: generated/app
-        apidoc-generator:
+        apibuilder-generator:
           version: latest
           generators:
             play_2_5_client: generated/app
@@ -106,8 +106,8 @@ Example File w/ Settings:
       code.create.directories: true
 
     code:
-      bryzek:
-        apidoc:
+      apicollective:
+        apibuilder:
           version: latest
           generators:
             play_2_5_client: generated/app
@@ -115,7 +115,7 @@ Example File w/ Settings:
 Supported settings include:
 
   - code.create.directories: Defaults to false. If true, when you run
-    `apidoc update`, we will create the subdirectories as specified by
+    `apibuilder update`, we will create the subdirectories as specified by
     the code generator.
 
 
@@ -123,24 +123,24 @@ Supported settings include:
 
 Display the current version of the CLI.
 
-    bin/apidoc cli version
+    bin/apibuilder cli version
 
 Display the latest available version of the CLI.
 
-    bin/apidoc cli latest
+    bin/apibuilder cli latest
 
 Upgrade to the latest version
 
-    bin/apidoc cli upgrade
+    bin/apibuilder cli upgrade
 
 # Environment Variables
 
-    PROFILE: Select a specific profile to use, read from the .apidoc
+    PROFILE: Select a specific profile to use, read from the .apibuilder
              configuration file
 
-    APIDOC_TOKEN: If specified, this is the apidoc token we use
+    APIBUILDER_TOKEN: If specified, this is the apibuilder token we use
 
-To setup a configuration profile, add a section to ~/.apidoc/config for each profile:
+To setup a configuration profile, add a section to ~/.apibuilder/config for each profile:
 
 ```
 [default]

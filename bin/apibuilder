@@ -18,30 +18,30 @@
 #  - Pagination is implemented with environment variables LIMIT and OFFSET. Example:
 #    LIMIT=10 OFFSET=0 apibuilder list organizations
 #
-# apibuilder list applications bryzek
-#  - Returns a list of the applications for the organization bryzek
+# apibuilder list applications apicollective
+#  - Returns a list of the applications for the organization apicollective
 #  - Pagination is implemented with environment variables LIMIT and OFFSET. Example:
-#    HAS_VERSION=t LIMIT=10 OFFSET=0 apibuilder list applications bryzek
+#    HAS_VERSION=t LIMIT=10 OFFSET=0 apibuilder list applications apicollective
 #
-# apibuilder list versions bryzek apibuilder
+# apibuilder list versions apicollective apibuilder
 #  - Returns a list of all of the versions for the specific org and application.
 #  - Pagination is implemented with environment variables LIMIT and OFFSET. Example:
-#    LIMIT=10 OFFSET=0 apibuilder list applications bryzek
+#    LIMIT=10 OFFSET=0 apibuilder list applications apicollective
 #
-# apibuilder code bryzek apibuilder-api latest scala_models
-#  - Returns the code for bryzek/apibuilder version 'latest' using the
+# apibuilder code apicollective apibuilder-api latest scala_models
+#  - Returns the code for apicollective/apibuilder version 'latest' using the
 #    codegenerator 'scala_models'
 #
-# apibuilder download bryzek apibuilder-api latest original|service
+# apibuilder download apicollective apibuilder-api latest original|service
 #  - Downloads the 'original' uploaded file used to create the specified
 #    version of the application. This example would download
-#    http://apibuilder.me/bryzek/apibuilder-api/latest/original and print to stdout
+#    http://apibuilder.me/apicollective/apibuilder-api/latest/original and print to stdout
 #
-# apibuilder example bryzek apibuilder-api latest type
+# apibuilder example apicollective apibuilder-api latest type
 #  - Generates an example JSON document for the specified type
 #
-# apibuilder upload bryzek apibuilder-api api/api.json [--version 1.5.0-dev]
-#  - Uploads the file api/api.json to the bryzek org, apibuilder application.
+# apibuilder upload apicollective apibuilder-api api/api.json [--version 1.5.0-dev]
+#  - Uploads the file api/api.json to the apicollective org, apibuilder application.
 #    The uploaded file will be the specified version, defaulting to
 #    the output from git describe.
 #
@@ -64,7 +64,7 @@ load File.join(File.dirname(__FILE__), 'apibuilder-cli-config')
 
 env = {
   :profile => ApibuilderCli::Util.read_non_empty_string(ENV['PROFILE']),
-  :apibuilder_token => ApibuilderCli::Util.read_non_empty_string(ENV['APIBUILDER_TOKEN']),
+  :apibuilder_token => ApibuilderCli::Util.read_non_empty_string(ENV['APIBUILDER_TOKEN'] || ENV['APIDOC_TOKEN']),
   :limit => ApibuilderCli::Util.read_non_empty_integer(ENV['LIMIT']),
   :offset => ApibuilderCli::Util.read_non_empty_integer(ENV['OFFSET']),
   :has_version => ApibuilderCli::Util.read_non_empty_string(ENV['HAS_VERSION'])
@@ -142,7 +142,7 @@ if command == "list"
       client.applications.get(org,
                               :limit => env[:limit],
                               :offset => env[:offset],
-                              :has_version => Com::Bryzek::Apibuilder::Api::V0::HttpClient::Helper.to_boolean('has_version', env[:has_version])
+                              :has_version => Io::Apibuilder::Api::V0::HttpClient::Helper.to_boolean('has_version', env[:has_version])
                              ).each do |app|
         puts app.key
       end
@@ -190,7 +190,7 @@ elsif command == "download"
     else
       $stderr.puts "  ERROR: invalid type[#{typ}] - must be 'original' or 'service'"
     end
-  rescue Com::Bryzek::Apibuilder::Api::V0::HttpClient::ServerError => e
+  rescue Io::Apibuilder::Api::V0::HttpClient::ServerError => e
     if e.code == 401
       $stderr.puts "  ERROR: %s/%s:%s not authorized" % [org, application, version]
     elsif e.code == 404
@@ -215,13 +215,13 @@ elsif command == "example"
   if optional_fields.empty?
     optional_fields = false
   else
-    optional_fields = Com::Bryzek::Apibuilder::Spec::V0::HttpClient::Helper.to_boolean("optional_fields", optional_fields)
+    optional_fields = Io::Apibuilder::Spec::V0::HttpClient::Helper.to_boolean("optional_fields", optional_fields)
   end
 
   begin
     example = client.versions.get_example_by_application_key_and_version_and_type_name(org, application, version, typ, :optional_fields => optional_fields)
     puts example
-  rescue Com::Bryzek::Apibuilder::Api::V0::HttpClient::ServerError => e
+  rescue Io::Apibuilder::Api::V0::HttpClient::ServerError => e
     if e.code == 401
       $stderr.puts "  ERROR: %s/%s:%s not authorized" % [org, application, version]
     elsif e.code == 404
@@ -261,7 +261,7 @@ elsif command == "code"
       end
     end
 
-  rescue Com::Bryzek::Apibuilder::Api::V0::HttpClient::ServerError => e
+  rescue Io::Apibuilder::Api::V0::HttpClient::ServerError => e
     if e.code == 404
       $stderr.puts "  ERROR: 404 when accessing URI: #{e.uri}"
     elsif e.code == 409
@@ -314,14 +314,14 @@ elsif command == "upload"
     end
   end
 
-  original_form = Com::Bryzek::Apibuilder::Api::V0::Models::OriginalForm.new(:data => IO.read(path))
-  form = Com::Bryzek::Apibuilder::Api::V0::Models::VersionForm.new(:original_form => original_form)
+  original_form = Io::Apibuilder::Api::V0::Models::OriginalForm.new(:data => IO.read(path))
+  form = Io::Apibuilder::Api::V0::Models::VersionForm.new(:original_form => original_form)
 
   print "Uploading #{path} to #{client.url}/#{org}/#{application}/#{version} ... "
   begin
     client.versions.put_by_application_key_and_version(org, application, version, form)
     puts "success"
-  rescue Com::Bryzek::Apibuilder::Api::V0::HttpClient::ServerError => e
+  rescue Io::Apibuilder::Api::V0::HttpClient::ServerError => e
     puts "1 or more errors:"
     JSON.parse(e.body).each do |error|
       if error['code'] == "validation_error"
@@ -381,7 +381,7 @@ elsif command == "update"
               puts "unchanged"
             end
           end
-        rescue Com::Bryzek::Apibuilder::Api::V0::HttpClient::ServerError => e
+        rescue Io::Apibuilder::Api::V0::HttpClient::ServerError => e
           if e.code == 404
             puts "not found"
           else

@@ -1,19 +1,19 @@
 #!/usr/bin/env ruby
 #
-# This scripts creates the actual release of apidoc-clischema-evolution-manager
-#  - updates lib/apidoc-cli/version.rb
+# This scripts creates the actual release of apibuilder-cli
+#  - updates lib/apibuilder-cli/version.rb
 #  - creates git tags
 #
 # == Usage
 #  ./util/create-release.rb
 #
 
-load File.join(File.dirname(__FILE__), '../lib/apidoc-cli.rb')
+load File.join(File.dirname(__FILE__), '../lib/apibuilder-cli.rb')
 
 dirty_files = `git status --porcelain`.strip
-ApidocCli::Preconditions.check_state(dirty_files == "", "Local checkout is dirty:\n%s" % dirty_files)
+ApibuilderCli::Preconditions.check_state(dirty_files == "", "Local checkout is dirty:\n%s" % dirty_files)
 
-version = ApidocCli::Version.current
+version = ApibuilderCli::Version.current
 puts "Current version is %s" % version
 
 pieces = version.split(/\./)
@@ -30,7 +30,7 @@ if new_version == version
   exit(1)
 end
 
-version_path = "lib/apidoc-cli/version.rb"
+version_path = "lib/apibuilder-cli/version.rb"
 new_contents = ""
 found = false
 IO.readlines(version_path).each do |l|
@@ -40,7 +40,7 @@ IO.readlines(version_path).each do |l|
   end
   new_contents << l
 end
-ApidocCli::Preconditions.check_state(found, "Failed to update #{version_path}")
+ApibuilderCli::Preconditions.check_state(found, "Failed to update #{version_path}")
 
 puts "Update version in #{version_path}"
 File.open(version_path, "w") { |out| out << new_contents }

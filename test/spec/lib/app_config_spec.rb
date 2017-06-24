@@ -23,8 +23,8 @@ describe ApibuilderCli::AppConfig do
     it "constructor" do
       generators = [ApibuilderCli::AppConfig::Generator.new("ruby_client", "/tmp/client.rb")]
 
-      project = ApibuilderCli::AppConfig::Project.new("bryzek", "apibuilder", "0.1.2", generators)
-      expect(project.org).to eq("bryzek")
+      project = ApibuilderCli::AppConfig::Project.new("apicollective", "apibuilder", "0.1.2", generators)
+      expect(project.org).to eq("apicollective")
       expect(project.name).to eq("apibuilder")
       expect(project.version).to eq("0.1.2")
       expect(project.generators.map(&:name)).to eq(["ruby_client"])
@@ -37,7 +37,7 @@ describe ApibuilderCli::AppConfig do
     before do
       @sample_file = ApibuilderCli::Util.write_to_temp_file("""
 code:
-  bryzek:
+  apicollective:
     apibuilder:
       version: latest
       generators:
@@ -65,7 +65,7 @@ code:
       expect(app_config.code.projects.map(&:name).sort).to eq(["apibuilder", "apibuilder-generator", "apibuilder-spec", "bar"])
 
       apibuilder = app_config.code.projects.find { |p| p.name == "apibuilder" }
-      expect(apibuilder.org).to eq("bryzek")
+      expect(apibuilder.org).to eq("apicollective")
       expect(apibuilder.name).to eq("apibuilder")
       expect(apibuilder.version).to eq("latest")
       expect(apibuilder.generators.map(&:name).sort).to eq(["play_2_3_client", "play_2_x_routes"])
