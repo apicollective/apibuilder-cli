@@ -1,4 +1,4 @@
-module ApidocCli
+module ApibuilderCli
   # Modeled after http://docs.guava-libraries.googlecode.com/git/javadoc/com/google/common/base/Preconditions.html
   class Preconditions
 

@@ -1,10 +1,10 @@
-module ApidocCli
+module ApibuilderCli
 
   module Util
 
     # Writes contents to a temp file, returning the path
     def Util.write_to_temp_file(contents)
-      tmp = Tempfile.new('apidoc-cli')
+      tmp = Tempfile.new('apibuilder-cli')
       Util.write_to_file(tmp.path, contents)
     end
 

@@ -1,13 +1,13 @@
 load File.join(File.dirname(__FILE__), '../../init.rb')
 
-describe ApidocCli::Config do
+describe ApibuilderCli::Config do
 
   describe "with a valid configuration file" do
 
     before do
-      @sample_file = ApidocCli::Util.write_to_temp_file("""
+      @sample_file = ApibuilderCli::Util.write_to_temp_file("""
 [default]
-profile = public
+token = other
 
 [profile public]
 token = 
@@ -18,8 +18,12 @@ token = secret-token
     end
 
     it "reads file" do
-      config = ApidocCli::Config.new(:path => @sample_file)
-      expect(config.profiles.map(&:name).sort).to eq(["foo", "public"])
+      config = ApibuilderCli::Config.new(:path => @sample_file)
+      expect(config.profiles.map(&:name).sort).to eq(["default", "foo", "public"])
+
+      default = config.profiles.find { |p| p.name == "default" }
+      expect(default.name).to eq("default")
+      expect(default.token).to eq("other")
 
       pub = config.profiles.find { |p| p.name == "public" }
       expect(pub.name).to eq("public")
@@ -29,29 +33,8 @@ token = secret-token
       expect(foo.name).to eq("foo")
       expect(foo.token).to eq("secret-token")
 
-      expect(config.default_profile).to eq(pub)
+      expect(config.default_profile).to eq(default)
     end
-
-  end
-
-  describe "with an invalid default profile" do
-
-    before do
-      @sample_file = ApidocCli::Util.write_to_temp_file("""
-[default]
-profile = foo
-
-[profile public]
-token = 
-      """.strip)
-    end
-
-    it "raises error on invalid default" do
-      expect {
-        ApidocCli::Config.new(:path => @sample_file)
-      }.to raise_error(RuntimeError, "Default profile[foo] is not defined")
-    end
-
 
   end
 

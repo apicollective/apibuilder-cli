@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-load File.join(File.dirname(__FILE__), '..', 'lib', 'apidoc-cli.rb')
+load File.join(File.dirname(__FILE__), '..', 'lib', 'apibuilder-cli.rb')
 
 def run(command)
   puts command
@@ -17,7 +17,7 @@ files = `find specs -type f -name "*spec.rb"`.strip.split
 
 result = output = nil
 
-tmp = "/tmp/apidoc-cli.tmp"
+tmp = "/tmp/apibuilder-cli.tmp"
 result = run("export GEM_HOME=%s && %s %s > %s" % [gem_home, rspec, files.join(" "), tmp])
 output = IO.read(tmp)
 puts output

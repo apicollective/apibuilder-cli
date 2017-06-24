@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-module ApidocCli
+module ApibuilderCli
 
   module Args
 
