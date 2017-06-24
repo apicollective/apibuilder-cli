@@ -1,56 +1,56 @@
 load File.join(File.dirname(__FILE__), '../../init.rb')
 
-describe ApidocCli::AppConfig do
+describe ApibuilderCli::AppConfig do
 
-  describe ApidocCli::AppConfig::Generator do
+  describe ApibuilderCli::AppConfig::Generator do
 
     it "constructor for a single file" do
-      g = ApidocCli::AppConfig::Generator.new("ruby_client", "/tmp/client.rb")
+      g = ApibuilderCli::AppConfig::Generator.new("ruby_client", "/tmp/client.rb")
       expect(g.name).to eq("ruby_client")
       expect(g.targets).to eq(["/tmp/client.rb"])
     end
 
     it "constructor for multiple files" do
-      g = ApidocCli::AppConfig::Generator.new("ruby_client", ["/tmp/client.rb", "/tmp/bar"])
+      g = ApibuilderCli::AppConfig::Generator.new("ruby_client", ["/tmp/client.rb", "/tmp/bar"])
       expect(g.name).to eq("ruby_client")
       expect(g.targets).to eq(["/tmp/client.rb", "/tmp/bar"])
     end
 
   end
 
-  describe ApidocCli::AppConfig::Project do
+  describe ApibuilderCli::AppConfig::Project do
 
     it "constructor" do
-      generators = [ApidocCli::AppConfig::Generator.new("ruby_client", "/tmp/client.rb")]
+      generators = [ApibuilderCli::AppConfig::Generator.new("ruby_client", "/tmp/client.rb")]
 
-      project = ApidocCli::AppConfig::Project.new("bryzek", "apidoc", "0.1.2", generators)
+      project = ApibuilderCli::AppConfig::Project.new("bryzek", "apibuilder", "0.1.2", generators)
       expect(project.org).to eq("bryzek")
-      expect(project.name).to eq("apidoc")
+      expect(project.name).to eq("apibuilder")
       expect(project.version).to eq("0.1.2")
       expect(project.generators.map(&:name)).to eq(["ruby_client"])
     end
 
   end
 
-  describe ApidocCli::AppConfig do
+  describe ApibuilderCli::AppConfig do
 
     before do
-      @sample_file = ApidocCli::Util.write_to_temp_file("""
+      @sample_file = ApibuilderCli::Util.write_to_temp_file("""
 code:
   bryzek:
-    apidoc:
+    apibuilder:
       version: latest
       generators:
-        play_2_3_client: generated/app/ApidocClient.scala
+        play_2_3_client: generated/app/ApibuilderClient.scala
         play_2_x_routes: api/conf/routes
-    apidoc-spec:
+    apibuilder-spec:
       version: latest
       generators:
-        play_2_3_client: generated/app/ApidocSpec.scala
-    apidoc-generator:
+        play_2_3_client: generated/app/ApibuilderSpec.scala
+    apibuilder-generator:
       version: latest
       generators:
-        play_2_3_client: generated/app/ApidocGenerator.scala
+        play_2_3_client: generated/app/ApibuilderGenerator.scala
 
   foo:
     bar:
@@ -61,14 +61,14 @@ code:
     end
 
     it "reads file" do
-      app_config = ApidocCli::AppConfig.new(:path => @sample_file)
-      expect(app_config.code.projects.map(&:name).sort).to eq(["apidoc", "apidoc-generator", "apidoc-spec", "bar"])
+      app_config = ApibuilderCli::AppConfig.new(:path => @sample_file)
+      expect(app_config.code.projects.map(&:name).sort).to eq(["apibuilder", "apibuilder-generator", "apibuilder-spec", "bar"])
 
-      apidoc = app_config.code.projects.find { |p| p.name == "apidoc" }
-      expect(apidoc.org).to eq("bryzek")
-      expect(apidoc.name).to eq("apidoc")
-      expect(apidoc.version).to eq("latest")
-      expect(apidoc.generators.map(&:name).sort).to eq(["play_2_3_client", "play_2_x_routes"])
+      apibuilder = app_config.code.projects.find { |p| p.name == "apibuilder" }
+      expect(apibuilder.org).to eq("bryzek")
+      expect(apibuilder.name).to eq("apibuilder")
+      expect(apibuilder.version).to eq("latest")
+      expect(apibuilder.generators.map(&:name).sort).to eq(["play_2_3_client", "play_2_x_routes"])
 
       bar = app_config.code.projects.find { |p| p.name == "bar" }
       expect(bar.org).to eq("foo")

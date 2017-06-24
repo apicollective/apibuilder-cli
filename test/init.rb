@@ -1,1 +1,1 @@
-load File.join(File.dirname(__FILE__), '../lib/apidoc-cli.rb')
+load File.join(File.dirname(__FILE__), '../lib/apibuilder-cli.rb')

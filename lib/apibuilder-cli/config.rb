@@ -4,7 +4,7 @@ module ApibuilderCli
   class Config
 
     DEFAULT_PATH = "~/.apibuilder/config" unless defined?(DEFAULT_PATH)
-    DEFAULT_API_URI = "http://api.apibuilder.me" unless defined?(DEFAULT_API_URI)
+    DEFAULT_API_URI = "http://api.apidoc.me" unless defined?(DEFAULT_API_URI)
     DEFAULT_PROFILE_NAME = "default"
 
     def Config.client_from_profile(opts={})
@@ -41,7 +41,7 @@ module ApibuilderCli
     def initialize(opts={})
       @path = Preconditions.assert_class(opts.delete(:path) || File.expand_path(DEFAULT_PATH), String)
       contents = File.exists?(@path) ? IO.readlines(@path) : []
-      
+
       @profiles = []
 
       contents.each_with_index do |line, i|
