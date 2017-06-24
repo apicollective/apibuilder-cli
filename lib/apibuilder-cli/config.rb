@@ -5,7 +5,7 @@ module ApibuilderCli
 
     DEFAULT_DIRECTORIES = ["~/.apibuilder", "~/.apidoc"] unless defined?(DEFAULT_DIRECTORIES)
     DEFAULT_FILENAME = "config" unless defined?(DEFAULT_FILENAME)
-    DEFAULT_API_URI = "http://api.apidoc.me" unless defined?(DEFAULT_API_URI)
+    DEFAULT_API_URI = "https://api.apibuilder.io" unless defined?(DEFAULT_API_URI)
     DEFAULT_PROFILE_NAME = "default"
 
     def Config.client_from_profile(opts={})
