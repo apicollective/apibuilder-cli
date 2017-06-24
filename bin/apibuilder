@@ -339,7 +339,7 @@ elsif command == "upload"
 
 elsif command == "update"
   args = ApibuilderCli::Args.parse(ARGV)
-  path = File.expand_path(args[:path] || ApibuilderCli::AppConfig::DEFAULT_FILENAME)
+  path = File.expand_path(args[:path] || ApibuilderCli::AppConfig.default_path)
 
   if !File.exists?(path)
     puts "File #{path} does not exit"

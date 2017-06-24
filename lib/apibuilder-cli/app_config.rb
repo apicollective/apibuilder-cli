@@ -3,12 +3,24 @@ module ApibuilderCli
 
   class AppConfig
 
-    DEFAULT_FILENAME = ".apibuilder" unless defined?(DEFAULT_FILENAME)
+    DEFAULT_FILENAMES = [".apibuilder", ".apidoc"] unless defined?(DEFAULT_FILENAMES)
 
     attr_reader :settings, :code
 
+    def AppConfig.default_path
+      path = DEFAULT_FILENAMES.find { |p| File.exists?(p) }
+      if path.nil?
+        puts "**ERROR** Could not find apibuilder configuration file. Expected file to be located in current directory and named: %s" % DEFAULT_FILENAMES.first
+        exit(1)
+      end
+      if path != DEFAULT_FILENAMES.first
+        puts "**WARNING** File %s is now deprecated and should be named %s. To Fix: git mv %s %s" % [path, DEFAULT_FILENAMES.first, path, DEFAULT_FILENAMES.first]
+      end
+      path
+    end
+      
     def initialize(opts={})
-      @path = Preconditions.assert_class(opts.delete(:path) || DEFAULT_FILEPATH, String)
+      @path = Preconditions.assert_class(opts.delete(:path) || AppConfig.default_path, String)
       Preconditions.check_state(File.exists?(@path), "Apibuilder application config file[#{@path}] not found")
 
       yaml = YAML.load(IO.read(@path))

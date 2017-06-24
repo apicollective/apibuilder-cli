@@ -3,7 +3,7 @@ module ApibuilderCli
 
   class Config
 
-    DEFAULT_PATH = "~/.apibuilder/config" unless defined?(DEFAULT_PATH)
+    DEFAULT_PATHS = ["~/.apibuilder/config", "~/.apidoc/config"] unless defined?(DEFAULT_PATHS)
     DEFAULT_API_URI = "http://api.apidoc.me" unless defined?(DEFAULT_API_URI)
     DEFAULT_PROFILE_NAME = "default"
 
@@ -38,8 +38,17 @@ module ApibuilderCli
 
     attr_reader :path
 
+    def Config.default_path
+      path = DEFAULT_PATHS.map { |p| File.expand_path(p) }.find { |p| File.exists?(p) }
+      if path.nil?
+        puts "**ERROR** Could not find apibuilder configuration file. Expected file to be located at: %s" % DEFAULT_PATHS.first
+        exit(1)
+      end
+      path
+    end
+      
     def initialize(opts={})
-      @path = Preconditions.assert_class(opts.delete(:path) || File.expand_path(DEFAULT_PATH), String)
+      @path = Preconditions.assert_class(opts.delete(:path) || Config.default_path, String)
       contents = File.exists?(@path) ? IO.readlines(@path) : []
 
       @profiles = []
