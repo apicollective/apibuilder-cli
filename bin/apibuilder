@@ -64,7 +64,7 @@ load File.join(File.dirname(__FILE__), 'apibuilder-cli-config')
 
 env = {
   :profile => ApibuilderCli::Util.read_non_empty_string(ENV['PROFILE']),
-  :apibuilder_token => ApibuilderCli::Util.read_non_empty_string(ENV['APIBUILDER_TOKEN'] || ENV['APIDOC_TOKEN']),
+  :apibuilder_token => ApibuilderCli::Util.read_non_empty_string(ENV['APIBUILDER_TOKEN']) || ApibuilderCli::Util.read_non_empty_string(ENV['APIDOC_TOKEN']),
   :limit => ApibuilderCli::Util.read_non_empty_integer(ENV['LIMIT']),
   :offset => ApibuilderCli::Util.read_non_empty_integer(ENV['OFFSET']),
   :has_version => ApibuilderCli::Util.read_non_empty_string(ENV['HAS_VERSION'])
