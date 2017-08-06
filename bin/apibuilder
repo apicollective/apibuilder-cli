@@ -23,7 +23,7 @@
 #  - Pagination is implemented with environment variables LIMIT and OFFSET. Example:
 #    HAS_VERSION=t LIMIT=10 OFFSET=0 apibuilder list applications apicollective
 #
-# apibuilder list versions apicollective apibuilder
+# apibuilder list versions apicollective apibuilder-api
 #  - Returns a list of all of the versions for the specific org and application.
 #  - Pagination is implemented with environment variables LIMIT and OFFSET. Example:
 #    LIMIT=10 OFFSET=0 apibuilder list applications apicollective
