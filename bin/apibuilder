@@ -23,14 +23,15 @@
 #  - Pagination is implemented with environment variables LIMIT and OFFSET. Example:
 #    HAS_VERSION=t LIMIT=10 OFFSET=0 apibuilder list applications apicollective
 #
-# apibuilder list versions apicollective apibuilder
+# apibuilder list versions apicollective apibuilder-api
 #  - Returns a list of all of the versions for the specific org and application.
 #  - Pagination is implemented with environment variables LIMIT and OFFSET. Example:
 #    LIMIT=10 OFFSET=0 apibuilder list applications apicollective
 #
-# apibuilder code apicollective apibuilder-api latest scala_models
+# apibuilder code apicollective apibuilder-api latest scala_models /tmp
 #  - Returns the code for apicollective/apibuilder version 'latest' using the
-#    codegenerator 'scala_models'
+#    codegenerator 'scala_models', writing the generated code to the directory
+#    /tmp
 #
 # apibuilder download apicollective apibuilder-api latest original|service
 #  - Downloads the 'original' uploaded file used to create the specified
@@ -135,7 +136,7 @@ if command == "list"
   elsif resource == "applications"
     org = ARGV.shift.to_s.strip
 
-    if org == ""
+    if org.empty?
       puts "organization is required"
       exit(1)
     else
@@ -152,7 +153,7 @@ if command == "list"
     org = ARGV.shift.to_s.strip
     application = ARGV.shift.to_s.strip
 
-    if org == "" || application == ""
+    if org.empty? || application.empty?
       puts "organization and application are required"
       exit(1)
     else
@@ -161,7 +162,7 @@ if command == "list"
       end
     end
 
-  elsif resource == ""
+  elsif resource.empty?
     puts "resource to list is required"
     exit(1)
 
@@ -176,7 +177,7 @@ elsif command == "download"
   version = ARGV.shift.to_s.strip
   typ = ARGV.shift.to_s.strip
 
-  if org == "" || application == "" || version == "" || typ == ""
+  if org.empty? || application.empty? || version.empty? || typ.empty?
     puts "org, application, version, and type are required"
     exit(1)
   end
@@ -207,7 +208,7 @@ elsif command == "example"
   typ = ARGV.shift.to_s.strip
   optional_fields = ARGV.shift.to_s.strip
 
-  if org == "" || application == "" || version == "" || typ == ""
+  if org.empty? || application.empty? || version.empty? || typ.empty?
     puts "org, application, version, and type are required"
     exit(1)
   end
@@ -236,31 +237,32 @@ elsif command == "code"
   application = ARGV.shift.to_s.strip
   version = ARGV.shift.to_s.strip
   generator = ARGV.shift.to_s.strip
-  filename = ARGV.shift.to_s.strip
-  if filename == ""
-    filename = nil
+  directory = ARGV.shift.to_s.strip
+
+  if org.empty? || application.empty? || version.empty? || generator.empty? || directory.empty?
+    puts "org, application, version, generator, and directory are required"
+    exit(1)
   end
 
-  if org == "" || application == "" || version == "" || generator == ""
-    puts "org, application, version, and generator are required"
+  if !File.directory?(directory)
+    puts "ERROR: directory '%s' does not exist" % directory
     exit(1)
   end
 
   begin
-    code = client.code.get(org, application, version, generator)
-    if filename
-      if file = code.files.find { |f| f.name == filename }
-        puts file.contents
+    client.code.get(org, application, version, generator).files.each do |f|
+      if f.dir
+        target_dir = File.join(directory, f.dir)
+        `mkdir -p #{target_dir}`
       else
-        $stderr.puts "  ERROR: Could not find file named #{filename} for generator[#{generator}]. Available filenames: #{code.files.map(&:name).join(", ")}"
+        target_dir = directory
       end
-    else
-      puts "#{generator} Files:"
-      code.files.each do |f|
-        puts " - #{f.name}"
+      target_file = File.join(target_dir, f.name)
+      puts " - %s" % target_file
+      File.open(target_file, "w") do |out|
+        out << f.contents
       end
     end
-
   rescue Io::Apibuilder::Api::V0::HttpClient::ServerError => e
     if e.code == 404
       $stderr.puts "  ERROR: 404 when accessing URI: #{e.uri}"
@@ -280,7 +282,7 @@ elsif command == "upload"
   args = ApibuilderCli::Args.parse(ARGV)
   version = args[:version].to_s.strip
 
-  if org == "" || application == "" || path == ""
+  if org.empty? || application.empty? || path.empty?
     puts "org, application, path are required"
     exit(1)
   end
@@ -290,7 +292,7 @@ elsif command == "upload"
     exit(1)
   end
 
-  if version == ""
+  if version.empty?
     default_version = ""
 
     if system("git describe 2> /dev/null")
@@ -306,7 +308,7 @@ elsif command == "upload"
     version = nil
     while version.nil?
       answer = $stdin.gets
-      if answer.strip == "" && default_version != ""
+      if answer.strip.empty? && default_version != ""
         version = default_version
       else
         version = answer.strip
@@ -431,7 +433,7 @@ elsif command == "cli"
     exit(1)
   end
 
-elsif command == ""
+elsif command.empty?
   puts "** ERROR: Missing command is required. Available commands:"
   all_commands.sort.each do |cmd|
     puts " - %s" % cmd
