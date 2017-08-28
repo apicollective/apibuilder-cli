@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-load File.join(File.dirname(__FILE__), '..', 'lib', 'apibuilder-cli.rb')
+load File.join(File.dirname(__FILE__), '..', 'src', 'apibuilder-cli.rb')
 
 def run(command)
   puts command

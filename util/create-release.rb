@@ -1,14 +1,14 @@
 #!/usr/bin/env ruby
 #
 # This scripts creates the actual release of apibuilder-cli
-#  - updates lib/apibuilder-cli/version.rb
+#  - updates src/apibuilder-cli/version.rb
 #  - creates git tags
 #
 # == Usage
 #  ./util/create-release.rb
 #
 
-load File.join(File.dirname(__FILE__), '../lib/apibuilder-cli.rb')
+load File.join(File.dirname(__FILE__), '../src/apibuilder-cli.rb')
 
 dirty_files = `git status --porcelain`.strip
 ApibuilderCli::Preconditions.check_state(dirty_files == "", "Local checkout is dirty:\n%s" % dirty_files)
@@ -30,7 +30,7 @@ if new_version == version
   exit(1)
 end
 
-version_path = "lib/apibuilder-cli/version.rb"
+version_path = "src/apibuilder-cli/version.rb"
 new_contents = ""
 found = false
 IO.readlines(version_path).each do |l|
