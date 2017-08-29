@@ -6,7 +6,7 @@
 #   path: defaults to ~/.apibuilder/config
 #
 
-load File.join(File.dirname(__FILE__), 'apibuilder-cli-config')
+load File.join(File.dirname(__FILE__), '../src/apibuilder-cli.rb')
 
 args = ApibuilderCli::Args.parse(ARGV)
 

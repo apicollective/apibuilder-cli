@@ -61,7 +61,7 @@
 #  - Upgrade the CLI to the latest version
 #
 
-load File.join(File.dirname(__FILE__), 'apibuilder-cli-config')
+load File.join(File.dirname(__FILE__), '../src/apibuilder-cli.rb')
 
 env = {
   :profile => ApibuilderCli::Util.read_non_empty_string(ENV['PROFILE']),

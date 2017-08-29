@@ -3,16 +3,16 @@ code:
     apibuilder-common:
       version: latest
       generators:
-        ruby_client: lib/apibuilder-cli
+        ruby_client: src/apibuilder-cli
     apibuilder-api:
       version: latest
       generators:
-        ruby_client: lib/apibuilder-cli
+        ruby_client: src/apibuilder-cli
     apibuilder-generator:
       version: latest
       generators:
-        ruby_client: lib/apibuilder-cli
+        ruby_client: src/apibuilder-cli
     apibuilder-spec:
       version: latest
       generators:
-        ruby_client: lib/apibuilder-cli
+        ruby_client: src/apibuilder-cli
