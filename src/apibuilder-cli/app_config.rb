@@ -25,7 +25,13 @@ module ApibuilderCli
       @path = Preconditions.assert_class(opts.delete(:path) || AppConfig.default_path, String)
       Preconditions.check_state(File.exists?(@path), "Apibuilder application config file[#{@path}] not found")
 
-      yaml = YAML.load(IO.read(@path))
+      contents = IO.read(@path)
+      yaml = begin
+               YAML.load(contents)
+             rescue Psych::SyntaxError => e
+               puts "ERROR parsing YAML file at #{@path}:\n  #{e}"
+               exit(1)
+             end
 
       @settings = Settings.new(yaml['settings'] || {})
 
