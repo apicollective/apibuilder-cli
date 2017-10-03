@@ -87,7 +87,9 @@ The configuration file is a YAML file that follows the convention:
               files: <file name or file pattern>
             <generator name 3>:
               target: <path to directory or specific filename>
-              files: [ '<file>' ]
+              files:
+                - <file name or file pattern>
+                - <file name or file pattern>
 
 Example File:
 
@@ -106,7 +108,9 @@ Example File:
           generators:
             play_2_5_client:
               target: generated/app
-              files: [ apicollective*.*, '*client.rb' ]
+              files:
+                - apicollective*.*
+                - '*client.rb'
         apibuilder-generator:
           version: latest
           generators:

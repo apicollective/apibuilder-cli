@@ -16,7 +16,9 @@ code:
       generators:
         ruby_client:
           target: src/apibuilder-cli
-          files: [ apicollective*.*, '*client.rb' ]
+          files:
+            - apicollective*.*
+            - '*client.rb'
     apibuilder-spec:
       version: latest
       generators:
