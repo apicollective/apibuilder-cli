@@ -45,19 +45,19 @@ variables: LIMIT, OFFSET
 
 Invoke a code generator from the command line
 
-    bin/apibuilder <organization key> <application key> <version> <generator> [<filename>]
+    bin/apibuilder <organization key> <application key> <version> <generator> <target dir> [<filename>]
     
 For example, to generate a play 2.3 client for the latest version of apibuilder itself:
 
-    bin/apibuilder code apicollective apibuilder-api latest play_2_5_client
+    bin/apibuilder code apicollective apibuilder-api latest play_2_5_client .
 
 Each code generator returns a list of files. To download a specific file:
 
-    bin/apibuilder code apicollective apibuilder-api latest play_2_5_client <filename>
+    bin/apibuilder code apicollective apibuilder-api latest play_2_5_client . <filename>
     
 For example:
 
-    bin/apibuilder code apicollective apibuilder-api latest play_2_5_client ApibuilderApiClient.scala
+    bin/apibuilder code apicollective apibuilder-api latest play_2_5_client . ApicollectiveApibuilderApiV0Client.scala
 
 To view a list of available generators visit [apibuilder.io/generators](http://www.apibuilder.io/generators)
 

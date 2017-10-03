@@ -238,6 +238,7 @@ elsif command == "code"
   version = ARGV.shift.to_s.strip
   generator = ARGV.shift.to_s.strip
   directory = ARGV.shift.to_s.strip
+  filename = ARGV.shift.to_s.strip
 
   if org.empty? || application.empty? || version.empty? || generator.empty? || directory.empty?
     puts "org, application, version, generator, and directory are required"
@@ -250,17 +251,36 @@ elsif command == "code"
   end
 
   begin
-    client.code.get(org, application, version, generator).files.each do |f|
-      if f.dir
-        target_dir = File.join(directory, f.dir)
-        `mkdir -p #{target_dir}`
-      else
-        target_dir = directory
+    code = client.code.get(org, application, version, generator).files
+    if filename.empty?
+      code.each do |f|
+        if f.dir
+          target_dir = File.join(directory, f.dir)
+          `mkdir -p #{target_dir}`
+        else
+          target_dir = directory
+        end
+        target_file = File.join(target_dir, f.name)
+        puts " - %s" % target_file
+        File.open(target_file, "w") do |out|
+          out << f.contents
+        end
       end
-      target_file = File.join(target_dir, f.name)
-      puts " - %s" % target_file
-      File.open(target_file, "w") do |out|
-        out << f.contents
+    else
+      if file = code.find { |f| f.name == filename }
+        if file.dir
+          target_dir = File.join(directory, file.dir)
+          `mkdir -p #{target_dir}`
+        else
+          target_dir = directory
+        end
+        target_file = File.join(target_dir, file.name)
+        puts " - %s" % target_file
+        File.open(target_file, "w") do |out|
+          out << file.contents
+        end
+      else
+        $stderr.puts "  ERROR: Could not find file named #{filename} for generator[#{generator}]. Available filenames: #{code.files.map(&:name).join(", ")}"
       end
     end
   rescue Io::Apibuilder::Api::V0::HttpClient::ServerError => e
