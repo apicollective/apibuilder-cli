@@ -272,7 +272,7 @@ elsif command == "code"
       write_files(code, directory)
     else
       files = filenames.collect do |filename|
-        file_regex = Regexp::new(filename.gsub('.', '\.').gsub('*', '.*').gsub('?', '.?'))
+        file_regex = Regexp::new("^" + filename.gsub('.', '\.').gsub('*', '[^.]*').gsub('?', '[^.]?') + "$")
         files = code.select { |f| !file_regex.match(f.name).nil? }
         if files.empty?
           $stderr.puts "  WARNING: Could not find files named #{filename} for generator[#{generator}]. Available filenames: #{code.map(&:name).join(", ")}"
