@@ -125,6 +125,22 @@ def strip_apibuilder_comments(value)
   lines.join("\n").strip
 end
 
+def write_files(files, directory)
+  files.each do |file|
+    if file.dir
+      target_dir = File.join(directory, file.dir)
+      `mkdir -p #{target_dir}`
+    else
+      target_dir = directory
+    end
+    target_file = File.join(target_dir, file.name)
+    puts " - %s" % target_file
+    File.open(target_file, "w") do |out|
+      out << file.contents
+    end
+  end
+end
+
 if command == "list"
   resource = ARGV.shift.to_s.strip
 
@@ -238,6 +254,7 @@ elsif command == "code"
   version = ARGV.shift.to_s.strip
   generator = ARGV.shift.to_s.strip
   directory = ARGV.shift.to_s.strip
+  filenames = ARGV.collect { |f| f.to_s.strip }
 
   if org.empty? || application.empty? || version.empty? || generator.empty? || directory.empty?
     puts "org, application, version, generator, and directory are required"
@@ -250,18 +267,19 @@ elsif command == "code"
   end
 
   begin
-    client.code.get(org, application, version, generator).files.each do |f|
-      if f.dir
-        target_dir = File.join(directory, f.dir)
-        `mkdir -p #{target_dir}`
-      else
-        target_dir = directory
+    code = client.code.get(org, application, version, generator).files
+    if filenames.empty?
+      write_files(code, directory)
+    else
+      files = filenames.collect do |filename|
+        file_regex = Regexp::new("^" + filename.gsub('.', '\.').gsub('*', '[^.]*').gsub('?', '[^.]?') + "$")
+        files = code.select { |f| !file_regex.match(f.name).nil? }
+        if files.empty?
+          $stderr.puts "  WARNING: Could not find files named #{filename} for generator[#{generator}]. Available filenames: #{code.map(&:name).join(", ")}"
+        end
+        files
       end
-      target_file = File.join(target_dir, f.name)
-      puts " - %s" % target_file
-      File.open(target_file, "w") do |out|
-        out << f.contents
-      end
+      write_files(files.flatten|[], directory)
     end
   rescue Io::Apibuilder::Api::V0::HttpClient::ServerError => e
     if e.code == 404
