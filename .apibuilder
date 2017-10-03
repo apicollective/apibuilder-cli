@@ -3,15 +3,20 @@ code:
     apibuilder-common:
       version: latest
       generators:
-        ruby_client: src/apibuilder-cli
+        ruby_client:
+          target: src/apibuilder-cli
     apibuilder-api:
       version: latest
       generators:
-        ruby_client: src/apibuilder-cli
+        ruby_client:
+          target: src/apibuilder-cli
+          files: apicollective*.*
     apibuilder-generator:
       version: latest
       generators:
-        ruby_client: src/apibuilder-cli
+        ruby_client:
+          target: src/apibuilder-cli
+          files: [ apicollective*.*, '*client.rb' ]
     apibuilder-spec:
       version: latest
       generators:
