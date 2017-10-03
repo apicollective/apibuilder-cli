@@ -116,16 +116,15 @@ Example File:
           generators:
             play_2_5_client: generated/app
 
-The old configuration file syntax did not specify any files and instead had the path as the value of the generator name:
+Note: Previously the configuration file syntax did not specify any files and instead specified the path as the value of the generator name.
+While still supported, this syntax is deprecated:
 
     command:
       org:
         project:
           version: <version>
           generators:
-            <generator name 1>: <path to directory or specific filename>
-            <generator name 2>: <path to directory or specific filename>
-            <generator name 3>: <path to directory or specific filename>
+            <generator name>: <path to directory or specific filename>
 
 In addition, you can specify global settings for how the client behaves:
 
