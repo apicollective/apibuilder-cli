@@ -238,7 +238,7 @@ elsif command == "code"
   version = ARGV.shift.to_s.strip
   generator = ARGV.shift.to_s.strip
   directory = ARGV.shift.to_s.strip
-  filename = ARGV.shift.to_s.strip
+  filenames = ARGV.collect { |f| f.to_s.strip }
 
   if org.empty? || application.empty? || version.empty? || generator.empty? || directory.empty?
     puts "org, application, version, generator, and directory are required"
@@ -252,7 +252,7 @@ elsif command == "code"
 
   begin
     code = client.code.get(org, application, version, generator).files
-    if filename.empty?
+    if filenames.empty?
       code.each do |f|
         if f.dir
           target_dir = File.join(directory, f.dir)
@@ -267,20 +267,23 @@ elsif command == "code"
         end
       end
     else
-      if file = code.find { |f| f.name == filename }
-        if file.dir
-          target_dir = File.join(directory, file.dir)
-          `mkdir -p #{target_dir}`
+      filenames.each do |filename|
+        file = code.find { |f| f.name == filename }
+        if file.nil?
+          $stderr.puts "  ERROR: Could not find file named #{filename} for generator[#{generator}]. Available filenames: #{code.map(&:name).join(", ")}"
         else
-          target_dir = directory
+          if file.dir
+            target_dir = File.join(directory, file.dir)
+            `mkdir -p #{target_dir}`
+          else
+            target_dir = directory
+          end
+          target_file = File.join(target_dir, file.name)
+          puts " - %s" % target_file
+          File.open(target_file, "w") do |out|
+            out << file.contents
+          end
         end
-        target_file = File.join(target_dir, file.name)
-        puts " - %s" % target_file
-        File.open(target_file, "w") do |out|
-          out << file.contents
-        end
-      else
-        $stderr.puts "  ERROR: Could not find file named #{filename} for generator[#{generator}]. Available filenames: #{code.files.map(&:name).join(", ")}"
       end
     end
   rescue Io::Apibuilder::Api::V0::HttpClient::ServerError => e
