@@ -141,12 +141,12 @@ def write_files(files, directory)
   end
 end
 
-def filter_files(requested_files, downloaded_files)
+def filter_files(requested_files, downloaded_files, generator)
   requested_files.collect do |filename|
     file_regex = Regexp::new("^" + filename.gsub('.', '\.').gsub('*', '[^.]*').gsub('?', '[^.]?') + "$")
     files = downloaded_files.select { |f| !file_regex.match(f.name).nil? }
     if files.empty?
-      $stderr.puts "  WARNING: Could not find files named #{filename} for generator[#{generator}]. Available filenames: #{code.map(&:name).join(", ")}"
+      $stderr.puts "  WARNING: Could not find files named #{filename} for generator[#{generator}]. Available filenames: #{downloaded_files.map(&:name).join(", ")}"
     end
     files
   end.flatten|[]
@@ -282,7 +282,7 @@ elsif command == "code"
     if filenames.empty?
       write_files(code, directory)
     else
-      write_files(filter_files(filenames, code), directory)
+      write_files(filter_files(filenames, code, generator), directory)
     end
   rescue Io::Apibuilder::Api::V0::HttpClient::ServerError => e
     if e.code == 404
@@ -389,7 +389,7 @@ elsif command == "update"
           if generator.files.nil?
             files = code
           else
-            files = filter_files(generator.files, code)
+            files = filter_files(generator.files, code, generator.name)
           end
           files.each do |file|
             final_target_path = app_config.settings.code_create_directories ? File.join(base_target_path, file.dir) : base_target_path
