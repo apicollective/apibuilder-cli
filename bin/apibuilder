@@ -141,6 +141,17 @@ def write_files(files, directory)
   end
 end
 
+def filter_files(requested_files, downloaded_files, generator)
+  requested_files.collect do |filename|
+    file_regex = Regexp::new("^" + filename.gsub('.', '\.').gsub('*', '[^.]*').gsub('?', '[^.]?') + "$")
+    files = downloaded_files.select { |f| !file_regex.match(f.name).nil? }
+    if files.empty?
+      $stderr.puts "  WARNING: Could not find file/pattern #{filename} for generator[#{generator}]. Available filenames: #{downloaded_files.map(&:name).join(", ")}"
+    end
+    files
+  end.flatten|[]
+end
+
 if command == "list"
   resource = ARGV.shift.to_s.strip
 
@@ -271,15 +282,7 @@ elsif command == "code"
     if filenames.empty?
       write_files(code, directory)
     else
-      files = filenames.collect do |filename|
-        file_regex = Regexp::new("^" + filename.gsub('.', '\.').gsub('*', '[^.]*').gsub('?', '[^.]?') + "$")
-        files = code.select { |f| !file_regex.match(f.name).nil? }
-        if files.empty?
-          $stderr.puts "  WARNING: Could not find files named #{filename} for generator[#{generator}]. Available filenames: #{code.map(&:name).join(", ")}"
-        end
-        files
-      end
-      write_files(files.flatten|[], directory)
+      write_files(filter_files(filenames, code, generator), directory)
     end
   rescue Io::Apibuilder::Api::V0::HttpClient::ServerError => e
     if e.code == 404
@@ -382,7 +385,13 @@ elsif command == "update"
         base_target_path = File.join(target_dir, target)
 
         begin
-          client.code.get(project.org, project.name, project.version, generator.name).files.each do |file|
+          code = client.code.get(project.org, project.name, project.version, generator.name).files
+          if generator.files.nil?
+            files = code
+          else
+            files = filter_files(generator.files, code, generator.name)
+          end
+          files.each do |file|
             final_target_path = app_config.settings.code_create_directories ? File.join(base_target_path, file.dir) : base_target_path
 
             # check if target path ends with the filename - if not, this is a directory target and need to check if dir exists

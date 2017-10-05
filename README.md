@@ -80,9 +80,16 @@ The configuration file is a YAML file that follows the convention:
         project:
           version: <version>
           generators:
-            <generator name 1>: <path to directory or specific filename>
-            <generator name 2>: <path to directory or specific filename>
-            <generator name 3>: <path to directory or specific filename>
+            <generator name 1>:
+              target: <path to directory or specific filename>
+            <generator name 2>:
+              target: <path to directory or specific filename>
+              files: <file name or file pattern>
+            <generator name 3>:
+              target: <path to directory or specific filename>
+              files:
+                - <file name or file pattern>
+                - <file name or file pattern>
 
 Example File:
 
@@ -91,16 +98,33 @@ Example File:
         apibuilder:
           version: latest
           generators:
-            play_2_5_client: generated/app
-            play_2_x_routes: api/conf/routes
+            play_2_5_client:
+              target: generated/app
+            play_2_x_routes:
+              target: api/conf/routes
+              files: apicollective*.*
         apibuilder-spec:
           version: latest
           generators:
-            play_2_5_client: generated/app
+            play_2_5_client:
+              target: generated/app
+              files:
+                - apicollective*.*
+                - '*client.rb'
         apibuilder-generator:
           version: latest
           generators:
             play_2_5_client: generated/app
+
+Note: Previously the configuration file syntax did not specify any files and instead specified the path as the value of the generator name.
+While still supported, this syntax is deprecated:
+
+    command:
+      org:
+        project:
+          version: <version>
+          generators:
+            <generator name>: <path to directory or specific filename>
 
 In addition, you can specify global settings for how the client behaves:
 

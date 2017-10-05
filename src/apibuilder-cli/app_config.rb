@@ -42,8 +42,8 @@ module ApibuilderCli
             raise "File[#{@path}] Missing version for org[#{org_key}] project[#{project_name}]"
           end
 
-          generators = data['generators'].map do |name, target|
-            Generator.new(name, target)
+          generators = data['generators'].map do |name, data|
+            Generator.new(name, data)
           end
           project = Project.new(org_key, project_name, version, generators)
         end
@@ -91,23 +91,38 @@ module ApibuilderCli
 
     class Generator
 
-      attr_reader :name, :targets
+      attr_reader :name, :targets, :files
 
       # @param target The name of a file path or a
       # directory. Preferred usage is a directory, but paths are
       # supported based on the initial version of the configuration
       # files.
-      def initialize(name, target)
+      def initialize(name, data)
         @name = Preconditions.assert_class(name, String)
-        if target.is_a?(Array)
-          Preconditions.assert_class(target.first, String)
-          @targets = target
+        if data.is_a?(Array)
+          Preconditions.assert_class(data.first, String)
+          @targets = data
+          @files = nil
+        elsif data.is_a?(String)
+          Preconditions.assert_class(data, String)
+          @targets = [data]
+          @files = nil
+        elsif data['files'].nil?
+          Preconditions.assert_class(data['target'], String)
+          @targets = [data['target']]
+          @files = nil
+        elsif data['files'].is_a?(Array)
+          Preconditions.assert_class(data['target'], String)
+          Preconditions.assert_class(data['files'].first, String)
+          @targets = [data['target']]
+          @files = data['files']
         else
-          Preconditions.assert_class(target, String)
-          @targets = [target]
+          Preconditions.assert_class(data['target'], String)
+          Preconditions.assert_class(data['files'], String)
+          @targets = [data['target']]
+          @files = [data['files']]
         end
       end
-
     end
 
   end
