@@ -146,7 +146,7 @@ def filter_files(requested_files, downloaded_files, generator)
     file_regex = Regexp::new("^" + filename.gsub('.', '\.').gsub('*', '[^.]*').gsub('?', '[^.]?') + "$")
     files = downloaded_files.select { |f| !file_regex.match(f.name).nil? }
     if files.empty?
-      $stderr.puts "  WARNING: Could not find files named #{filename} for generator[#{generator}]. Available filenames: #{downloaded_files.map(&:name).join(", ")}"
+      $stderr.puts "  WARNING: Could not find file/pattern #{filename} for generator[#{generator}]. Available filenames: #{downloaded_files.map(&:name).join(", ")}"
     end
     files
   end.flatten|[]
