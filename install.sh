@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# install script from https://github.com/sstephenson/API_BUILDER
+# derived from install script in https://github.com/sstephenson/bats
 set -e
 
 resolve_link() {
@@ -33,4 +33,8 @@ mkdir -p "$PREFIX"/{bin,src}
 cp -R "$API_BUILDER_ROOT"/bin/* "$PREFIX"/bin
 cp -R "$API_BUILDER_ROOT"/src/* "$PREFIX"/src
 
-echo "Installed API_BUILDER_CLI to $PREFIX/bin/api-builder-cli"
+lib_path="'${PREFIX}\/src\/apibuilder\-cli\.rb'" 
+sed -ie "64s/.*/load\ File\($lib_path)/" bin/apibuilder
+
+echo "Installed API_BUILDER_CLI to $PREFIX/bin/api-builder-cli" 
+
