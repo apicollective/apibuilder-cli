@@ -41,9 +41,18 @@ module ApibuilderCli
           if version == ""
             raise "File[#{@path}] Missing version for org[#{org_key}] project[#{project_name}]"
           end
-
-          generators = data['generators'].map do |name, data|
-            Generator.new(name, data)
+          if data['generators'].nil?
+            generators = data.flat_map do |_, data|
+              if data.is_a?(Hash) && !data['generator'].nil?
+                [ Generator.new(data['generator'], data) ]
+              else
+                []
+              end
+            end
+          else
+            generators = data['generators'].map do |name, data|
+              Generator.new(name, data)
+            end
           end
           project = Project.new(org_key, project_name, version, generators)
         end
