@@ -65,6 +65,20 @@ The file names support wildcard expansion (`?` for a single character, `*` for z
 
 To view a list of available generators visit [apibuilder.io/generators](http://www.apibuilder.io/generators)
 
+## upload
+
+Upload a new version of an api given the json descriptor.
+
+```
+bin/apibuilder upload <organization key> <application key> <file> --version <version>
+```
+
+For example:
+
+```
+bin/apibuilder upload apicollective apibuilder-api apibuilder-api/api.json --version 1.0.1
+```
+
 ## update
 
 Invoke code generator based on configuration from a yaml configuration file
