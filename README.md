@@ -126,6 +126,22 @@ While still supported, this syntax is deprecated:
           generators:
             <generator name>: <path to directory or specific filename>
 
+If the same generator needs to be invoked multiple times for different target directories, the YAML file can have the following alternate syntax:
+
+    command:
+      org:
+        project:
+          version: <version>
+          generators:
+            - generator: <generator name>:
+              target: <path 1>
+              files:
+                - <file name or file pattern>
+            - generator: <generator name>:
+              target: <path 2>
+              files:
+                - <file name or file pattern>
+
 In addition, you can specify global settings for how the client behaves:
 
 Example File w/ Settings:
