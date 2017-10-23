@@ -33,8 +33,8 @@ mkdir -p "$PREFIX"/{bin,src}
 cp -R "$API_BUILDER_ROOT"/bin/* "$PREFIX"/bin
 cp -R "$API_BUILDER_ROOT"/src/* "$PREFIX"/src
 
-lib_path="'${PREFIX}\/src\/apibuilder\-cli\.rb'" 
-sed -ie "64s|.*|load\ File\.join\($lib_path)|" bin/apibuilder
+lib_path="${PREFIX}"/src/apibuilder-cli.rb
+sed -i '' -e "64s|^.*$|load File.join('$lib_path')|" bin/apibuilder
 
 echo "Installed API_BUILDER_CLI to $PREFIX/bin/api-builder-cli" 
 
