@@ -403,11 +403,21 @@ elsif command == "update"
             existing_source = File.exists?(target_path) ? IO.read(target_path).strip : ""
 
             print "    " + target_path.sub(/^#{pwd}\/?/, '') + ": "
-            if different?(file.contents, existing_source.strip)
-              puts "changed"
-              updates << { :source => file.contents, :generator => generator.name, :target => target_path }
+            case file.file_type
+            when Io::Apibuilder::Generator::V0::Models::FileType.editable
+              if existing_source.strip == ""
+                puts "new editable file"
+                updates << { :source => file.contents, :generator => generator.name, :target => target_path }
+              else
+                puts "locally editable - ignoring"
+              end
             else
-              puts "unchanged"
+              if different?(file.contents, existing_source.strip)
+                puts "changed"
+                updates << { :source => file.contents, :generator => generator.name, :target => target_path }
+              else
+                puts "unchanged"
+              end
             end
           end
         rescue Io::Apibuilder::Api::V0::HttpClient::ServerError => e
