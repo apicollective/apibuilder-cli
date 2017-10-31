@@ -3,6 +3,7 @@ module ApibuilderCli
 
   class Config
 
+    APIBUILDER_LOCAL_DIR = ".apibuilder" unless defined?(APIBUILDER_LOCAL_DIR)
     DEFAULT_DIRECTORIES = ["~/.apibuilder", "~/.apidoc"] unless defined?(DEFAULT_DIRECTORIES)
     DEFAULT_FILENAME = "config" unless defined?(DEFAULT_FILENAME)
     DEFAULT_API_URI = "https://api.apibuilder.io" unless defined?(DEFAULT_API_URI)

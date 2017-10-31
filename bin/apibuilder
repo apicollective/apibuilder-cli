@@ -98,6 +98,10 @@ def different?(source, target)
   end
 end
 
+def file_is_editable?(file)
+  file.file_type == Io::Apibuilder::Generator::V0::Models::FileType.editable
+end
+
 # Apibuilder injects a few comments into the code base to identify
 # versions; we want to exclude those lines for the purposes of seeing
 # if the API has changed as there is no functional change if only
@@ -391,6 +395,7 @@ elsif command == "update"
       generator.targets.each do |target|
         puts "  #{project.org}/#{project.name}/#{project.version}/#{generator.name}..."
         base_target_path = File.join(target_dir, target)
+        reference_target_path = File.join(target_dir, ApibuilderCli::Config::APIBUILDER_LOCAL_DIR, target)
 
         begin
           code = client.code.get(project.org, project.name, project.version, generator.name).files
@@ -399,32 +404,35 @@ elsif command == "update"
           else
             files = filter_files(generator.files, code, generator.name)
           end
-          files.each do |file|
-            final_target_path = app_config.settings.code_create_directories ? File.join(base_target_path, file.dir) : base_target_path
+          files.each do |f|
+            # For locally-editable files, store a copy of the original in the .apibuilder directory in order to
+            # demonstrate diffs to be manually ported to the editable files.
+            [[f, base_target_path], file_is_editable?(f) ? [Io::Apibuilder::Generator::V0::Models::File.new(f.to_hash.merge(:file_type => nil)), reference_target_path] : nil].compact.each do |file, file_target_path|
+              final_target_path = app_config.settings.code_create_directories ? File.join(file_target_path, file.dir) : file_target_path
 
-            # check if target path ends with the filename - if not, this is a directory target and need to check if dir exists
-            # for example: "play_2_x_routes: api/conf/routes" is a file
-            # while "anorm_2_x_parsers: api/app/generated" should be a directory we check if exists
-            FileUtils.mkdir_p(final_target_path) unless final_target_path.include?(file.name) || Dir.exists?(final_target_path) || File.exists?(final_target_path)
+              # check if target path ends with the filename - if not, this is a directory target and need to check if dir exists
+              # for example: "play_2_x_routes: api/conf/routes" is a file
+              # while "anorm_2_x_parsers: api/app/generated" should be a directory we check if exists
+              FileUtils.mkdir_p(final_target_path) unless final_target_path.include?(file.name) || Dir.exists?(final_target_path) || File.exists?(final_target_path)
 
-            target_path = File.directory?(final_target_path) ? File.join(final_target_path, file.name) : final_target_path
-            existing_source = File.exists?(target_path) ? IO.read(target_path).strip : ""
+              target_path = File.directory?(final_target_path) ? File.join(final_target_path, file.name) : final_target_path
+              existing_source = File.exists?(target_path) ? IO.read(target_path).strip : ""
 
-            print "    " + target_path.sub(/^#{pwd}\/?/, '') + ": "
-            case file.file_type
-            when Io::Apibuilder::Generator::V0::Models::FileType.editable
-              if existing_source.strip == ""
-                puts "new editable file"
-                updates << { :source => file.contents, :generator => generator.name, :target => target_path }
+              print "    " + target_path.sub(/^#{pwd}\/?/, '') + ": "
+              if file_is_editable?(file)
+                if existing_source == ""
+                  puts "new editable file"
+                  updates << { :source => file.contents, :generator => generator.name, :target => target_path }
+                else
+                  puts "locally editable - ignoring"
+                end
               else
-                puts "locally editable - ignoring"
-              end
-            else
-              if different?(file.contents, existing_source.strip)
-                puts "changed"
-                updates << { :source => file.contents, :generator => generator.name, :target => target_path }
-              else
-                puts "unchanged"
+                if different?(file.contents, existing_source)
+                  puts "changed"
+                  updates << { :source => file.contents, :generator => generator.name, :target => target_path }
+                else
+                  puts "unchanged"
+                end
               end
             end
           end
