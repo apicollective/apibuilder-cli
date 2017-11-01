@@ -99,7 +99,7 @@ def different?(source, target)
 end
 
 def file_is_editable?(file)
-  file.file_type == Io::Apibuilder::Generator::V0::Models::FileType.editable
+  !file.flags.nil? && file.flags.include?(Io::Apibuilder::Generator::V0::Models::FileFlag.editable)
 end
 
 # Apibuilder injects a few comments into the code base to identify
@@ -407,7 +407,7 @@ elsif command == "update"
           files.each do |f|
             # For locally-editable files, store a copy of the original in the .apibuilder directory in order to
             # demonstrate diffs to be manually ported to the editable files.
-            [[f, base_target_path], file_is_editable?(f) ? [Io::Apibuilder::Generator::V0::Models::File.new(f.to_hash.merge(:file_type => nil)), reference_target_path] : nil].compact.each do |file, file_target_path|
+            [[f, base_target_path], file_is_editable?(f) ? [Io::Apibuilder::Generator::V0::Models::File.new(f.to_hash.merge(:flags => nil)), reference_target_path] : nil].compact.each do |file, file_target_path|
               final_target_path = app_config.settings.code_create_directories ? File.join(file_target_path, file.dir) : file_target_path
 
               # check if target path ends with the filename - if not, this is a directory target and need to check if dir exists

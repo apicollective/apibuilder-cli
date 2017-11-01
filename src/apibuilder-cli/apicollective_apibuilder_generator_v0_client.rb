@@ -139,7 +139,7 @@ module Io
 
         module Models
 
-          class FileType
+          class FileFlag
 
             attr_reader :value
 
@@ -147,30 +147,30 @@ module Io
               @value = HttpClient::Preconditions.assert_class('value', value, String)
             end
 
-            # Returns the instance of FileType for this value, creating a new instance for an unknown value
-            def FileType.apply(value)
-              if value.instance_of?(FileType)
+            # Returns the instance of FileFlag for this value, creating a new instance for an unknown value
+            def FileFlag.apply(value)
+              if value.instance_of?(FileFlag)
                 value
               else
                 HttpClient::Preconditions.assert_class_or_nil('value', value, String)
-                value.nil? ? nil : (from_string(value) || FileType.new(value))
+                value.nil? ? nil : (from_string(value) || FileFlag.new(value))
               end
             end
 
-            # Returns the instance of FileType for this value, or nil if not found
-            def FileType.from_string(value)
+            # Returns the instance of FileFlag for this value, or nil if not found
+            def FileFlag.from_string(value)
               HttpClient::Preconditions.assert_class('value', value, String)
-              FileType.ALL.find { |v| v.value == value }
+              FileFlag.ALL.find { |v| v.value == value }
             end
 
-            def FileType.ALL
-              @@all ||= [FileType.editable]
+            def FileFlag.ALL
+              @@all ||= [FileFlag.editable]
             end
 
             # The end user may edit these files - consider not overwriting these files when
             # code is re-generated.
-            def FileType.editable
-              @@_editable ||= FileType.new('editable')
+            def FileFlag.editable
+              @@_editable ||= FileFlag.new('editable')
             end
 
             def to_hash
@@ -241,7 +241,7 @@ module Io
           # Represents a source file
           class File
 
-            attr_reader :name, :dir, :contents, :file_type
+            attr_reader :name, :dir, :contents, :flags
 
             def initialize(incoming={})
               opts = HttpClient::Helper.symbolize_keys(incoming)
@@ -249,7 +249,7 @@ module Io
               @name = HttpClient::Preconditions.assert_class('name', opts.delete(:name), String)
               @dir = (x = opts.delete(:dir); x.nil? ? nil : HttpClient::Preconditions.assert_class('dir', x, String))
               @contents = HttpClient::Preconditions.assert_class('contents', opts.delete(:contents), String)
-              @file_type = (x = opts.delete(:file_type); x.nil? ? nil : (x = x; x.is_a?(::Io::Apibuilder::Generator::V0::Models::FileType) ? x : ::Io::Apibuilder::Generator::V0::Models::FileType.apply(x)))
+              @flags = (x = opts.delete(:flags); x.nil? ? nil : HttpClient::Preconditions.assert_class('flags', x, Array).map { |v| (x = v; x.is_a?(::Io::Apibuilder::Generator::V0::Models::FileFlag) ? x : ::Io::Apibuilder::Generator::V0::Models::FileFlag.apply(x)) })
             end
 
             def to_json
@@ -265,7 +265,7 @@ module Io
                 :name => name,
                 :dir => dir,
                 :contents => contents,
-                :file_type => file_type.nil? ? nil : file_type.value
+                :flags => flags.nil? ? nil : flags.map { |o| o.value }
               }
             end
 
