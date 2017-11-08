@@ -85,7 +85,7 @@ Invoke code generator based on configuration from a yaml configuration file
 
     bin/apibuilder update [--path path]
     
-        path defaults to .apibuilder in the current directory.
+        path defaults to .apibuilder/config in the current directory.
 
 The configuration file is a YAML file that follows the convention:
 
@@ -193,7 +193,7 @@ Upgrade to the latest version
 
 # Environment Variables
 
-    PROFILE: Select a specific profile to use, read from the .apibuilder
+    PROFILE: Select a specific profile to use, read from the .apibuilder/config
              configuration file
 
     APIBUILDER_TOKEN: If specified, this is the apibuilder token we use

@@ -1,9 +1,9 @@
-# Reads the apibuilder application configuration file (.apibuilder filename by convention)
+# Reads the apibuilder application configuration file (.apibuilder/config filename by convention)
 module ApibuilderCli
 
   class AppConfig
 
-    DEFAULT_FILENAMES = [".apibuilder", ".apidoc"] unless defined?(DEFAULT_FILENAMES)
+    DEFAULT_FILENAMES = ["#{ApibuilderCli::Config::APIBUILDER_LOCAL_DIR}/config", ".apibuilder", ".apidoc"] unless defined?(DEFAULT_FILENAMES)
 
     attr_reader :settings, :code
 
@@ -15,8 +15,13 @@ module ApibuilderCli
       end
       if path != DEFAULT_FILENAMES.first
         puts "******************** WARNING ********************"
-        puts "** File %s is now deprecated and should be named %s\n** To Fix:\n**   git mv %s %s" % [path, DEFAULT_FILENAMES.first, path, DEFAULT_FILENAMES.first]
+        puts "** File %s is now deprecated and should be named %s. Moving it..." % [path, DEFAULT_FILENAMES.first]
+        ["git mv #{path} .apibuilder.tmp", "mkdir #{ApibuilderCli::Config::APIBUILDER_LOCAL_DIR}", "git mv .apibuilder.tmp #{DEFAULT_FILENAMES.first}"].each do |cmd|
+          puts "** #{cmd}"
+          `#{cmd}`
+        end
         puts "*************************************************"
+        path = DEFAULT_FILENAMES.first
       end
       path
     end
