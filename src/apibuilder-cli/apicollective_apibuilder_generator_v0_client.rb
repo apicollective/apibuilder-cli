@@ -164,13 +164,15 @@ module Io
             end
 
             def FileFlag.ALL
-              @@all ||= [FileFlag.editable]
+              @@all ||= [FileFlag.scaffolding]
             end
 
-            # The end user may edit these files - consider not overwriting these files when
-            # code is re-generated.
-            def FileFlag.editable
-              @@_editable ||= FileFlag.new('editable')
+            # Indicates files that an end user starts from but should edit. Not intended to
+            # be the final product (see:
+            # https://stackoverflow.com/questions/235018/what-is-scaffolding-is-it-a-term-for-a-particular-platform).
+            # Consider not overwriting these files when code is re-generated.
+            def FileFlag.scaffolding
+              @@_scaffolding ||= FileFlag.new('scaffolding')
             end
 
             def to_hash
