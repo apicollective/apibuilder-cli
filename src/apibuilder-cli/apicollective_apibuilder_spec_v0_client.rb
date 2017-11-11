@@ -84,7 +84,6 @@ module Io
 
             def initialize(incoming={})
               opts = HttpClient::Helper.symbolize_keys(incoming)
-              @__discriminator__ = 'response_code'
             end
 
             def subtype_to_hash
@@ -92,7 +91,7 @@ module Io
             end
 
             def to_hash
-              { @__discriminator__ => subtype_to_hash }
+              subtype_to_hash
             end
 
             def ResponseCode.from_json(hash)
