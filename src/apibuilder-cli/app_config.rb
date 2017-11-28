@@ -77,10 +77,11 @@ module ApibuilderCli
 
     class Settings
 
-      attr_reader :code_create_directories
+      attr_reader :code_create_directories, :code_cleanup_generated_files
 
       def initialize(data)
         @code_create_directories = data.has_key?("code.create.directories") ? data.delete("code.create.directories") : false
+        @code_cleanup_generated_files = data.has_key?("code.cleanup.generated.files") ? data.delete("code.cleanup.generated.files") : false
         Preconditions.check_state(data.empty?, "Invalid settings: #{data.keys.sort}")
       end
 
