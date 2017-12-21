@@ -7,7 +7,7 @@ No setup needed - just use the API Builder command directly (see below)
 
 # Setup for private APIs
 
-1. [Create a token](http://www.apibuilder.io/tokens/) for your user account
+1. [Create a token](https://app.apibuilder.io/tokens/) for your user account
 
 2. Create a configuration file in ~/.apibuilder/config
    Example File:
@@ -45,7 +45,7 @@ variables: LIMIT, OFFSET
 
 Invoke a code generator from the command line
 
-    bin/apibuilder <organization key> <application key> <version> <generator> <target dir> [<filename> ...]
+    bin/apibuilder code <organization key> <application key> <version> <generator> <target dir> [<filename> ...]
     
 For example, to generate a play 2.3 client for the latest version of apibuilder itself:
 
@@ -63,7 +63,7 @@ The file names support wildcard expansion (`?` for a single character, `*` for z
 
     bin/apibuilder code apicollective apibuilder-api latest http4s_0_17 . *ApiV?Client*.scala
 
-To view a list of available generators visit [apibuilder.io/generators](http://www.apibuilder.io/generators)
+To view a list of available generators visit [apibuilder.io/generators](https://app.apibuilder.io/generators)
 
 ## upload
 
