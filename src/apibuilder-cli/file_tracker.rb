@@ -8,11 +8,12 @@ module ApibuilderCli
 
     # Options:
     #   :path => Mostly here for injecting test config
-    def initialize(opts={})
+    def initialize(pwd, opts={})
       @path = Preconditions.assert_class(opts.delete(:path) || FileTracker.default_path, String)
       @previous = {}
       @current = {}
       @current_raw = []
+      @pwd = pwd
       if File.exists?(@path)
         contents = IO.read(@path).strip
         if contents != ""
@@ -58,6 +59,7 @@ module ApibuilderCli
       Preconditions.assert_class(project, String)
       Preconditions.assert_class(generator, String)
       Preconditions.assert_class(file, String)
+      file = file.sub(/^#{@pwd}\/?/, '')
 
       @current[org] = {} if @current[org].nil?
       @current[org][project] = {} if @current[org][project].nil?

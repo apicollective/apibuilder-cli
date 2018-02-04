@@ -26,7 +26,7 @@ foo:
 
       before do
         @file_path = is_empty ? @empty_destination : @sample_file
-        @files = ApibuilderCli::FileTracker.new(:path => @file_path)
+        @files = ApibuilderCli::FileTracker.new(`pwd`.strip, :path => @file_path)
         @previous_count = @files.to_cleanup.size
       end
 
@@ -59,7 +59,7 @@ baz:
   describe "with some files tracked" do
 
     before do
-      @files = ApibuilderCli::FileTracker.new(:path => @sample_file)
+      @files = ApibuilderCli::FileTracker.new(`pwd`.strip, :path => @sample_file)
     end
 
     describe "#save" do
@@ -89,6 +89,17 @@ apicollective:
 """
       end
 
+      it "should not include current directory" do
+        pwd = `pwd`.strip
+        @files.track!("apicollective", "apibuilder", "play_2_x_routes", "#{pwd}/conf/routes")
+        @files.save!
+        expect(IO.read(@sample_file)).to eq """---
+apicollective:
+  apibuilder:
+    play_2_x_routes:
+    - conf/routes
+"""
+      end
     end
 
     describe "#to_cleanup" do
