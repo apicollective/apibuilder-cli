@@ -378,8 +378,7 @@ elsif command == "update"
 
   app_config = ApibuilderCli::AppConfig.new(:path => path)
 
-  pwd = `pwd`.strip
-  tracked_files = ApibuilderCli::FileTracker.new(pwd)
+  tracked_files = ApibuilderCli::FileTracker.new(app_config.project_dir)
 
   app_config.code.projects.map do |project|
     project.generators.each do |generator|
@@ -409,7 +408,7 @@ elsif command == "update"
               target_path = File.directory?(final_target_path) ? File.join(final_target_path, file.name) : final_target_path
               existing_source = File.exists?(target_path) ? IO.read(target_path).strip : ""
 
-              print "    " + target_path.sub(/^#{pwd}\/?/, '') + ": "
+              print "    " + target_path.sub(/^#{app_config.project_dir}\/?/, '') + ": "
               if file_is_scaffolding?(file)
                 if existing_source == ""
                   puts "new scaffolding file"

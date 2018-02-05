@@ -8,9 +8,17 @@ module ApibuilderCli
     attr_reader :settings, :code, :project_dir
 
     def AppConfig.default_path
-      path = DEFAULT_FILENAMES.find { |p| File.exists?(p) }
+      path = find_config_file
+      path_root = Dir.pwd
       if path.nil?
-        puts "**ERROR** Could not find apibuilder configuration file. Expected file to be located in current directory and named: %s" % DEFAULT_FILENAMES.first
+        git_root = `git rev-parse --show-toplevel 2> /dev/null`.strip
+        if git_root != ""
+          path = find_config_file(git_root)
+          path_root = git_root unless path.nil?
+        end
+      end
+      if path.nil?
+        puts "**ERROR** Could not find apibuilder configuration file. Expected file to be located in current directory or the project root directory and named: %s" % DEFAULT_FILENAMES.first
         exit(1)
       end
       if path != DEFAULT_FILENAMES.first
@@ -23,7 +31,11 @@ module ApibuilderCli
         puts "*************************************************"
         path = DEFAULT_FILENAMES.first
       end
-      path
+      Util.file_join(path_root, path)
+    end
+
+    def AppConfig.find_config_file(root_dir = nil)
+      DEFAULT_FILENAMES.find { |p| File.exists?(Util.file_join(root_dir, p)) }
     end
       
     def AppConfig.parse_project_dir(path)

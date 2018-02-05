@@ -83,6 +83,62 @@ code:
     end
   end
 
+  describe "ApibuilderCli::AppConfig.default_path" do
+    it "should correctly find the project root when in the root dir" do
+      in_tmpdir do |dir|
+        Dir.mkdir(File.join(dir, ".apibuilder"))
+        ApibuilderCli::Util.write_to_file("#{dir}/.apibuilder/config", """
+code:
+  apicollective:
+    apibuilder:
+      version: latest
+      generators:
+        play_2_3_client: generated/app/ApibuilderClient.scala
+      """.strip)
+        app_config = ApibuilderCli::AppConfig.new
+        expect(app_config.project_dir).to eq(dir)
+      end
+    end
+
+    it "should correctly find the project root when in the root directory the git has been initialized" do
+      in_tmpdir do |dir|
+        Dir.mkdir(File.join(dir, ".apibuilder"))
+        ApibuilderCli::Util.write_to_file("#{dir}/.apibuilder/config", """
+code:
+  apicollective:
+    apibuilder:
+      version: latest
+      generators:
+        play_2_3_client: generated/app/ApibuilderClient.scala
+      """.strip)
+        `git init`
+        subdir = File.join(dir, "foo")
+        Dir.mkdir(subdir)
+        Dir.chdir(subdir)
+        app_config = ApibuilderCli::AppConfig.new
+        expect(app_config.project_dir).to eq(dir)
+      end
+    end
+
+    it "should not find the project root when not in the root directory and git is missing" do
+      in_tmpdir do |dir|
+        Dir.mkdir(File.join(dir, ".apibuilder"))
+        ApibuilderCli::Util.write_to_file("#{dir}/.apibuilder/config", """
+code:
+  apicollective:
+    apibuilder:
+      version: latest
+      generators:
+        play_2_3_client: generated/app/ApibuilderClient.scala
+      """.strip)
+        subdir = File.join(dir, "foo")
+        Dir.mkdir(subdir)
+        Dir.chdir(subdir)
+        expect{ApibuilderCli::AppConfig.new}.to raise_error(SystemExit)
+      end
+    end
+  end
+
   describe "ApibuilderCli::AppConfig.parse_project_dir" do
     it "should correctly find the project root" do
       expect(ApibuilderCli::AppConfig.parse_project_dir("/src/my-project/.apibuilder/config")).to eq("/src/my-project")
@@ -93,4 +149,12 @@ code:
     end
   end
 
+  def in_tmpdir
+    Dir.mktmpdir do |dir|
+      current_dir = Dir.pwd
+      Dir.chdir(dir)
+      yield Dir.pwd
+      Dir.chdir(current_dir)
+    end
+  end
 end

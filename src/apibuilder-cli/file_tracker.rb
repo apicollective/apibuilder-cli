@@ -2,18 +2,18 @@ module ApibuilderCli
 
   class FileTracker
 
-    def FileTracker.default_path
-      "#{ApibuilderCli::Config::APIBUILDER_LOCAL_DIR}/.tracked_files"
+    def FileTracker.default_path(project_dir)
+      Util.file_join(project_dir, ApibuilderCli::Config::APIBUILDER_LOCAL_DIR, ".tracked_files")
     end
 
     # Options:
     #   :path => Mostly here for injecting test config
-    def initialize(pwd, opts={})
-      @path = Preconditions.assert_class(opts.delete(:path) || FileTracker.default_path, String)
+    def initialize(project_dir, opts={})
+      @project_dir = Preconditions.check_not_blank(project_dir, "ERROR: Missing project_dir")
+      @path = Preconditions.assert_class(opts.delete(:path) || FileTracker.default_path(@project_dir), String)
       @previous = {}
       @current = {}
       @current_raw = []
-      @pwd = pwd
       if File.exists?(@path)
         contents = IO.read(@path).strip
         if contents != ""
@@ -50,7 +50,7 @@ module ApibuilderCli
             files - @current_raw
           }
         }
-      }.flatten.sort
+      }.flatten.sort.map{|f| Util.file_join(@project_dir, f)}
     end
 
     # Keep track of the given file
@@ -59,7 +59,7 @@ module ApibuilderCli
       Preconditions.assert_class(project, String)
       Preconditions.assert_class(generator, String)
       Preconditions.assert_class(file, String)
-      file = file.sub(/^#{@pwd}\/?/, '')
+      file = file.sub(/^#{@project_dir}\/?/, '')
 
       @current[org] = {} if @current[org].nil?
       @current[org][project] = {} if @current[org][project].nil?
