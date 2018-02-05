@@ -77,6 +77,20 @@ code:
       expect(bar.generators.map(&:name).sort).to eq(["ruby_client"])
     end
 
+    it "sets the project_dir" do
+      app_config = ApibuilderCli::AppConfig.new(:path => @sample_file)
+      expect(app_config.project_dir).to eq(File.dirname(@sample_file))
+    end
+  end
+
+  describe "ApibuilderCli::AppConfig.parse_project_dir" do
+    it "should correctly find the project root" do
+      expect(ApibuilderCli::AppConfig.parse_project_dir("/src/my-project/.apibuilder/config")).to eq("/src/my-project")
+      expect(ApibuilderCli::AppConfig.parse_project_dir("/src/my-project/.foo/.apibuilder/config")).to eq("/src/my-project/.foo")
+      expect(ApibuilderCli::AppConfig.parse_project_dir("/src/my-project/.apibuilder/my/buried/config")).to eq("/src/my-project")
+      expect(ApibuilderCli::AppConfig.parse_project_dir("/src/my-project/.apibuilder")).to eq("/src/my-project")
+      expect(ApibuilderCli::AppConfig.parse_project_dir("/src/my-project/apibuilder.config")).to eq("/src/my-project")
+    end
   end
 
 end

@@ -5,7 +5,7 @@ module ApibuilderCli
 
     DEFAULT_FILENAMES = ["#{ApibuilderCli::Config::APIBUILDER_LOCAL_DIR}/config", ".apibuilder", ".apidoc"] unless defined?(DEFAULT_FILENAMES)
 
-    attr_reader :settings, :code
+    attr_reader :settings, :code, :project_dir
 
     def AppConfig.default_path
       path = DEFAULT_FILENAMES.find { |p| File.exists?(p) }
@@ -26,6 +26,19 @@ module ApibuilderCli
       path
     end
       
+    def AppConfig.parse_project_dir(path)
+      project_dir = File.dirname(path)
+      # If the config file is buried in a directory starting with '.', bubble up to the
+      # directory that contains that '.' directory.
+      nested_dirs = project_dir
+                      .split("/")
+                      .reverse
+                      .drop_while{ |dir| !dir.start_with?(".") }
+      nested_dirs = nested_dirs.drop(1) if nested_dirs.length > 0 && nested_dirs[0].start_with?(".")
+      project_dir = nested_dirs.reverse.join("/") if nested_dirs.length > 0
+      project_dir
+    end
+
     def initialize(opts={})
       @path = Preconditions.assert_class(opts.delete(:path) || AppConfig.default_path, String)
       Preconditions.check_state(File.exists?(@path), "Apibuilder application config file[#{@path}] not found")
@@ -62,6 +75,8 @@ module ApibuilderCli
       end.flatten
 
       @code = Code.new(code_projects)
+
+      @project_dir = AppConfig.parse_project_dir(@path)
     end
 
     class Code
