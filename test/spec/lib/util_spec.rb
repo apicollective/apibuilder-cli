@@ -2,6 +2,17 @@ load File.join(File.dirname(__FILE__), '../../init.rb')
 
 describe ApibuilderCli::Util do
 
+  describe "Util.file_join" do
+    it "should eliminate nils" do
+      expect(ApibuilderCli::Util.file_join(nil, "foo", "bar")).to eq("foo/bar")
+    end
+
+    it "should eliminate empty strings" do
+      expect(ApibuilderCli::Util.file_join("", "foo", "bar")).to eq("foo/bar")
+      expect(ApibuilderCli::Util.file_join("  ", "foo", "bar")).to eq("foo/bar")
+    end
+  end
+
   it "Util.write_to_temp_file" do
     path = ApibuilderCli::Util.write_to_temp_file("foo")
     expect(IO.read(path)).to eq("foo")

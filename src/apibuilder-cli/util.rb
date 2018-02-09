@@ -2,6 +2,11 @@ module ApibuilderCli
 
   module Util
 
+    def Util.file_join(*args)
+      args.select!{|s| s.to_s.strip != "" }
+      File.join(*args)
+    end
+
     # Writes contents to a temp file, returning the path
     def Util.write_to_temp_file(contents)
       tmp = Tempfile.new('apibuilder-cli')

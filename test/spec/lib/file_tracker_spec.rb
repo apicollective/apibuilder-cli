@@ -16,7 +16,7 @@ apicollective:
 foo:
   bar:
     ruby_client:
-    - /tmp/client.rb
+    - tmp/client.rb
     """.strip)
     @empty_destination = ApibuilderCli::Util.write_to_temp_file("")
   end
@@ -26,7 +26,7 @@ foo:
 
       before do
         @file_path = is_empty ? @empty_destination : @sample_file
-        @files = ApibuilderCli::FileTracker.new(:path => @file_path)
+        @files = ApibuilderCli::FileTracker.new(`pwd`.strip, :path => @file_path)
         @previous_count = @files.to_cleanup.size
       end
 
@@ -59,7 +59,7 @@ baz:
   describe "with some files tracked" do
 
     before do
-      @files = ApibuilderCli::FileTracker.new(:path => @sample_file)
+      @files = ApibuilderCli::FileTracker.new(`pwd`.strip, :path => @sample_file)
     end
 
     describe "#save" do
@@ -89,27 +89,42 @@ apicollective:
 """
       end
 
+      it "should not include current directory" do
+        pwd = `pwd`.strip
+        @files.track!("apicollective", "apibuilder", "play_2_x_routes", "#{pwd}/conf/routes")
+        @files.save!
+        expect(IO.read(@sample_file)).to eq """---
+apicollective:
+  apibuilder:
+    play_2_x_routes:
+    - conf/routes
+"""
+      end
     end
 
     describe "#to_cleanup" do
 
       it "should flatten files across org/project/generator" do
-        expect(@files.to_cleanup).to match_array ["/tmp/client.rb", "api/conf/routes", "generated/app/ApibuilderClient.scala", "generated/app/ApibuilderSpec.scala"]
+        expect(@files.to_cleanup).to match_array [rel("api/conf/routes"), rel("generated/app/ApibuilderClient.scala"), rel("generated/app/ApibuilderSpec.scala"), rel("tmp/client.rb")]
       end
 
       it "should not list files used by other org/project/generator" do
-        @files.track!("apicollective", "apibuilder", "play_2_x_routes", "/tmp/client.rb")
-        expect(@files.to_cleanup).to match_array ["api/conf/routes", "generated/app/ApibuilderClient.scala", "generated/app/ApibuilderSpec.scala"]
+        @files.track!("apicollective", "apibuilder", "play_2_x_routes", "tmp/client.rb")
+        expect(@files.to_cleanup).to match_array [rel("api/conf/routes"), rel("generated/app/ApibuilderClient.scala"), rel("generated/app/ApibuilderSpec.scala")]
       end
 
       it "should remove current files" do
         @files.track!("apicollective", "apibuilder", "play_2_x_routes", "api/conf/routes")
         @files.track!("apicollective", "apibuilder", "play_2_3_client", "generated/app/ApibuilderClient.scala")
-        expect(@files.to_cleanup).to match_array ["/tmp/client.rb", "generated/app/ApibuilderSpec.scala"]
+        expect(@files.to_cleanup).to match_array [rel("generated/app/ApibuilderSpec.scala"), rel("tmp/client.rb")]
       end
 
     end
 
+  end
+
+  def rel(path)
+    File.join(`pwd`.strip, path)
   end
 
 end
