@@ -156,6 +156,35 @@ def filter_files(requested_files, downloaded_files, generator)
   end.flatten|[]
 end
 
+def handle_server_error(e)
+  $stderr.puts ""
+
+  if e.code == 401
+    $stderr.puts "ERROR: 401 Unauthorized"
+    $stderr.puts "  URI: #{e.uri}"
+    $stderr.puts ""
+
+  elsif e.code == 404
+    $stderr.puts "ERROR: 404 Not Found"
+    $stderr.puts "  URI: #{e.uri}"
+    $stderr.puts ""
+
+  elsif e.code == 409
+    $stderr.puts "ERROR 409: Unprocessable Entity"
+    JSON.parse(e.body).each do |error|
+      if error['code'] == "validation_error"
+        $stderr.puts " - %s" % error['message']
+      else
+        $stderr.puts " - %s: %s" % [error['code'], error['message']]
+      end
+    end
+
+  else
+    $stderr.puts "ERROR #{e.code}: Server Error"
+    raise e
+  end
+end
+
 if command == "list"
   resource = ARGV.shift.to_s.strip
 
@@ -223,13 +252,7 @@ elsif command == "download"
       $stderr.puts "  ERROR: invalid type[#{typ}] - must be 'original' or 'service'"
     end
   rescue Io::Apibuilder::Api::V0::HttpClient::ServerError => e
-    if e.code == 401
-      $stderr.puts "  ERROR: %s/%s:%s not authorized" % [org, application, version]
-    elsif e.code == 404
-      $stderr.puts "  ERROR: %s/%s:%s not found" % [org, application, version]
-    else
-      raise e
-    end
+    handle_server_error(e)
   end
   
 elsif command == "example"
@@ -254,13 +277,7 @@ elsif command == "example"
     example = client.versions.get_example_by_application_key_and_version_and_type_name(org, application, version, typ, :optional_fields => optional_fields)
     puts example
   rescue Io::Apibuilder::Api::V0::HttpClient::ServerError => e
-    if e.code == 401
-      $stderr.puts "  ERROR: %s/%s:%s not authorized" % [org, application, version]
-    elsif e.code == 404
-      $stderr.puts "  ERROR: %s/%s:%s not found" % [org, application, version]
-    else
-      raise e
-    end
+    handle_server_error(e)
   end
   
 elsif command == "code"
@@ -289,14 +306,7 @@ elsif command == "code"
       write_files(filter_files(filenames, code, generator), directory)
     end
   rescue Io::Apibuilder::Api::V0::HttpClient::ServerError => e
-    if e.code == 404
-      $stderr.puts "  ERROR: 404 when accessing URI: #{e.uri}"
-    elsif e.code == 409
-      errors = JSON.parse(e.body).map { |h| h["message"] }.join(", ")
-      $stderr.puts "  ERROR: 409: " + errors
-    else
-      raise e
-    end
+    handle_server_error(e)
   end
 
 elsif command == "upload"
@@ -349,15 +359,7 @@ elsif command == "upload"
     client.versions.put_by_application_key_and_version(org, application, version, form)
     puts "success"
   rescue Io::Apibuilder::Api::V0::HttpClient::ServerError => e
-    puts "1 or more errors:"
-    JSON.parse(e.body).each do |error|
-      if error['code'] == "validation_error"
-        puts " - %s" % error['message']
-      else
-        puts " - %s: %s" % [error['code'], error['message']]
-      end
-    end
-    exit(1)
+    handle_server_error(e)
   rescue Exception => e
     puts ""
     puts "** ERROR: #{e}"
@@ -428,12 +430,7 @@ elsif command == "update"
             end
           end
         rescue Io::Apibuilder::Api::V0::HttpClient::ServerError => e
-          if e.code == 404
-            puts "not found"
-          else
-            puts ""
-            raise e
-          end
+          handle_server_error(e)
         end
         puts ""
       end
@@ -501,3 +498,4 @@ else
   end
   exit(1)
 end
+
