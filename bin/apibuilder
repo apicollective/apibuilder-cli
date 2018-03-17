@@ -330,8 +330,8 @@ elsif command == "upload"
   if version.empty?
     default_version = ""
 
-    if system("git describe 2> /dev/null")
-      default_version = `git describe`.strip
+    if system("git describe &> /dev/null")
+      default_version = `git describe --abbrev=0`.strip + "-dev"
     end
 
     print "Version"
