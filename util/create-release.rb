@@ -56,6 +56,9 @@ system_or_error("git commit -m 'autocommit: Update version to %s' %s" % [new_ver
 puts "Creating git tag[%s]" % new_version
 system_or_error("git tag -a -m '%s' %s" % [new_version, new_version])
 
+system_or_error("gem build apidoc-cli.gemspec")
+
 puts "Release tag[%s] created. Need to:" % new_version
 puts "  git push origin"
 puts "  git push --tags origin"
+puts "  push gem up to rubygems"
