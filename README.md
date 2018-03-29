@@ -78,6 +78,8 @@ For example:
 ```
 bin/apibuilder upload apicollective apibuilder-api apibuilder-api/api.json --version 1.0.1
 ```
+The `version` parameter is optional. If omitted a suggestion will be made using the currently
+tagged version appended with `-dev`.
 
 ## update
 
