@@ -70,7 +70,7 @@ To view a list of available generators visit [apibuilder.io/generators](https://
 Upload a new version of an api given the json descriptor.
 
 ```
-bin/apibuilder upload <organization key> <application key> <file> --version <version>
+bin/apibuilder upload <organization key> <application key> <file> --version <version> [--force] [--silent]
 ```
 
 For example:
@@ -78,6 +78,10 @@ For example:
 ```
 bin/apibuilder upload apicollective apibuilder-api apibuilder-api/api.json --version 1.0.1
 ```
+
+The `--force` flag will allow you to re-upload an api.json even if there are no changes since the previously uploaded version.
+
+When using the `--silent` flag, the suggested tag will be automatically used. This is useful for automated uploading vis git hooks and/or CD pipelines.
 
 ## update
 

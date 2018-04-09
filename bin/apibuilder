@@ -41,7 +41,7 @@
 # apibuilder example apicollective apibuilder-api latest type
 #  - Generates an example JSON document for the specified type
 #
-# apibuilder upload apicollective apibuilder-api api/api.json [--version 1.5.0-dev]
+# apibuilder upload apicollective apibuilder-api api/api.json [--version 1.5.0-dev] [--force] [--silent]
 #  - Uploads the file api/api.json to the apicollective org, apibuilder application.
 #    The uploaded file will be the specified version, defaulting to
 #    the output from git describe.
@@ -100,6 +100,27 @@ end
 
 def file_is_scaffolding?(file)
   !file.flags.nil? && file.flags.include?(Io::Apibuilder::Generator::V0::Models::FileFlag.scaffolding)
+end
+
+# Searches backwards through the commit history to look for the last commit
+# that corresponds to an api version that was uploaded to ApiBuilder. Looks
+# backwards a max of 100 commits.
+def head_of_latest_uploaded_version(org, application, client)
+  found = nil
+  0.upto(99).each do |i|
+    version = ApibuilderCli::Git.safe_describe(i)
+    begin
+      apibuilder_version = client.versions.get_by_application_key_and_version(org, application, version)
+      found = i
+      break
+    rescue Io::Apibuilder::Api::V0::HttpClient::ServerError => e
+      # Continue looking when the version is not found; fail for other exceptions.
+      if e.code != 404
+        raise e
+      end
+    end
+  end
+  found
 end
 
 # Apibuilder injects a few comments into the code base to identify
@@ -317,6 +338,8 @@ elsif command == "upload"
   path = ARGV.shift.to_s.strip
 
   args = ApibuilderCli::Args.parse(ARGV)
+  force = args.key?(:force)
+  silent = args.key?(:silent)
   version = args[:version].to_s.strip
 
   if org.empty? || application.empty? || path.empty?
@@ -330,42 +353,53 @@ elsif command == "upload"
   end
 
   if version.empty?
-    default_version = ""
+    head = head_of_latest_uploaded_version(org, application, client)
+    if !head.nil? && system("git diff --exit-code --quiet HEAD~#{head} HEAD #{path}") && !force
+      # Don't bother uploading a new version if there is no diff between the last version and
+      # the current commit. Allow uploading if --force is used.
+      puts "No diff from last tag on file [${path}]. Please either specify a --version or use the --force flag."
+    else
+      default_version = ApibuilderCli::Git.safe_describe
 
-    if system("git describe 2> /dev/null")
-      default_version = `git describe`.strip
-    end
-
-    print "Version"
-    if default_version != ""
-      print " [#{default_version}]"
-    end
-    print ": "
-
-    version = nil
-    while version.nil?
-      answer = $stdin.gets
-      if answer.strip.empty? && default_version != ""
+      if silent
+        # Don't prompt for a version when in --silent mode.
         version = default_version
+        puts "Generated version [#{version}]"
       else
-        version = answer.strip
+        print "Version"
+        if default_version != ""
+          print " [#{default_version}]"
+        end
+        print ": "
+
+        version = nil
+        while version.nil?
+          answer = $stdin.gets
+          if answer.strip.empty? && default_version != ""
+            version = default_version
+          else
+            version = answer.strip
+          end
+        end
       end
     end
   end
 
-  original_form = Io::Apibuilder::Api::V0::Models::OriginalForm.new(:data => IO.read(path))
-  form = Io::Apibuilder::Api::V0::Models::VersionForm.new(:original_form => original_form)
+  unless version.empty?
+    original_form = Io::Apibuilder::Api::V0::Models::OriginalForm.new(:data => IO.read(path))
+    form = Io::Apibuilder::Api::V0::Models::VersionForm.new(:original_form => original_form)
 
-  print "Uploading #{path} to #{client.url}/#{org}/#{application}/#{version} ... "
-  begin
-    client.versions.put_by_application_key_and_version(org, application, version, form)
-    puts "success"
-  rescue Exception => e
-    handle_server_error(e)
-  rescue Exception => e
-    puts ""
-    puts "** ERROR: #{e}"
-    exit(1)
+    print "Uploading #{path} to #{client.url}/#{org}/#{application}/#{version} ... "
+    begin
+      client.versions.put_by_application_key_and_version(org, application, version, form)
+      puts "success"
+    rescue Exception => e
+      handle_server_error(e)
+    rescue Exception => e
+      puts ""
+      puts "** ERROR: #{e}"
+      exit(1)
+    end
   end
 
 elsif command == "update"
