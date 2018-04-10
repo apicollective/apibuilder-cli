@@ -364,7 +364,11 @@ elsif command == "upload"
       if silent
         # Don't prompt for a version when in --silent mode.
         version = default_version
-        puts "Generated version [#{version}]"
+        if version == ""
+          puts "WARNING: No version generated; #{path} will not be uploaded to ApiBuilder until there is at least one tagged version."
+        else
+          puts "Generated version [#{version}]"
+        end
       else
         print "Version"
         if default_version != ""
