@@ -45,6 +45,30 @@ describe ApibuilderCli::Git do
 
   end
 
+  describe "#current_branch" do
+
+    it "should detect master" do
+      with_repo do |dir|
+        expect(ApibuilderCli::Git.current_branch).to eq "master"
+      end
+    end
+
+    it "should detect other" do
+      with_repo do |dir|
+        system("git checkout -b other")
+        expect(ApibuilderCli::Git.current_branch).to eq "other"
+      end
+    end
+
+    it "should detect master when other exists" do
+      with_repo do |dir|
+        system("git checkout -b other; git checkout master")
+        expect(ApibuilderCli::Git.current_branch).to eq "master"
+      end
+    end
+
+  end
+
 end
 
 def with_repo()
