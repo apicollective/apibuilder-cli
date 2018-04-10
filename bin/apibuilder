@@ -108,17 +108,20 @@ end
 def head_of_latest_uploaded_version(org, application, client)
   found = nil
   0.upto(99).each do |i|
-    version = ApibuilderCli::Git.safe_describe(i)
-    begin
-      apibuilder_version = client.versions.get_by_application_key_and_version(org, application, version)
-      found = i
-      break
-    rescue Io::Apibuilder::Api::V0::HttpClient::ServerError => e
-      # Continue looking when the version is not found; fail for other exceptions.
-      if e.code != 404
-        raise e
+    # Attempt both naming with branch and the legacy version without branch.
+    [ApibuilderCli::Git.generate_version(i), ApibuilderCli::Git.generate_version(i, true)].each do |version|
+      begin
+        apibuilder_version = client.versions.get_by_application_key_and_version(org, application, version)
+        found = i
+        break
+      rescue Io::Apibuilder::Api::V0::HttpClient::ServerError => e
+        # Continue looking when the version is not found; fail for other exceptions.
+        if e.code != 404
+          raise e
+        end
       end
     end
+    break unless found.nil?
   end
   found
 end
@@ -357,9 +360,9 @@ elsif command == "upload"
     if !head.nil? && system("git diff --exit-code --quiet HEAD~#{head} HEAD #{path}") && !force
       # Don't bother uploading a new version if there is no diff between the last version and
       # the current commit. Allow uploading if --force is used.
-      puts "No diff from last tag on file [${path}]. Please either specify a --version or use the --force flag."
+      puts "No diff from last tag on file [#{path}]. Please either specify a --version or use the --force flag."
     else
-      default_version = ApibuilderCli::Git.safe_describe
+      default_version = ApibuilderCli::Git.generate_version
 
       if silent
         # Don't prompt for a version when in --silent mode.

@@ -55,20 +55,127 @@ describe ApibuilderCli::Git do
 
     it "should detect other" do
       with_repo do |dir|
-        system("git checkout -b other")
+        system_quiet("git checkout -b other")
         expect(ApibuilderCli::Git.current_branch).to eq "other"
       end
     end
 
     it "should detect master when other exists" do
       with_repo do |dir|
-        system("git checkout -b other; git checkout master")
+        system_quiet("git checkout -b other; git checkout master")
         expect(ApibuilderCli::Git.current_branch).to eq "master"
       end
     end
 
   end
 
+  describe "#generate_version" do
+
+    it "should work for tagged repos" do
+      with_repo do |dir|
+        system("git tag -a 0.0.1 -m 'Initial tag'")
+        version = ApibuilderCli::Git.generate_version
+        expect(version).to eq "0.0.1"
+      end
+    end
+
+    it "should work for tagged repos on other branch" do
+      with_repo do |dir|
+        system("git tag -a 0.0.1 -m 'Initial tag'")
+        system_quiet("git checkout -b other")
+        version = ApibuilderCli::Git.generate_version
+        expect(version).to eq "0.0.1-other"
+      end
+    end
+
+    it "should work for untagged" do
+      with_repo do |dir|
+        version = ApibuilderCli::Git.generate_version
+        expect(version).to eq ""
+      end
+    end
+
+    it "should work for untagged on other branch" do
+      with_repo do |dir|
+        system_quiet("git checkout -b other")
+        version = ApibuilderCli::Git.generate_version
+        expect(version).to eq ""
+      end
+    end
+
+    it "should work for untagged commits after a tag" do
+      with_repo do |dir|
+        system("git tag -a 0.0.1 -m 'Initial tag'")
+        system("touch temp2.txt; git add temp2.txt; git commit -m 'Second commit' &> /dev/null")
+        version = ApibuilderCli::Git.generate_version
+        expect(version).to match /^0\.0\.1-1-g[0-9a-f]{7}$/
+      end
+    end
+
+    it "should work for untagged commits after a tag on other branch" do
+      with_repo do |dir|
+        system("git tag -a 0.0.1 -m 'Initial tag'")
+        system_quiet("git checkout -b other")
+        system("touch temp2.txt; git add temp2.txt; git commit -m 'Second commit' &> /dev/null")
+        version = ApibuilderCli::Git.generate_version
+        expect(version).to match /^0\.0\.1-1-g[0-9a-f]{7}-other$/
+      end
+    end
+
+    it "should work for previous commits" do
+      with_repo do |dir|
+        system("git tag -a 0.0.1 -m 'Initial tag'")
+        system("touch temp2.txt; git add temp2.txt; git commit -m 'Second commit' &> /dev/null")
+        system("touch temp3.txt; git add temp3.txt; git commit -m 'Third commit' &> /dev/null")
+        expect(ApibuilderCli::Git.generate_version).to eq ApibuilderCli::Git.generate_version(0)
+        version = ApibuilderCli::Git.generate_version
+        expect(version).to match /^0\.0\.1-2-g[0-9a-f]{7}$/
+        version = ApibuilderCli::Git.generate_version(1)
+        expect(version).to match /^0\.0\.1-1-g[0-9a-f]{7}$/
+        version = ApibuilderCli::Git.generate_version(2)
+        expect(version).to eq "0.0.1"
+      end
+    end
+
+    it "should work for previous commits on other branch" do
+      with_repo do |dir|
+        system("git tag -a 0.0.1 -m 'Initial tag'")
+        system_quiet("git checkout -b other")
+        system("touch temp2.txt; git add temp2.txt; git commit -m 'Second commit' &> /dev/null")
+        system("touch temp3.txt; git add temp3.txt; git commit -m 'Third commit' &> /dev/null")
+        expect(ApibuilderCli::Git.generate_version).to eq ApibuilderCli::Git.generate_version(0)
+        version = ApibuilderCli::Git.generate_version
+        expect(version).to match /^0\.0\.1-2-g[0-9a-f]{7}-other$/
+        version = ApibuilderCli::Git.generate_version(1)
+        expect(version).to match /^0\.0\.1-1-g[0-9a-f]{7}-other$/
+        version = ApibuilderCli::Git.generate_version(2)
+        expect(version).to eq "0.0.1-other"
+      end
+    end
+
+    it "should work for previous commits on other branch with legacy flag" do
+      with_repo do |dir|
+        system("git tag -a 0.0.1 -m 'Initial tag'")
+        system_quiet("git checkout -b other")
+        system("touch temp2.txt; git add temp2.txt; git commit -m 'Second commit' &> /dev/null")
+        system("touch temp3.txt; git add temp3.txt; git commit -m 'Third commit' &> /dev/null")
+        expect(ApibuilderCli::Git.generate_version).to eq ApibuilderCli::Git.generate_version(0)
+        version = ApibuilderCli::Git.generate_version(nil, true)
+        expect(version).to match /^0\.0\.1-2-g[0-9a-f]{7}$/
+        version = ApibuilderCli::Git.generate_version(1, true)
+        expect(version).to match /^0\.0\.1-1-g[0-9a-f]{7}$/
+        version = ApibuilderCli::Git.generate_version(2, true)
+        expect(version).to eq "0.0.1"
+      end
+    end
+
+  end
+
+end
+
+def system_quiet(cmd)
+  quiet = " > /dev/null 2>&1"
+  system(cmd.gsub(";", "#{quiet};") + quiet)
 end
 
 def with_repo()
