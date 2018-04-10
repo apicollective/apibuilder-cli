@@ -171,6 +171,27 @@ describe ApibuilderCli::Git do
 
   end
 
+  describe "#tag_list" do
+
+    it "should work for tagged repos" do
+      with_repo do |dir|
+        system("git tag -a 0.0.1 -m 'Initial tag'")
+        system("touch temp2.txt; git add temp2.txt; git commit -m 'Second commit' &> /dev/null")
+        system("git tag -a 0.0.2 -m 'Initial tag'")
+        tags = ApibuilderCli::Git.tag_list
+        expect(tags).to eq ["0.0.1", "0.0.2"]
+      end
+    end
+
+    it "should work for repos with no tags" do
+      with_repo do |dir|
+        tags = ApibuilderCli::Git.tag_list
+        expect(tags).to eq []
+      end
+    end
+
+  end
+
 end
 
 def system_quiet(cmd)

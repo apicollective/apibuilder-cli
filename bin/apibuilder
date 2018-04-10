@@ -51,6 +51,10 @@
 #    parameter. Invokes the apibuilder code generators specified in the
 #    configuration file.
 #
+# apibuilder clean apicollective apibuilder-api [--silent]
+#  - Interactively deletes from ApiBuilder any version not tagged in the source repo.
+#  - Using the --silent flag will delete versions without asking.
+#
 # apibuilder cli version
 #  - Displays the current version of the CLI
 #
@@ -498,6 +502,56 @@ elsif command == "update"
     end
   end
   tracked_files.save!
+
+elsif command == "clean"
+  org = ARGV.shift.to_s.strip
+  application = ARGV.shift.to_s.strip
+
+  args = ApibuilderCli::Args.parse(ARGV)
+  silent = args.key?(:silent)
+  limit = 50
+
+  if org.empty? || application.empty?
+    puts "org, application are required"
+    exit(1)
+  end
+
+  # This is a brute-force implementation. We could consider doing fancier things (such as
+  # only cleaning back to the most recent tag and providing a flag to clean "all"), but
+  # for simplicity and reduced bugs, let's use the naive implementation until it proves
+  # burdensome.
+  offset = 0
+  versions = []
+  # Must load all versions up front, since deleting will disrupt the clean pagination.
+  loop do
+    current_page = client.versions.get_by_application_key(org, application, :limit => limit, :offset => offset).each do |v|
+      versions << v.version
+    end
+    offset += 1
+    break if current_page.size < limit
+  end
+  to_delete = versions - ApibuilderCli::Git.tag_list
+  if to_delete.size == 0
+    puts "API is clean"
+  else
+    to_delete.each do |version|
+      delete = false
+      if silent
+        delete = true
+      else
+        print "Delete #{version} [Yn]? "
+        answer = $stdin.gets
+        delete = answer.strip.empty? || answer.strip.downcase == "y"
+      end
+      if delete
+        client.versions.delete_by_application_key_and_version(org, application, version)
+        puts "deleted #{version}..."
+      else
+        puts "skipping #{version}..."
+      end
+    end
+  end
+
 
 elsif command == "cli"
   subcommand = ARGV.shift.to_s.strip

@@ -81,7 +81,7 @@ bin/apibuilder upload apicollective apibuilder-api apibuilder-api/api.json --ver
 
 The `--force` flag will allow you to re-upload an api.json even if there are no changes since the previously uploaded version.
 
-When using the `--silent` flag, the suggested tag will be automatically used. This is useful for automated uploading vis git hooks and/or CD pipelines.
+When using the `--silent` flag, the suggested tag will be automatically used. This is useful for automated uploading via git hooks and/or CD pipelines.
 
 ## update
 
@@ -180,6 +180,22 @@ Supported settings include:
     `apibuilder update`, we will create the subdirectories as specified by
     the code generator.
 
+
+## clean
+
+Delete versions in ApiBuilder that are not tagged in the source repo.
+
+```
+bin/apibuilder clean <organization key> <application key> [--silent]
+```
+
+For example:
+
+```
+bin/apibuilder clean apicollective apibuilder-api
+```
+
+When using the `--silent` flag, the suggested versions will be automatically deleted without prompting. This is useful for automated cleanup via git hooks and/or CD pipelines.
 
 ## cli itself
 

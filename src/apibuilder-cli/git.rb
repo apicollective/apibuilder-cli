@@ -24,6 +24,10 @@ module ApibuilderCli
       system("git describe #{head} > /dev/null 2>&1") ? `git describe #{head}`.strip : ""
     end
 
+    def Git.tag_list
+      `git tag --list`.strip.split("\n")
+    end
+
   end
 
 end
