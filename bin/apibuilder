@@ -51,7 +51,7 @@
 #    parameter. Invokes the apibuilder code generators specified in the
 #    configuration file.
 #
-# apibuilder clean apicollective apibuilder-api [--silent]
+# apibuilder clean apicollective apibuilder-api [--branch branch-name] [--silent]
 #  - Interactively deletes from ApiBuilder any version not tagged in the source repo.
 #  - Using the --silent flag will delete versions without asking.
 #
@@ -508,6 +508,8 @@ elsif command == "clean"
   application = ARGV.shift.to_s.strip
 
   args = ApibuilderCli::Args.parse(ARGV)
+  branch = args[:branch].to_s.strip.downcase
+  branch = "master" if branch.empty?
   silent = args.key?(:silent)
   limit = 50
 
@@ -530,28 +532,43 @@ elsif command == "clean"
     offset += 1
     break if current_page.size < limit
   end
-  to_delete = versions - ApibuilderCli::Git.tag_list
-  if to_delete.size == 0
-    puts "API is clean"
-  else
-    to_delete.each do |version|
-      delete = false
-      if silent
-        delete = true
-      else
-        print "Delete #{version} [Yn]? "
-        answer = $stdin.gets
-        delete = answer.strip.empty? || answer.strip.downcase == "y"
-      end
-      if delete
-        client.versions.delete_by_application_key_and_version(org, application, version)
-        puts "deleted #{version}..."
-      else
-        puts "skipping #{version}..."
+
+  ApibuilderCli::Git.in_branch(branch) do
+    to_delete = versions - ApibuilderCli::Git.tag_list.map { |tag|
+      branch == "master" ? tag : "#{tag}#{ApibuilderCli::Git.branch_suffix(branch)}"
+    }
+    if branch == "master"
+      to_delete.reject! { |version|
+        # Ignore versions with a branch delimiter.
+        version.match(/-b[0-9a-f]{7}-.+$/)
+      }
+    else
+      to_delete.select! { |version|
+        # Only consider versions that match the branch.
+        version.end_with?(ApibuilderCli::Git.branch_suffix(branch))
+      }
+    end
+    if to_delete.size == 0
+      puts "API is clean"
+    else
+      to_delete.each do |version|
+        delete = false
+        if silent
+          delete = true
+        else
+          print "Delete #{version} [Yn]? "
+          answer = $stdin.gets
+          delete = answer.strip.empty? || answer.strip.downcase == "y"
+        end
+        if delete
+          client.versions.delete_by_application_key_and_version(org, application, version)
+          puts "deleted #{version}..."
+        else
+          puts "skipping #{version}..."
+        end
       end
     end
   end
-
 
 elsif command == "cli"
   subcommand = ARGV.shift.to_s.strip

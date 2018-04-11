@@ -8,6 +8,10 @@ module ApibuilderCli
       "-b#{Git.small_hash(branch)}-#{branch}"
     end
 
+    def Git.checkout(branch)
+      `git checkout #{branch}`
+    end
+
     def Git.current_branch
       `git rev-parse --abbrev-ref HEAD`.strip
     end
@@ -29,6 +33,16 @@ module ApibuilderCli
           # name for readability.
           "#{raw_version}#{Git.branch_suffix(branch)}"
         end
+      end
+    end
+
+    def Git.in_branch(branch)
+      current_branch = ApibuilderCli::Git.current_branch
+      ApibuilderCli::Git.checkout(branch) unless current_branch == branch
+      begin
+        yield
+      ensure
+        ApibuilderCli::Git.checkout(current_branch) unless ApibuilderCli::Git.current_branch == current_branch
       end
     end
 

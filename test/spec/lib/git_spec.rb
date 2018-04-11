@@ -10,6 +10,20 @@ describe ApibuilderCli::Git do
 
   end
 
+  describe "#checkout" do
+
+    it "should work" do
+      with_repo do |dir|
+        system_quiet("git checkout -b other")
+        ApibuilderCli::Git.checkout("master")
+        expect(ApibuilderCli::Git.current_branch).to eq "master"
+        ApibuilderCli::Git.checkout("other")
+        expect(ApibuilderCli::Git.current_branch).to eq "other"
+      end
+    end
+
+  end
+
   describe "#safe_describe" do
 
     it "should work for tagged repos" do
@@ -181,6 +195,46 @@ describe ApibuilderCli::Git do
         expect(version).to match /^0\.0\.1-1-g[0-9a-f]{7}$/
         version = ApibuilderCli::Git.generate_version(2, true)
         expect(version).to eq "0.0.1"
+      end
+    end
+
+  end
+
+  describe "#in_branch" do
+
+    it "should switch to the branch and switch back" do
+      with_repo do |dir|
+        system_quiet("git checkout -b other")
+        expect(ApibuilderCli::Git.current_branch).to eq "other"
+        ApibuilderCli::Git.in_branch("master") do
+          expect(ApibuilderCli::Git.current_branch).to eq "master"
+        end
+        expect(ApibuilderCli::Git.current_branch).to eq "other"
+      end
+    end
+
+    it "should not switch when already on the branch" do
+      with_repo do |dir|
+        system_quiet("git checkout -b other")
+        expect(ApibuilderCli::Git.current_branch).to eq "other"
+        ApibuilderCli::Git.in_branch("other") do
+          expect(ApibuilderCli::Git.current_branch).to eq "other"
+        end
+        expect(ApibuilderCli::Git.current_branch).to eq "other"
+      end
+    end
+
+    it "should switch back even when there is an exception" do
+      with_repo do |dir|
+        system_quiet("git checkout -b other")
+        expect(ApibuilderCli::Git.current_branch).to eq "other"
+        begin
+          ApibuilderCli::Git.in_branch("master") do
+            raise "error"
+          end
+        rescue Exception => e
+        end
+        expect(ApibuilderCli::Git.current_branch).to eq "other"
       end
     end
 

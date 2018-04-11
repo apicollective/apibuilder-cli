@@ -186,13 +186,13 @@ Supported settings include:
 Delete versions in ApiBuilder that are not tagged in the source repo.
 
 ```
-bin/apibuilder clean <organization key> <application key> [--silent]
+bin/apibuilder clean <organization key> <application key> [--branch <branch name>] [--silent]
 ```
 
 For example:
 
 ```
-bin/apibuilder clean apicollective apibuilder-api
+bin/apibuilder clean apicollective apibuilder-api --branch dev
 ```
 
 When using the `--silent` flag, the suggested versions will be automatically deleted without prompting. This is useful for automated cleanup via git hooks and/or CD pipelines.
