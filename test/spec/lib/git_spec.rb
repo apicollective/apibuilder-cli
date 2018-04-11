@@ -2,6 +2,14 @@ load File.join(File.dirname(__FILE__), '../../init.rb')
 
 describe ApibuilderCli::Git do
 
+  describe "#branch_suffix" do
+
+    it "should work" do
+      expect(ApibuilderCli::Git.branch_suffix("my-branch")).to eq "-b663c692-my-branch"
+    end
+
+  end
+
   describe "#safe_describe" do
 
     it "should work for tagged repos" do
@@ -91,7 +99,7 @@ describe ApibuilderCli::Git do
         system("git tag -a 0.0.1 -m 'Initial tag'")
         system_quiet("git checkout -b other")
         version = ApibuilderCli::Git.generate_version
-        expect(version).to eq "0.0.1-other"
+        expect(version).to eq "0.0.1-bd0941e6-other"
       end
     end
 
@@ -125,7 +133,7 @@ describe ApibuilderCli::Git do
         system_quiet("git checkout -b other")
         system("touch temp2.txt; git add temp2.txt; git commit -m 'Second commit' &> /dev/null")
         version = ApibuilderCli::Git.generate_version
-        expect(version).to match /^0\.0\.1-1-g[0-9a-f]{7}-other$/
+        expect(version).to match /^0\.0\.1-1-g[0-9a-f]{7}-bd0941e6-other$/
       end
     end
 
@@ -152,11 +160,11 @@ describe ApibuilderCli::Git do
         system("touch temp3.txt; git add temp3.txt; git commit -m 'Third commit' &> /dev/null")
         expect(ApibuilderCli::Git.generate_version).to eq ApibuilderCli::Git.generate_version(0)
         version = ApibuilderCli::Git.generate_version
-        expect(version).to match /^0\.0\.1-2-g[0-9a-f]{7}-other$/
+        expect(version).to match /^0\.0\.1-2-g[0-9a-f]{7}-bd0941e6-other$/
         version = ApibuilderCli::Git.generate_version(1)
-        expect(version).to match /^0\.0\.1-1-g[0-9a-f]{7}-other$/
+        expect(version).to match /^0\.0\.1-1-g[0-9a-f]{7}-bd0941e6-other$/
         version = ApibuilderCli::Git.generate_version(2)
-        expect(version).to eq "0.0.1-other"
+        expect(version).to eq "0.0.1-bd0941e6-other"
       end
     end
 
@@ -173,6 +181,20 @@ describe ApibuilderCli::Git do
         expect(version).to match /^0\.0\.1-1-g[0-9a-f]{7}$/
         version = ApibuilderCli::Git.generate_version(2, true)
         expect(version).to eq "0.0.1"
+      end
+    end
+
+  end
+
+  describe "#small_hash" do
+
+    it "should work" do
+      expect(ApibuilderCli::Git.small_hash("foo")).to eq "0beec7b"
+    end
+
+    it "should be the correct length" do
+      1.upto(50).each do
+        expect(ApibuilderCli::Git.small_hash(rand(10000).to_s).size).to eq 7
       end
     end
 
