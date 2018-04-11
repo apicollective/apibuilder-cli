@@ -182,22 +182,6 @@ describe ApibuilderCli::Git do
       end
     end
 
-    it "should work for previous commits on other branch with legacy flag" do
-      with_repo do |dir|
-        system("git tag -a 0.0.1 -m 'Initial tag'")
-        system_quiet("git checkout -b other")
-        system("touch temp2.txt; git add temp2.txt; git commit -m 'Second commit' &> /dev/null")
-        system("touch temp3.txt; git add temp3.txt; git commit -m 'Third commit' &> /dev/null")
-        expect(ApibuilderCli::Git.generate_version).to eq ApibuilderCli::Git.generate_version(0)
-        version = ApibuilderCli::Git.generate_version(nil, true)
-        expect(version).to match /^0\.0\.1-2-g[0-9a-f]{7}$/
-        version = ApibuilderCli::Git.generate_version(1, true)
-        expect(version).to match /^0\.0\.1-1-g[0-9a-f]{7}$/
-        version = ApibuilderCli::Git.generate_version(2, true)
-        expect(version).to eq "0.0.1"
-      end
-    end
-
   end
 
   describe "#in_branch" do

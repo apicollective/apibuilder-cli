@@ -51,7 +51,7 @@
 #    parameter. Invokes the apibuilder code generators specified in the
 #    configuration file.
 #
-# apibuilder clean apicollective apibuilder-api [--branch branch-name] [--silent]
+# apibuilder clean apicollective apibuilder-api [--branch branch-name] [--silent] [--legacy]
 #  - Interactively deletes from ApiBuilder any version not tagged in the source repo.
 #  - Using the --silent flag will delete versions without asking.
 #
@@ -112,20 +112,17 @@ end
 def head_of_latest_uploaded_version(org, application, client)
   found = nil
   0.upto(99).each do |i|
-    # Attempt both naming with branch and the legacy version without branch.
-    [ApibuilderCli::Git.generate_version(i), ApibuilderCli::Git.generate_version(i, true)].each do |version|
-      begin
-        apibuilder_version = client.versions.get_by_application_key_and_version(org, application, version)
-        found = i
-        break
-      rescue Io::Apibuilder::Api::V0::HttpClient::ServerError => e
-        # Continue looking when the version is not found; fail for other exceptions.
-        if e.code != 404
-          raise e
-        end
+    version = ApibuilderCli::Git.generate_version(i)
+    begin
+      apibuilder_version = client.versions.get_by_application_key_and_version(org, application, version)
+      found = i
+      break
+    rescue Io::Apibuilder::Api::V0::HttpClient::ServerError => e
+      # Continue looking when the version is not found; fail for other exceptions.
+      if e.code != 404
+        raise e
       end
     end
-    break unless found.nil?
   end
   found
 end
@@ -212,6 +209,23 @@ def handle_server_error(e)
     end
   else
     $stderr.puts "#{e.to_s}"
+  end
+end
+
+def upload_version(client, org, application, version, data, path = "")
+  original_form = Io::Apibuilder::Api::V0::Models::OriginalForm.new(:data => data)
+  form = Io::Apibuilder::Api::V0::Models::VersionForm.new(:original_form => original_form)
+
+  print "Uploading #{path == '' ? 'data' : path} to #{client.url}/#{org}/#{application}/#{version} ... "
+  begin
+    client.versions.put_by_application_key_and_version(org, application, version, form)
+    puts "success"
+  rescue Exception => e
+    handle_server_error(e)
+  rescue Exception => e
+    puts ""
+    puts "** ERROR: #{e}"
+    exit(1)
   end
 end
 
@@ -397,20 +411,7 @@ elsif command == "upload"
   end
 
   unless version.empty?
-    original_form = Io::Apibuilder::Api::V0::Models::OriginalForm.new(:data => IO.read(path))
-    form = Io::Apibuilder::Api::V0::Models::VersionForm.new(:original_form => original_form)
-
-    print "Uploading #{path} to #{client.url}/#{org}/#{application}/#{version} ... "
-    begin
-      client.versions.put_by_application_key_and_version(org, application, version, form)
-      puts "success"
-    rescue Exception => e
-      handle_server_error(e)
-    rescue Exception => e
-      puts ""
-      puts "** ERROR: #{e}"
-      exit(1)
-    end
+    upload_version(client, org, application, version, IO.read(path), path)
   end
 
 elsif command == "update"
@@ -510,11 +511,17 @@ elsif command == "clean"
   args = ApibuilderCli::Args.parse(ARGV)
   branch = args[:branch].to_s.strip.downcase
   branch = "master" if branch.empty?
+  legacy = args.key?(:legacy)
   silent = args.key?(:silent)
   limit = 50
 
   if org.empty? || application.empty?
     puts "org, application are required"
+    exit(1)
+  end
+
+  if legacy && silent
+    puts "--legacy is intended to be interactive; please use either --legacy or --silent but not both."
     exit(1)
   end
 
@@ -553,14 +560,29 @@ elsif command == "clean"
     else
       to_delete.each do |version|
         delete = false
+        move_to_branch = ""
         if silent
           delete = true
+        elsif legacy
+          print "Move #{version} to branch? Enter branch name or leave blank to delete: "
+          answer = $stdin.gets
+          if answer.strip.empty?
+            delete = true
+          else
+            move_to_branch = answer.strip
+          end
         else
           print "Delete #{version} [Yn]? "
           answer = $stdin.gets
           delete = answer.strip.empty? || answer.strip.downcase == "y"
         end
         if delete
+          client.versions.delete_by_application_key_and_version(org, application, version)
+          puts "deleted #{version}..."
+        elsif move_to_branch != ""
+          app = client.versions.get_by_application_key_and_version(org, application, version)
+          new_version = "#{version}#{ApibuilderCli::Git.branch_suffix(move_to_branch)}"
+          upload_version(client, org, application, new_version, app.original.data)
           client.versions.delete_by_application_key_and_version(org, application, version)
           puts "deleted #{version}..."
         else

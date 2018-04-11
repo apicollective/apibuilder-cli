@@ -16,12 +16,10 @@ module ApibuilderCli
       `git rev-parse --abbrev-ref HEAD`.strip
     end
 
-    def Git.generate_version(commits_back = nil, legacy = false)
+    def Git.generate_version(commits_back = nil)
       raw_version = Git.safe_describe(commits_back)
       if raw_version == ""
         ""
-      elsif legacy
-        raw_version
       else
         branch = Git.current_branch.downcase
         if branch == "master"

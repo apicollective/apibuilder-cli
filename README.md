@@ -186,7 +186,7 @@ Supported settings include:
 Delete versions in ApiBuilder that are not tagged in the source repo.
 
 ```
-bin/apibuilder clean <organization key> <application key> [--branch <branch name>] [--silent]
+bin/apibuilder clean <organization key> <application key> [--branch <branch name>] [--silent] [--legacy]
 ```
 
 For example:
@@ -196,6 +196,8 @@ bin/apibuilder clean apicollective apibuilder-api --branch dev
 ```
 
 When using the `--silent` flag, the suggested versions will be automatically deleted without prompting. This is useful for automated cleanup via git hooks and/or CD pipelines.
+
+If you have versions that use the legacy default naming (i.e. that match the pattern `/^.*-\d+-g[0-9a-f]{7}$/`) and belong on a non-master branch, use the `--legacy` flag to interactively move those versions to the proper branch. You only need to run this once, at the point of migrating from the legacy naming to the branch naming. Afterwards, simply run `clean` without the `--legacy` flag.
 
 ## cli itself
 
