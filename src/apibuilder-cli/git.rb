@@ -14,8 +14,11 @@ module ApibuilderCli
         raw_version
       else
         branch = Git.current_branch.downcase
-        suffix = branch == "master" ? "" : "-#{branch}"
-        "#{raw_version}#{suffix}"
+        if branch == "master"
+          raw_version
+        else
+          "#{raw_version}-#{branch}"
+        end
       end
     end
 
