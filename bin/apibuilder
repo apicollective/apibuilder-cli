@@ -41,7 +41,7 @@
 # apibuilder example apicollective apibuilder-api latest type
 #  - Generates an example JSON document for the specified type
 #
-# apibuilder upload apicollective apibuilder-api api/api.json [--version 1.5.0-dev] [--force] [--silent]
+# apibuilder upload apicollective apibuilder-api api/api.json [--version 1.5.0-dev] [--force] [--silent] [--update-config optional-file-path]
 #  - Uploads the file api/api.json to the apicollective org, apibuilder application.
 #    The uploaded file will be the specified version, defaulting to
 #    the output from git describe.
@@ -125,6 +125,18 @@ def head_of_latest_uploaded_version(org, application, client)
     end
   end
   found
+end
+
+def get_app_config_from_argument(argName)
+  args = ApibuilderCli::Args.parse(ARGV)
+  path = File.expand_path(args[argName] || ApibuilderCli::AppConfig.default_path)
+
+  if !File.exists?(path)
+    puts "Apibuilder config file #{path} does not exist"
+    exit(1)
+  end
+
+  ApibuilderCli::AppConfig.new(:path => path)
 end
 
 # Apibuilder injects a few comments into the code base to identify
@@ -360,6 +372,7 @@ elsif command == "upload"
 
   args = ApibuilderCli::Args.parse(ARGV)
   force = args.key?(:force)
+  update_config = args.key?(:'update-config')
   silent = args.key?(:silent)
   version = args[:version].to_s.strip
 
@@ -412,21 +425,18 @@ elsif command == "upload"
 
   unless version.empty?
     upload_version(client, org, application, version, IO.read(path), path)
+    if update_config
+      app_config = get_app_config_from_argument(:'update-config')
+      app_config.set_version(org, application, version)
+      app_config.save!
+    end
   end
 
 elsif command == "update"
-  args = ApibuilderCli::Args.parse(ARGV)
-  path = File.expand_path(args[:path] || ApibuilderCli::AppConfig.default_path)
-
-  if !File.exists?(path)
-    puts "File #{path} does not exit"
-    exit(1)
-  end
+  app_config = get_app_config_from_argument(:path)
 
   updates = []
   puts "Fetching code from #{client.url}"
-
-  app_config = ApibuilderCli::AppConfig.new(:path => path)
 
   tracked_files = ApibuilderCli::FileTracker.new(app_config.project_dir)
 

@@ -56,16 +56,16 @@ module ApibuilderCli
       Preconditions.check_state(File.exists?(@path), "Apibuilder application config file[#{@path}] not found")
 
       contents = IO.read(@path)
-      yaml = begin
+      @yaml = begin
                YAML.load(contents)
              rescue Psych::SyntaxError => e
                puts "ERROR parsing YAML file at #{@path}:\n  #{e}"
                exit(1)
              end
 
-      @settings = Settings.new(yaml['settings'] || {})
+      @settings = Settings.new((@yaml['settings'] || {}).clone) # NB: clone is not deep, so this will not work if settings become nested
 
-      code_projects = (yaml["code"] || {}).map do |org_key, project_map|
+      code_projects = (@yaml["code"] || {}).map do |org_key, project_map|
         project_map.map do |project_name, data|
           version = data['version'].to_s.strip
           if version == ""
@@ -89,6 +89,20 @@ module ApibuilderCli
       @code = Code.new(code_projects)
 
       @project_dir = AppConfig.parse_project_dir(@path)
+    end
+
+    def save!
+      IO.write(@path, @yaml.to_yaml)
+    end
+
+    def set_version(org_key, project_name, version)
+      if version.empty?
+        raise "Version missing"
+      elsif @yaml["code"].nil? || @yaml["code"][org_key].nil? || @yaml["code"][org_key][project_name].nil?
+        raise "File[#{@path}] Missing config for org[#{org_key}] project[#{project_name}]"
+      else
+        @yaml["code"][org_key][project_name]['version'] = version
+      end
     end
 
     class Code
