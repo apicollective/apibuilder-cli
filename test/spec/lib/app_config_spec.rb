@@ -36,6 +36,8 @@ describe ApibuilderCli::AppConfig do
 
     before do
       @sample_file = ApibuilderCli::Util.write_to_temp_file("""
+settings:
+  code.create.directories: true
 code:
   apicollective:
     apibuilder:
@@ -64,6 +66,7 @@ code:
       app_config = ApibuilderCli::AppConfig.new(:path => @sample_file)
       expect(app_config.code.projects.map(&:name).sort).to eq(["apibuilder", "apibuilder-generator", "apibuilder-spec", "bar"])
 
+      expect(app_config.settings.code_create_directories).to eq(true)
       apibuilder = app_config.code.projects.find { |p| p.name == "apibuilder" }
       expect(apibuilder.org).to eq("apicollective")
       expect(apibuilder.name).to eq("apibuilder")
@@ -74,6 +77,40 @@ code:
       expect(bar.org).to eq("foo")
       expect(bar.name).to eq("bar")
       expect(bar.version).to eq("0.0.1")
+      expect(bar.generators.map(&:name).sort).to eq(["ruby_client"])
+    end
+
+    it "sets version and writes file" do
+      app_config = ApibuilderCli::AppConfig.new(:path => @sample_file)
+      expect(app_config.settings.code_create_directories).to eq(true)
+
+      apibuilder = app_config.code.projects.find { |p| p.name == "apibuilder" }
+      expect(apibuilder.org).to eq("apicollective")
+      expect(apibuilder.name).to eq("apibuilder")
+      expect(apibuilder.version).to eq("latest")
+      expect(apibuilder.generators.map(&:name).sort).to eq(["play_2_3_client", "play_2_x_routes"])
+
+      bar = app_config.code.projects.find { |p| p.name == "bar" }
+      expect(bar.org).to eq("foo")
+      expect(bar.name).to eq("bar")
+      expect(bar.version).to eq("0.0.1")
+      expect(bar.generators.map(&:name).sort).to eq(["ruby_client"])
+
+      app_config.set_version("foo", "bar", "0.0.2")
+      app_config.save!
+
+      app_config = ApibuilderCli::AppConfig.new(:path => @sample_file)
+
+      apibuilder = app_config.code.projects.find { |p| p.name == "apibuilder" }
+      expect(apibuilder.org).to eq("apicollective")
+      expect(apibuilder.name).to eq("apibuilder")
+      expect(apibuilder.version).to eq("latest")
+      expect(apibuilder.generators.map(&:name).sort).to eq(["play_2_3_client", "play_2_x_routes"])
+
+      bar = app_config.code.projects.find { |p| p.name == "bar" }
+      expect(bar.org).to eq("foo")
+      expect(bar.name).to eq("bar")
+      expect(bar.version).to eq("0.0.2")
       expect(bar.generators.map(&:name).sort).to eq(["ruby_client"])
     end
 
