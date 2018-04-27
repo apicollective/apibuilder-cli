@@ -3,7 +3,7 @@ module ApibuilderCli
   class FileTracker
 
     def FileTracker.default_path(project_dir)
-      Util.file_join(project_dir, ApibuilderCli::Config::APIBUILDER_LOCAL_DIR, ".tracked_files")
+      Util.file_join(project_dir, ApibuilderCli::Config::APIBUILDER_LOCAL_DIR, "tracked_files")
     end
 
     # Options:
