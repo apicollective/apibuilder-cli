@@ -46,10 +46,12 @@
 #    The uploaded file will be the specified version, defaulting to
 #    the output from git describe.
 #
-# apibuilder update [--path path]
+# apibuilder update [--path <path> --org <org> --app <app>]
 #  - Reads a config file, optionally specified by path
 #    parameter. Invokes the apibuilder code generators specified in the
 #    configuration file.
+#  - org: If specified, we update code only for this organization
+#  - app: If specified, we update code only for this application
 #
 # apibuilder clean apicollective apibuilder-api [--branch branch-name] [--silent] [--legacy]
 #  - Interactively deletes from ApiBuilder any version not tagged in the source repo.
@@ -434,13 +436,16 @@ elsif command == "upload"
 
 elsif command == "update"
   app_config = get_app_config_from_argument(:path)
+  args = ApibuilderCli::Args.parse(ARGV)
 
   updates = []
   puts "Fetching code from #{client.url}"
 
   tracked_files = ApibuilderCli::FileTracker.new(app_config.project_dir)
 
-  app_config.code.projects.map do |project|
+  app_config.code.projects.select { |s|
+    (args[:org].nil? || s.org == args[:org]) && (args[:app].nil? || s.name == args[:app])
+  }.map do |project|
     project.generators.each do |generator|
       generator.targets.each do |target|
         puts "  #{project.org}/#{project.name}/#{project.version}/#{generator.name}..."
