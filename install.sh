@@ -33,8 +33,8 @@ mkdir -p "$PREFIX"/{bin,src}
 cp -R "$API_BUILDER_ROOT"/bin/* "$PREFIX"/bin
 cp -R "$API_BUILDER_ROOT"/src/* "$PREFIX"/src
 
-lib_path="${PREFIX}"/src/apibuilder-cli.rb
-sed -i '' -e "70s|^.*$|load File.join('$lib_path')|" "$PREFIX"/bin/apibuilder
+eval "./util/update-library-path.rb $PREFIX/bin/apibuilder ${PREFIX}/src/apibuilder-cli.rb"
+eval "chmod +x $PREFIX/bin/apibuilder"
 
 echo "Installed API_BUILDER_CLI to $PREFIX/bin/apibuilder"
 
