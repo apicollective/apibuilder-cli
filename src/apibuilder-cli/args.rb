@@ -7,9 +7,13 @@ module ApibuilderCli
     # Simple command line argument parsers to avoid pulling in external
     # dependency. Returns a hash
     #
-    # Example: ["--organization", "foo"]
-    #  returns: { :organization => "foo" }
-    def Args.parse(values)
+    # Example: ["--org", "foo"]
+    #  returns: { :org => "foo" }
+    #
+    # Example: Arg.parse(["--app", "foo", "--app", "bar"], :multi => ['app'])
+    #  returns: { :app => ["foo", "bar"] }
+    def Args.parse(values, config = {})
+      multi = (config.delete(:multi) || []).map(&:to_sym)
       args = {}
 
       index = 0
@@ -23,8 +27,10 @@ module ApibuilderCli
             args[name.to_sym] = nil
           else
             index += 1
-            if value == ""
-              args[name.to_sym] = nil
+            value = nil if value.empty?
+            if multi.include?(name.to_sym)
+              args[name.to_sym] ||= []
+              args[name.to_sym] << value
             else
               args[name.to_sym] = value
             end
