@@ -34,7 +34,7 @@ cp -R "$API_BUILDER_ROOT"/bin/* "$PREFIX"/bin
 cp -R "$API_BUILDER_ROOT"/src/* "$PREFIX"/src
 
 lib_path="${PREFIX}"/src/apibuilder-cli.rb
-sed -i '' -e "64s|^.*$|load File.join('$lib_path')|" "$PREFIX"/bin/apibuilder
+sed -i '' -e "70s|^.*$|load File.join('$lib_path')|" "$PREFIX"/bin/apibuilder
 
-echo "Installed API_BUILDER_CLI to $PREFIX/bin/api-builder-cli" 
+echo "Installed API_BUILDER_CLI to $PREFIX/bin/apibuilder"
 
