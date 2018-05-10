@@ -25,6 +25,19 @@ describe ApibuilderCli::Args do
     expect(args[:path]).to eq("bar")
   end
 
+  it "with multi value" do
+    args = ApibuilderCli::Args.parse(["--app", "foo", "--app", "bar"], :multi => ["app"])
+    expect(args.keys.map(&:to_s).sort.join(" ")).to eq("app")
+    expect(args[:app]).to eq(["foo", "bar"])
+  end
+
+  it "with multi and single values" do
+    args = ApibuilderCli::Args.parse(["--org", "apibuilder", "--app", "foo", "--app", "bar"], :multi => ["app"])
+    expect(args.keys.map(&:to_s).sort.join(" ")).to eq("app org")
+    expect(args[:org]).to eq("apibuilder")
+    expect(args[:app]).to eq(["foo", "bar"])
+  end
+
   it "args without values" do
     pairs = [
              ["--force", "--organization", "foo"],
