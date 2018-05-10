@@ -246,7 +246,7 @@ module Io
             end
 
             def full_uri(path)
-              File.join(@base_uri.to_s, path)
+              path.start_with?(@base_uri.to_s) ? path : File.join(@base_uri.to_s, path)
             end
 
             # Called to configure SSL if the base uri requires it
