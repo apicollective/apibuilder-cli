@@ -112,10 +112,10 @@ end
 # that corresponds to an api version that was uploaded to ApiBuilder. Looks
 # backwards a max of 100 commits.
 def head_of_latest_uploaded_version(org, application, client)
-  versions = client.versions.get_by_application_key(org, application, limit: 100).map { |v| v.version }
+  versions = client.versions.get_by_application_key(org, application, limit: 100).map(&:version)
 
   gitversions = ApibuilderCli::Git.generate_versions(0.upto(99).take([ApibuilderCli::Git.num_commits, 100].min))
-  gitversions.find { |gitv|
+  gitversions.find_index { |gitv|
     versions.include?(gitv)
   }
 end
@@ -303,7 +303,7 @@ elsif command == "download"
   rescue Exception => e
     handle_server_error(e)
   end
-  
+
 elsif command == "example"
   org = ARGV.shift.to_s.strip
   application = ARGV.shift.to_s.strip
@@ -328,7 +328,7 @@ elsif command == "example"
   rescue Exception => e
     handle_server_error(e)
   end
-  
+
 elsif command == "code"
   org = ARGV.shift.to_s.strip
   application = ARGV.shift.to_s.strip
