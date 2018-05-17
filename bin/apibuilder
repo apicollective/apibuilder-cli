@@ -112,21 +112,12 @@ end
 # that corresponds to an api version that was uploaded to ApiBuilder. Looks
 # backwards a max of 100 commits.
 def head_of_latest_uploaded_version(org, application, client)
-  found = nil
-  0.upto(99).each do |i|
-    version = ApibuilderCli::Git.generate_version(i)
-    begin
-      apibuilder_version = client.versions.get_by_application_key_and_version(org, application, version)
-      found = i
-      break
-    rescue Io::Apibuilder::Api::V0::HttpClient::ServerError => e
-      # Continue looking when the version is not found; fail for other exceptions.
-      if e.code != 404
-        raise e
-      end
-    end
-  end
-  found
+  versions = client.versions.get_by_application_key(org, application, limit: 100).map { |v| v.version }
+
+  gitversions = ApibuilderCli::Git.generate_versions(0.upto(99).take([ApibuilderCli::Git.num_commits, 100].min))
+  gitversions.find { |gitv|
+    versions.include?(gitv)
+  }
 end
 
 def get_app_config_from_argument(argName)
