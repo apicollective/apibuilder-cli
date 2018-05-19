@@ -193,11 +193,13 @@ def handle_server_error(e)
       $stderr.puts "ERROR: 401 Unauthorized"
       $stderr.puts "  URI: #{e.uri}"
       $stderr.puts ""
+      exit(1)
 
     elsif e.code == 404
       $stderr.puts "ERROR: 404 Not Found"
       $stderr.puts "  URI: #{e.uri}"
       $stderr.puts ""
+      exit(4)
 
     elsif e.code == 409
       $stderr.puts "ERROR 409: Unprocessable Entity"
@@ -208,12 +210,15 @@ def handle_server_error(e)
           $stderr.puts " - %s: %s" % [error['code'], error['message']]
         end
       end
+      exit(9)
     else
       $stderr.puts "ERROR #{e.code}: Server Error"
       raise e
     end
+
   else
     $stderr.puts "#{e.to_s}"
+    exit(2)
   end
 end
 
