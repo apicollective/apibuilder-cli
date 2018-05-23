@@ -459,7 +459,7 @@ elsif command == "update"
             # For scaffolding (i.e. locally-editable) files, store a copy of the original in the .apibuilder directory in order to
             # demonstrate diffs to be manually ported to the scaffolding files.
             [[f, base_target_path], file_is_scaffolding?(f) ? [Io::Apibuilder::Generator::V0::Models::File.new(f.to_hash.merge(:flags => nil)), reference_target_path] : nil].compact.each do |file, file_target_path|
-              final_target_path = app_config.settings.code_create_directories ? File.join(file_target_path, file.dir) : file_target_path
+              final_target_path = app_config.settings.code_create_directories && file.dir ? File.join(file_target_path, file.dir) : file_target_path
 
               # check if target path ends with the filename - if not, this is a directory target and need to check if dir exists
               # for example: "play_2_x_routes: api/conf/routes" is a file
