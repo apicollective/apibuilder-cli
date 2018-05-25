@@ -437,7 +437,8 @@ elsif command == "update"
   updates = []
   puts "Fetching code from #{client.url}"
 
-  tracked_files = ApibuilderCli::FileTracker.new(app_config.project_dir)
+  subset = !args[:org].nil? || !args[:app].nil? # if we are only updating a subset of the files
+  tracked_files = ApibuilderCli::FileTracker.new(app_config.project_dir, subset: subset)
 
   app_config.code.projects.select { |s|
     (args[:org].nil? || s.org == args[:org]) && (args[:app].nil? || args[:app].include?(s.name))

@@ -25,6 +25,11 @@ module ApibuilderCli
                       end
         end
       end
+      @subset = !!opts.delete(:subset)
+      if @subset
+        @current = @previous
+        @current_raw = @previous.values.flat_map(&:values).flat_map(&:values)
+      end
     end
 
     # Saves the tracked file list to the file
@@ -67,7 +72,9 @@ module ApibuilderCli
       @current[org][project][generator] << file
       @current_raw << file
 
-      @previous[org][project][generator].select!{ |previous_file| previous_file != file } if @previous[org] && @previous[org][project] && @previous[org][project][generator]
+      if !@subset
+        @previous[org][project][generator].select!{ |previous_file| previous_file != file } if @previous[org] && @previous[org][project] && @previous[org][project][generator]
+      end
     end
 
   end
