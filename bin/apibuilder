@@ -437,11 +437,18 @@ elsif command == "update"
   updates = []
   puts "Fetching code from #{client.url}"
 
-  tracked_files = ApibuilderCli::FileTracker.new(app_config.project_dir)
-
-  app_config.code.projects.select { |s|
+  selected = app_config.code.projects.select { |s|
     (args[:org].nil? || s.org == args[:org]) && (args[:app].nil? || args[:app].include?(s.name))
-  }.map do |project|
+  }
+
+  # Only track files if we are not filtering
+  tracked_files = if selected.size == app_config.code.projects.size
+                    ApibuilderCli::FileTracker.new(app_config.project_dir)
+                  else
+                    nil
+                  end
+
+  selected.map do |project|
     project.generators.each do |generator|
       generator.targets.each do |target|
         puts "  #{project.org}/#{project.name}/#{project.version}/#{generator.name}..."
@@ -484,7 +491,9 @@ elsif command == "update"
                 else
                   puts "unchanged"
                 end
-                tracked_files.track!(project.org, project.name, generator.name, target_path)
+                if tracked_files
+                  tracked_files.track!(project.org, project.name, generator.name, target_path)
+                end
               end
             end
           end
