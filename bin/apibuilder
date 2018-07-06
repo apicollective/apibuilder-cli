@@ -512,7 +512,7 @@ elsif command == "update"
       puts " - #{data[:generator]} => #{data[:target]}"
       ApibuilderCli::Util.write_to_file(data[:target], data[:source])
     end
-    if app_config.settings.code_cleanup_generated_files
+    if tracked_files && app_config.settings.code_cleanup_generated_files
       puts "Cleaning up obsolete code"
       tracked_files.to_cleanup.each do |file|
         file_dir = File.join(File.split(file).shift)
@@ -522,7 +522,9 @@ elsif command == "update"
       end
     end
   end
-  tracked_files.save!
+  if tracked_files
+    tracked_files.save!
+  end
 
 elsif command == "clean"
   org = ARGV.shift.to_s.strip
