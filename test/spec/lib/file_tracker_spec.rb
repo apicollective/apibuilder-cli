@@ -14,6 +14,9 @@ apicollective:
     play_2_3_client:
     - generated/app/ApibuilderSpec.scala
 foo:
+  apibuilder:
+    play_2_3_client:
+    - tmp/app/FooClient.scala
   bar:
     ruby_client:
     - tmp/client.rb
@@ -100,23 +103,101 @@ apicollective:
     - conf/routes
 """
       end
+
+      it "should not touch other files when update_only[org] is specified" do
+        pwd = `pwd`.strip
+        @files = ApibuilderCli::FileTracker.new(`pwd`.strip, :path => @sample_file, :updating_only => { :org => "apicollective"})
+        @files.track!("apicollective", "apibuilder", "play_2_x_routes", "#{pwd}/conf/routes")
+        @files.save!
+        expect(IO.read(@sample_file)).to eq """---
+apicollective:
+  apibuilder:
+    play_2_x_routes:
+    - conf/routes
+foo:
+  apibuilder:
+    play_2_3_client:
+    - tmp/app/FooClient.scala
+  bar:
+    ruby_client:
+    - tmp/client.rb
+"""
+      end
+
+      it "should not touch other files when update_only[app] is specified" do
+        pwd = `pwd`.strip
+        @files = ApibuilderCli::FileTracker.new(`pwd`.strip, :path => @sample_file, :updating_only => { :app => "apibuilder"})
+        @files.track!("apicollective", "apibuilder", "play_2_3_client", "#{pwd}/generated/app/ApibuilderClientNew.scala")
+        @files.save!
+        expect(IO.read(@sample_file)).to eq """---
+apicollective:
+  apibuilder:
+    play_2_3_client:
+    - generated/app/ApibuilderClientNew.scala
+  apibuilder-spec:
+    play_2_3_client:
+    - generated/app/ApibuilderSpec.scala
+foo:
+  bar:
+    ruby_client:
+    - tmp/client.rb
+"""
+      end
+
+      it "should not touch other files when update_only[org,app] is specified" do
+        pwd = `pwd`.strip
+        @files = ApibuilderCli::FileTracker.new(`pwd`.strip, :path => @sample_file, :updating_only => { :org => "apicollective", :app => "apibuilder"})
+        @files.track!("apicollective", "apibuilder", "play_2_3_client", "#{pwd}/generated/app/ApibuilderClientNew.scala")
+        @files.save!
+        expect(IO.read(@sample_file)).to eq """---
+apicollective:
+  apibuilder:
+    play_2_3_client:
+    - generated/app/ApibuilderClientNew.scala
+  apibuilder-spec:
+    play_2_3_client:
+    - generated/app/ApibuilderSpec.scala
+foo:
+  apibuilder:
+    play_2_3_client:
+    - tmp/app/FooClient.scala
+  bar:
+    ruby_client:
+    - tmp/client.rb
+"""
+      end
     end
 
     describe "#to_cleanup" do
 
       it "should flatten files across org/project/generator" do
-        expect(@files.to_cleanup).to match_array [rel("api/conf/routes"), rel("generated/app/ApibuilderClient.scala"), rel("generated/app/ApibuilderSpec.scala"), rel("tmp/client.rb")]
+        expect(@files.to_cleanup).to match_array [rel("api/conf/routes"), rel("generated/app/ApibuilderClient.scala"), rel("generated/app/ApibuilderSpec.scala"), rel("tmp/client.rb"), rel("tmp/app/FooClient.scala")]
       end
 
       it "should not list files used by other org/project/generator" do
         @files.track!("apicollective", "apibuilder", "play_2_x_routes", "tmp/client.rb")
-        expect(@files.to_cleanup).to match_array [rel("api/conf/routes"), rel("generated/app/ApibuilderClient.scala"), rel("generated/app/ApibuilderSpec.scala")]
+        expect(@files.to_cleanup).to match_array [rel("api/conf/routes"), rel("generated/app/ApibuilderClient.scala"), rel("generated/app/ApibuilderSpec.scala"), rel("tmp/app/FooClient.scala")]
       end
 
       it "should remove current files" do
         @files.track!("apicollective", "apibuilder", "play_2_x_routes", "api/conf/routes")
         @files.track!("apicollective", "apibuilder", "play_2_3_client", "generated/app/ApibuilderClient.scala")
-        expect(@files.to_cleanup).to match_array [rel("generated/app/ApibuilderSpec.scala"), rel("tmp/client.rb")]
+        expect(@files.to_cleanup).to match_array [rel("generated/app/ApibuilderSpec.scala"), rel("tmp/client.rb"), rel("tmp/app/FooClient.scala")]
+      end
+
+      it "should not remove files excluded by updating_only[org]" do
+        @files = ApibuilderCli::FileTracker.new(`pwd`.strip, :path => @sample_file, :updating_only => { :org => "apicollective" })
+        expect(@files.to_cleanup).to match_array [rel("api/conf/routes"), rel("generated/app/ApibuilderClient.scala"), rel("generated/app/ApibuilderSpec.scala")]
+      end
+
+      it "should not remove files excluded by updating_only[app]" do
+        @files = ApibuilderCli::FileTracker.new(`pwd`.strip, :path => @sample_file, :updating_only => { :app => "apibuilder" })
+        expect(@files.to_cleanup).to match_array [rel("api/conf/routes"), rel("generated/app/ApibuilderClient.scala"), rel("tmp/app/FooClient.scala")]
+      end
+
+      it "should not remove files excluded by updating_only[org,app]" do
+        @files = ApibuilderCli::FileTracker.new(`pwd`.strip, :path => @sample_file, :updating_only => { :org => "apicollective", :app => "apibuilder" })
+        expect(@files.to_cleanup).to match_array [rel("api/conf/routes"), rel("generated/app/ApibuilderClient.scala")]
       end
 
     end

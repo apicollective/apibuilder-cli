@@ -437,18 +437,12 @@ elsif command == "update"
   updates = []
   puts "Fetching code from #{client.url}"
 
-  selected = app_config.code.projects.select { |s|
+  updating_only = (args[:org].nil? && args[:app].nil?) ? nil : { :org => args[:org], :app => args[:app] }
+  tracked_files = ApibuilderCli::FileTracker.new(app_config.project_dir, { :updating_only => updating_only })
+
+  app_config.code.projects.select { |s|
     (args[:org].nil? || s.org == args[:org]) && (args[:app].nil? || args[:app].include?(s.name))
-  }
-
-  # Only track files if we are not filtering
-  tracked_files = if selected.size == app_config.code.projects.size
-                    ApibuilderCli::FileTracker.new(app_config.project_dir)
-                  else
-                    nil
-                  end
-
-  selected.map do |project|
+  }.map do |project|
     project.generators.each do |generator|
       generator.targets.each do |target|
         puts "  #{project.org}/#{project.name}/#{project.version}/#{generator.name}..."
@@ -491,9 +485,7 @@ elsif command == "update"
                 else
                   puts "unchanged"
                 end
-                if tracked_files
-                  tracked_files.track!(project.org, project.name, generator.name, target_path)
-                end
+                tracked_files.track!(project.org, project.name, generator.name, target_path)
               end
             end
           end
@@ -512,7 +504,7 @@ elsif command == "update"
       puts " - #{data[:generator]} => #{data[:target]}"
       ApibuilderCli::Util.write_to_file(data[:target], data[:source])
     end
-    if tracked_files && app_config.settings.code_cleanup_generated_files
+    if app_config.settings.code_cleanup_generated_files
       puts "Cleaning up obsolete code"
       tracked_files.to_cleanup.each do |file|
         file_dir = File.join(File.split(file).shift)
@@ -522,9 +514,7 @@ elsif command == "update"
       end
     end
   end
-  if tracked_files
-    tracked_files.save!
-  end
+  tracked_files.save!
 
 elsif command == "clean"
   org = ARGV.shift.to_s.strip

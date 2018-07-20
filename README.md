@@ -89,9 +89,17 @@ The `--update-config` flag tells the cli to update the local `.apibuilder/config
 
 Invoke code generator based on configuration from a yaml configuration file
 
-    bin/apibuilder update [--path path]
+    bin/apibuilder update [--path path] [--org org-name] [--app project-name]
     
         path defaults to .apibuilder/config in the current directory.
+
+        Specifying `--org` will limit the update to only projects within that org;
+        all code generated from other orgs will remain untouched. Can be combined with
+        `--app` but not required.
+
+        Specifying `--app` will limit the update to only projects that match the given name;
+        all code generated from other projects will remain untouched. Can be combined with
+        `--org` but not required.
 
 The configuration file is a YAML file that follows the convention:
 

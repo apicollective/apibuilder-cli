@@ -8,9 +8,14 @@ module ApibuilderCli
 
     # Options:
     #   :path => Mostly here for injecting test config
+    #   :updating_only => Filter to indicate which orgs/apps are being updated. All other orgs/apps
+    #     will be carried forward untouched. Options:
+    #       :org => The organization that contains the project
+    #       :app => The project name that is getting updated
     def initialize(project_dir, opts={})
       @project_dir = Preconditions.check_not_blank(project_dir, "ERROR: Missing project_dir")
       @path = Preconditions.assert_class(opts.delete(:path) || FileTracker.default_path(@project_dir), String)
+      @updating_only = opts.delete(:updating_only) || nil
       @previous = {}
       @current = {}
       @current_raw = []
@@ -25,21 +30,38 @@ module ApibuilderCli
                       end
         end
       end
-    end
-
-    # Saves the tracked file list to the file
-    def save!
-      if @current_raw.size > 0
-        @current.each do |org_name, projects|
+      unless @updating_only.nil? || (@updating_only[:org].nil? && @updating_only[:app].nil?)
+        @previous.each do |org_name, projects|
           projects.each do |project_name, generators|
-            generators.each do |generator_name, files|
-              files.uniq!
-              files.sort!
+            if ((!@updating_only[:org].nil? && org_name != @updating_only[:org]) || (!@updating_only[:app].nil? && project_name != @updating_only[:app]))
+              generators.each do |generator_name, files|
+                files.each do |file|
+                  track!(org_name, project_name, generator_name, file)
+                end
+              end
             end
           end
         end
       end
-      ApibuilderCli::Util.write_to_file(@path, @current.to_yaml)
+    end
+
+    # Saves the tracked file list to the file
+    def save!
+      output = {}
+      if @current_raw.size > 0
+        # Using .keys here to preserve deterministic ordering
+        @current.keys.sort.each do |org_name|
+          @current[org_name].keys.sort.each do |project_name|
+            @current[org_name][project_name].keys.sort.each do |generator_name|
+              output[org_name] = {} if output[org_name].nil?
+              output[org_name][project_name] = {} if output[org_name][project_name].nil?
+              output[org_name][project_name][generator_name] = {} if output[org_name][project_name][generator_name].nil?
+              output[org_name][project_name][generator_name] = @current[org_name][project_name][generator_name].uniq.sort
+            end
+          end
+        end
+      end
+      ApibuilderCli::Util.write_to_file(@path, output.to_yaml)
     end
 
     # Lists files that were tracked, but no longer are - should be deleted
