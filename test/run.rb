@@ -13,7 +13,7 @@ if !File.exists?(rspec)
   run("export GEM_HOME=%s && gem install rspec --version 3.2.0 --no-rdoc --no-ri --install-dir %s" % [gem_home, gem_home])
 end
 
-files = `find specs -type f -name "*spec.rb"`.strip.split
+files = `find spec -type f -name "*spec.rb"`.strip.split
 
 result = output = nil
 
