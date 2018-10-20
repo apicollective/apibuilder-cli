@@ -53,7 +53,18 @@ code:
       version: latest
       generators:
         play_2_3_client: generated/app/ApibuilderGenerator.scala
-
+  happycorp:
+    api-salary-calculator:
+        version: 1.3.5
+        generators:
+          - generator: http4s_0_18
+            target: src/main/generated
+            files:
+              - HappycorpApiSalaryCalculatorV0Client.scala
+          - generator: http4s_0_18
+            target: src/test/generated
+            files:
+              - HappycorpApiSalaryCalculatorV0MockClient.scala
   foo:
     bar:
       version: 0.0.1
@@ -64,7 +75,7 @@ code:
 
     it "reads file" do
       app_config = ApibuilderCli::AppConfig.new(:path => @sample_file)
-      expect(app_config.code.projects.map(&:name).sort).to eq(["apibuilder", "apibuilder-generator", "apibuilder-spec", "bar"])
+      expect(app_config.code.projects.map(&:name).sort).to eq(["api-salary-calculator", "apibuilder", "apibuilder-generator", "apibuilder-spec", "bar"])
 
       expect(app_config.settings.code_create_directories).to eq(true)
       apibuilder = app_config.code.projects.find { |p| p.name == "apibuilder" }
@@ -78,6 +89,21 @@ code:
       expect(bar.name).to eq("bar")
       expect(bar.version).to eq("0.0.1")
       expect(bar.generators.map(&:name).sort).to eq(["ruby_client"])
+
+      salary_calculator = app_config.code.projects.find { |p| p.name == "api-salary-calculator" }
+      expect(salary_calculator.org).to eq("happycorp")
+      expect(salary_calculator.name).to eq("api-salary-calculator")
+      expect(salary_calculator.version).to eq("1.3.5")
+      expect(salary_calculator.generators.size).to eq(2)
+      salary_gen0 = salary_calculator.generators[0]
+      salary_gen1 = salary_calculator.generators[1]
+      expect(salary_gen0.name).to eq("http4s_0_18")
+      expect(salary_gen0.targets).to eq(["src/main/generated"])
+      expect(salary_gen0.files).to eq(["HappycorpApiSalaryCalculatorV0Client.scala"])
+      expect(salary_gen1.name).to eq("http4s_0_18")
+      expect(salary_gen1.targets).to eq(["src/test/generated"])
+      expect(salary_gen1.files).to eq(["HappycorpApiSalaryCalculatorV0MockClient.scala"])
+
     end
 
     it "sets version and writes file" do
