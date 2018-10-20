@@ -4,6 +4,6 @@
 This will also install rspec into ../gems directory
 
 # Run a specific spec
-rspec specs/library_spec.rb
-rspec specs/library_spec.rb:12
+rspec spec/lib/foo_spec.rb
+rspec spec/lib/foo_spec.rb:12
 
