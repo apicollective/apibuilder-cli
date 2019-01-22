@@ -450,7 +450,9 @@ elsif command == "update"
         reference_target_path = File.join(app_config.project_dir, ApibuilderCli::Config::APIBUILDER_LOCAL_DIR, target)
 
         begin
-          code = client.code.get(project.org, project.name, project.version, generator.name).files
+          attributes = generator.attributes.map { |k, v| Io::Apibuilder::Generator::V0::Models::Attribute.new(:name => k, :value => v) }
+          form = Io::Apibuilder::Api::V0::Models::CodeForm.new(:attributes => attributes)
+          code = client.code.post(project.org, project.name, project.version, generator.name, form).files
           if generator.files.nil?
             files = code
           else
