@@ -1,6 +1,13 @@
 # apibuilder-cli
 Command line interface to API Builder
 
+# Install
+
+On MacOS using [brew](https://formulae.brew.sh/formula/apibuilder-cli):
+```
+brew install apibuilder-cli
+```
+
 # Setup for public APIs
 
 No setup needed - just use the API Builder command directly (see below)
