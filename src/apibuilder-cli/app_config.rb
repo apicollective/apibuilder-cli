@@ -66,15 +66,11 @@ module ApibuilderCli
       @settings = Settings.new((@yaml['settings'] || {}).clone) # NB: clone is not deep, so this will not work if settings become nested
       @generator_attributes = (@yaml['generator_attributes'] || []).map { |name, attributes| GeneratorAttribute.new(name, attributes) }
       def get_generator_attributes_by_name(name, override_attributes)
-        a = if ga = @generator_attributes.find { |ga| ga.generator_name == name }
-              ga.attributes.clone.merge(override_attributes)
-            else
-              override_attributes
-            end
-        if name == "happy_client"
-          puts "#{name} override[#{override_attributes.inspect} => #{a.inspect}"
+        if ga = @generator_attributes.find { |ga| ga.generator_name == name }
+          ga.attributes.clone.merge(override_attributes)
+        else
+          override_attributes
         end
-        a
       end
 
       code_projects = (@yaml["code"] || {}).map do |org_key, project_map|
@@ -86,12 +82,12 @@ module ApibuilderCli
           end
           if data['generators'].is_a?(Hash)
             generators = data['generators'].map do |name, data|
-              Generator.new(name, data, get_generator_attributes_by_name(name, attributes))
+              Generator.new(name, data, get_generator_attributes_by_name(name, {}))
             end
           elsif data['generators'].is_a?(Array)
             generators = data['generators'].map do |generator|
               name = generator['generator']
-              Generator.new(name, generator, get_generator_attributes_by_name(name, attributes))
+              Generator.new(name, generator, get_generator_attributes_by_name(name, generator['attributes'] || {}))
             end
           else
             raise "File[#{@path}] Missing generators for org[#{org_key}] project[#{project_name}]"
