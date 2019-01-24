@@ -5,7 +5,7 @@ module ApibuilderCli
 
     DEFAULT_FILENAMES = ["#{ApibuilderCli::Config::APIBUILDER_LOCAL_DIR}/config", ".apibuilder", ".apidoc"] unless defined?(DEFAULT_FILENAMES)
 
-    attr_reader :settings, :code, :project_dir
+    attr_reader :settings, :code, :project_dir, :generator_attributes
 
     def AppConfig.default_path
       path = find_config_file
@@ -64,22 +64,30 @@ module ApibuilderCli
              end
 
       @settings = Settings.new((@yaml['settings'] || {}).clone) # NB: clone is not deep, so this will not work if settings become nested
+      @generator_attributes = (@yaml['generator_attributes'] || []).map { |key, attributes| GeneratorAttribute.new(key, attributes) }
+      def get_generator_attributes_by_key(key)
+        if ga = @generator_attributes.find { |ga| ga.generator_key == key }
+          ga.attributes
+        else
+          {}
+        end
+      end
 
-      global_attribs = (@yaml['attributes'] || {})
       code_projects = (@yaml["code"] || {}).map do |org_key, project_map|
         project_map.map do |project_name, data|
-          project_attribs = global_attribs.clone().merge(data['attributes'] || {})
+          attributes = data['attributes'] || {}
           version = data['version'].to_s.strip
           if version == ""
             raise "File[#{@path}] Missing version for org[#{org_key}] project[#{project_name}]"
           end
           if data['generators'].is_a?(Hash)
-            generators = data['generators'].map do |name, data|
-              Generator.new(name, data, project_attribs)
+            generators = data['generators'].map do |key, data|
+              Generator.new(key, data, get_generator_attributes_by_key(key).clone.merge(attributes))
             end
           elsif data['generators'].is_a?(Array)
             generators = data['generators'].map do |generator|
-              Generator.new(generator['generator'], generator, project_attribs)
+              key = generator['generator']
+              Generator.new(key, generator, get_generator_attributes_by_key(key).clone.merge(attributes))
             end
           else
             raise "File[#{@path}] Missing generators for org[#{org_key}] project[#{project_name}]"
@@ -118,6 +126,16 @@ module ApibuilderCli
 
     end
 
+    class GeneratorAttribute
+
+      attr_reader :generator_key, :attributes
+
+      def initialize(generator_key, attributes)
+        @generator_key = generator_key
+        @attributes = attributes
+      end
+    end
+
     class Settings
 
       attr_reader :code_create_directories, :code_cleanup_generated_files
@@ -153,8 +171,9 @@ module ApibuilderCli
       # directory. Preferred usage is a directory, but paths are
       # supported based on the initial version of the configuration
       # files.
-      def initialize(name, data, project_attributes)
+      def initialize(name, data, attributes)
         @name = Preconditions.assert_class(name, String)
+        @attributes = attributes
         if data.is_a?(Array)
           Preconditions.assert_class(data.first, String)
           @targets = data
@@ -177,16 +196,6 @@ module ApibuilderCli
           Preconditions.assert_class(data['files'], String)
           @targets = [data['target']]
           @files = [data['files']]
-        end
-        if data['attributes'].is_a?(Hash)
-          generator_attributes = data['attributes']
-        else
-          generator_attributes = {}
-        end
-        if project_attributes.is_a?(Hash)
-          @attributes = project_attributes.merge(generator_attributes)
-        else
-          @attributes = generator_attributes
         end
       end
     end
