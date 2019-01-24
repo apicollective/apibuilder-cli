@@ -334,6 +334,17 @@ module Io
               ::Io::Apibuilder::Api::V0::Models::Code.new(r)
             end
 
+            # Generate code for a specific version of an application.
+            def post(org_key, application_key, version, generator_key, code_form)
+              HttpClient::Preconditions.assert_class('org_key', org_key, String)
+              HttpClient::Preconditions.assert_class('application_key', application_key, String)
+              HttpClient::Preconditions.assert_class('version', version, String)
+              HttpClient::Preconditions.assert_class('generator_key', generator_key, String)
+              (x = code_form; x.is_a?(::Io::Apibuilder::Api::V0::Models::CodeForm) ? x : ::Io::Apibuilder::Api::V0::Models::CodeForm.new(x))
+              r = @client.request("/#{CGI.escape(org_key)}/#{CGI.escape(application_key)}/#{CGI.escape(version)}/#{CGI.escape(generator_key)}").with_json(code_form.to_json).post
+              ::Io::Apibuilder::Api::V0::Models::Code.new(r)
+            end
+
           end
 
           class Domains
@@ -1834,6 +1845,32 @@ module Io
 
           end
 
+          class CodeForm
+
+            attr_reader :attributes
+
+            def initialize(incoming={})
+              opts = HttpClient::Helper.symbolize_keys(incoming)
+              HttpClient::Preconditions.require_keys(opts, [:attributes], 'CodeForm')
+              @attributes = HttpClient::Preconditions.assert_class('attributes', opts.delete(:attributes), Array).map { |v| (x = v; x.is_a?(::Io::Apibuilder::Generator::V0::Models::Attribute) ? x : ::Io::Apibuilder::Generator::V0::Models::Attribute.new(x)) }
+            end
+
+            def to_json
+              JSON.dump(to_hash)
+            end
+
+            def copy(incoming={})
+              CodeForm.new(to_hash.merge(HttpClient::Helper.symbolize_keys(incoming)))
+            end
+
+            def to_hash
+              {
+                :attributes => attributes.map { |o| o.to_hash }
+              }
+            end
+
+          end
+
           # Represents a single breaking diff of an application version. A breaking diff
           # indicates that it is possible for an existing client to now experience an
           # error or invalid data due to the diff.
@@ -3037,20 +3074,20 @@ module Io
 
               request = klass.send(:new, uri)
 
-              curl = ['curl']
-              if klass != Net::HTTP::Get
-                curl << "-X%s" % klass.name.split("::").last.upcase
-              end
+              # DEBUG curl = ['curl']
+              # DEBUG if klass != Net::HTTP::Get
+              # DEBUG  curl << "-X%s" % klass.name.split("::").last.upcase
+              # DEBUGend
 
               if @body
-                # DEBUG path = "/tmp/rest_client.tmp"
-                # DEBUG File.open(path, "w") { |os| os << @body.to_s }
-                # DEBUG curl << "-d@%s" % path
+                # DEBUG tmpfile = "/tmp/rest_client.tmp"
+                # DEBUG File.open(tmpfile, "w") { |os| os << @body.to_s }
+                # DEBUG curl << "-d@%s" % tmpfile
                 request.body = @body
               end
 
               if @auth
-                curl << "-u \"%s:%s\"" % [@auth.username, @auth.password]
+                # DEBUG curl << "-u \"%s:%s\"" % [@auth.username, @auth.password]
                 Preconditions.check_state(!@header_keys_lower_case.include?("authorization"),
                                           "Cannot specify both an Authorization header and an auth instance")
                 user_pass = "%s:%s" % [@auth.username, @auth.password]
@@ -3059,11 +3096,11 @@ module Io
               end
 
               @headers.each { |key, value|
-                curl <<  "-H \"%s: %s\"" % [key, value]
+                # DEBUG curl <<  "-H \"%s: %s\"" % [key, value]
                 request.add_field(key, value)
               }
 
-              curl << "'%s%s'" % [@base_uri, path]
+              # DEBUG curl << "'%s%s'" % [@base_uri, path]
               # DEBUG puts curl.join(" ")
 
               raw_response = @http_handler.instance(@base_uri, request.path).execute(request)

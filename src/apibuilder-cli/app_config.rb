@@ -65,19 +65,21 @@ module ApibuilderCli
 
       @settings = Settings.new((@yaml['settings'] || {}).clone) # NB: clone is not deep, so this will not work if settings become nested
 
+      global_attribs = (@yaml['attributes'] || {})
       code_projects = (@yaml["code"] || {}).map do |org_key, project_map|
         project_map.map do |project_name, data|
+          project_attribs = global_attribs.clone().merge(data['attributes'] || {})
           version = data['version'].to_s.strip
           if version == ""
             raise "File[#{@path}] Missing version for org[#{org_key}] project[#{project_name}]"
           end
           if data['generators'].is_a?(Hash)
             generators = data['generators'].map do |name, data|
-              Generator.new(name, data)
+              Generator.new(name, data, project_attribs)
             end
           elsif data['generators'].is_a?(Array)
             generators = data['generators'].map do |generator|
-              Generator.new(generator['generator'], generator)
+              Generator.new(generator['generator'], generator, project_attribs)
             end
           else
             raise "File[#{@path}] Missing generators for org[#{org_key}] project[#{project_name}]"
@@ -145,13 +147,13 @@ module ApibuilderCli
 
     class Generator
 
-      attr_reader :name, :targets, :files
+      attr_reader :name, :targets, :files, :attributes
 
       # @param target The name of a file path or a
       # directory. Preferred usage is a directory, but paths are
       # supported based on the initial version of the configuration
       # files.
-      def initialize(name, data)
+      def initialize(name, data, project_attributes)
         @name = Preconditions.assert_class(name, String)
         if data.is_a?(Array)
           Preconditions.assert_class(data.first, String)
@@ -175,6 +177,16 @@ module ApibuilderCli
           Preconditions.assert_class(data['files'], String)
           @targets = [data['target']]
           @files = [data['files']]
+        end
+        if data['attributes'].is_a?(Hash)
+          generator_attributes = data['attributes']
+        else
+          generator_attributes = {}
+        end
+        if project_attributes.is_a?(Hash)
+          @attributes = project_attributes.merge(generator_attributes)
+        else
+          @attributes = generator_attributes
         end
       end
     end
