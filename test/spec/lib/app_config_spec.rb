@@ -5,13 +5,13 @@ describe ApibuilderCli::AppConfig do
   describe ApibuilderCli::AppConfig::Generator do
 
     it "constructor for a single file" do
-      g = ApibuilderCli::AppConfig::Generator.new("ruby_client", "/tmp/client.rb")
+      g = ApibuilderCli::AppConfig::Generator.new("ruby_client", "/tmp/client.rb", {})
       expect(g.name).to eq("ruby_client")
       expect(g.targets).to eq(["/tmp/client.rb"])
     end
 
     it "constructor for multiple files" do
-      g = ApibuilderCli::AppConfig::Generator.new("ruby_client", ["/tmp/client.rb", "/tmp/bar"])
+      g = ApibuilderCli::AppConfig::Generator.new("ruby_client", ["/tmp/client.rb", "/tmp/bar"], {})
       expect(g.name).to eq("ruby_client")
       expect(g.targets).to eq(["/tmp/client.rb", "/tmp/bar"])
     end
@@ -21,7 +21,7 @@ describe ApibuilderCli::AppConfig do
   describe ApibuilderCli::AppConfig::Project do
 
     it "constructor" do
-      generators = [ApibuilderCli::AppConfig::Generator.new("ruby_client", "/tmp/client.rb")]
+      generators = [ApibuilderCli::AppConfig::Generator.new("ruby_client", "/tmp/client.rb", {})]
 
       project = ApibuilderCli::AppConfig::Project.new("apicollective", "apibuilder", "0.1.2", generators)
       expect(project.org).to eq("apicollective")
