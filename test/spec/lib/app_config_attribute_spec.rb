@@ -17,15 +17,17 @@ code:
       version: latest
       generators:
         play_2_6_client: generated/app/ApibuilderClient.scala
+        other_client: generated/app/OtherClient.scala
+        random_client: generated/app/RandomClient.scala
   happycorp:
-    api-salary-calculator:
+    salary:
         version: 1.3.5
         generators:
           - generator: play_2_6_client
             target: src/main/generated
             files:
               - HappycorpApiSalaryCalculatorV0Client.scala
-          - generator: play_2_6_client
+          - generator: other_client
             target: src/test/generated
             attributes:
               foo: baz
@@ -44,6 +46,27 @@ code:
       ga = app_config.generator_attributes.last
       expect(ga.generator_key).to eq("other_client")
       expect(ga.attributes).to eq({ "a" => "b" })
+    end
+
+    def generator(project, name)
+      project.generators.find { |g| g.name == name }
+    end
+
+    it "reads local generator attributes" do
+      app_config = ApibuilderCli::AppConfig.new(:path => @sample_file)
+      puts app_config.code.projects.inspect
+      apicollective = app_config.code.projects.find { |p| p.name == "apibuilder" }
+      expect(generator(apicollective, "play_2_6_client").attributes).to eq({ "foo" => "bar" })
+      expect(generator(apicollective, "other_client").attributes).to eq({"a" => "b"})
+      expect(generator(apicollective, "random_client").attributes).to eq({})
+    end
+
+    it "supports local override" do
+      app_config = ApibuilderCli::AppConfig.new(:path => @sample_file)
+      puts app_config.code.projects.inspect
+      apicollective = app_config.code.projects.find { |p| p.name == "salary" }
+      expect(generator(apicollective, "play_2_6_client").attributes).to eq({ "foo" => "bar" })
+      expect(generator(apicollective, "other_client").attributes).to eq({"foo" => "baz"})
     end
   end
 
