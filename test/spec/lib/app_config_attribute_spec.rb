@@ -54,7 +54,6 @@ code:
 
     it "reads local generator attributes" do
       app_config = ApibuilderCli::AppConfig.new(:path => @sample_file)
-      puts app_config.code.projects.inspect
       apicollective = app_config.code.projects.find { |p| p.name == "apibuilder" }
       expect(generator(apicollective, "play_2_6_client").attributes).to eq({ "foo" => "bar" })
       expect(generator(apicollective, "other_client").attributes).to eq({"a" => "b"})
@@ -63,7 +62,6 @@ code:
 
     it "supports local override" do
       app_config = ApibuilderCli::AppConfig.new(:path => @sample_file)
-      puts app_config.code.projects.inspect
       apicollective = app_config.code.projects.find { |p| p.name == "salary" }
       expect(generator(apicollective, "play_2_6_client").attributes).to eq({ "foo" => "bar" })
       expect(generator(apicollective, "happy_client").attributes).to eq({"foo" => "baz"})

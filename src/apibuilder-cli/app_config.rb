@@ -178,7 +178,6 @@ module ApibuilderCli
       def initialize(name, data, attributes)
         @name = Preconditions.assert_class(name, String)
         @attributes = attributes || {}
-        puts "gen: #{@name} => #{attributes.inspect}"
         if data.is_a?(Array)
           Preconditions.assert_class(data.first, String)
           @targets = data
