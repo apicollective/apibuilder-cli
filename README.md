@@ -201,7 +201,7 @@ You can also specify attributes to pass in to the code generators (both global a
 
 Example File w/ Global Generator Attributes:
 
-    generator_attributes:
+    attributes:
       play_2_6_client:
         foo: bar
 

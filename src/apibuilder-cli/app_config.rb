@@ -5,7 +5,7 @@ module ApibuilderCli
 
     DEFAULT_FILENAMES = ["#{ApibuilderCli::Config::APIBUILDER_LOCAL_DIR}/config", ".apibuilder", ".apidoc"] unless defined?(DEFAULT_FILENAMES)
 
-    attr_reader :settings, :code, :project_dir, :generator_attributes
+    attr_reader :settings, :code, :project_dir, :attributes
 
     def AppConfig.default_path
       path = find_config_file
@@ -64,9 +64,9 @@ module ApibuilderCli
              end
 
       @settings = Settings.new((@yaml['settings'] || {}).clone) # NB: clone is not deep, so this will not work if settings become nested
-      @generator_attributes = (@yaml['generator_attributes'] || []).map { |name, attributes| GeneratorAttribute.new(name, attributes) }
+      @attributes = Attributes.new((@yaml['attributes'] || {}))
       def get_generator_attributes_by_name(name, override_attributes)
-        if ga = @generator_attributes.find { |ga| ga.generator_name == name }
+        if ga = @attributes.generators.find { |ga| ga.generator_name == name }
           ga.attributes.clone.merge(override_attributes)
         else
           override_attributes
@@ -122,6 +122,16 @@ module ApibuilderCli
       def initialize(projects)
         @projects = Preconditions.assert_class(projects, Array)
         Preconditions.assert_class_or_nil(projects.first, Project)
+      end
+
+    end
+
+    class Attributes
+
+      attr_reader :generators
+
+      def initialize(data)
+        @generators = (data['generators'] || []).map { |name, attributes| GeneratorAttribute.new(name, attributes) }
       end
 
     end

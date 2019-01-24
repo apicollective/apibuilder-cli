@@ -6,11 +6,13 @@ describe ApibuilderCli::AppConfig do
 
     before do
       @sample_file = ApibuilderCli::Util.write_to_temp_file("""
-generator_attributes:
-  play_2_6_client:
-    foo: bar
-  other_client:
-    a: b
+attributes:
+  generators:
+    play_2_6_client:
+      foo: bar
+    other_client:
+      a: b
+
 code:
   apicollective:
     apibuilder:
@@ -38,12 +40,12 @@ code:
 
     it "reads global generator attributes" do
       app_config = ApibuilderCli::AppConfig.new(:path => @sample_file)
-      expect(app_config.generator_attributes.size).to eq(2)
-      ga = app_config.generator_attributes.first
+      expect(app_config.attributes.generators.size).to eq(2)
+      ga = app_config.attributes.generators.first
       expect(ga.generator_name).to eq("play_2_6_client")
       expect(ga.attributes).to eq({ "foo" => "bar" })
 
-      ga = app_config.generator_attributes.last
+      ga = app_config.attributes.generators.last
       expect(ga.generator_name).to eq("other_client")
       expect(ga.attributes).to eq({ "a" => "b" })
     end
