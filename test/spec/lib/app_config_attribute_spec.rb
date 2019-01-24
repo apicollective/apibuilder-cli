@@ -27,7 +27,7 @@ code:
             target: src/main/generated
             files:
               - HappycorpApiSalaryCalculatorV0Client.scala
-          - generator: other_client
+          - generator: happy_client
             target: src/test/generated
             attributes:
               foo: baz
@@ -40,11 +40,11 @@ code:
       app_config = ApibuilderCli::AppConfig.new(:path => @sample_file)
       expect(app_config.generator_attributes.size).to eq(2)
       ga = app_config.generator_attributes.first
-      expect(ga.generator_key).to eq("play_2_6_client")
+      expect(ga.generator_name).to eq("play_2_6_client")
       expect(ga.attributes).to eq({ "foo" => "bar" })
 
       ga = app_config.generator_attributes.last
-      expect(ga.generator_key).to eq("other_client")
+      expect(ga.generator_name).to eq("other_client")
       expect(ga.attributes).to eq({ "a" => "b" })
     end
 
@@ -66,7 +66,7 @@ code:
       puts app_config.code.projects.inspect
       apicollective = app_config.code.projects.find { |p| p.name == "salary" }
       expect(generator(apicollective, "play_2_6_client").attributes).to eq({ "foo" => "bar" })
-      expect(generator(apicollective, "other_client").attributes).to eq({"foo" => "baz"})
+      expect(generator(apicollective, "happy_client").attributes).to eq({"foo" => "baz"})
     end
   end
 

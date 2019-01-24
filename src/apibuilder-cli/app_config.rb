@@ -64,13 +64,17 @@ module ApibuilderCli
              end
 
       @settings = Settings.new((@yaml['settings'] || {}).clone) # NB: clone is not deep, so this will not work if settings become nested
-      @generator_attributes = (@yaml['generator_attributes'] || []).map { |key, attributes| GeneratorAttribute.new(key, attributes) }
-      def get_generator_attributes_by_key(key)
-        if ga = @generator_attributes.find { |ga| ga.generator_key == key }
-          ga.attributes
-        else
-          {}
+      @generator_attributes = (@yaml['generator_attributes'] || []).map { |name, attributes| GeneratorAttribute.new(name, attributes) }
+      def get_generator_attributes_by_name(name, override_attributes)
+        a = if ga = @generator_attributes.find { |ga| ga.generator_name == name }
+              ga.attributes.clone.merge(override_attributes)
+            else
+              override_attributes
+            end
+        if name == "happy_client"
+          puts "#{name} override[#{override_attributes.inspect} => #{a.inspect}"
         end
+        a
       end
 
       code_projects = (@yaml["code"] || {}).map do |org_key, project_map|
@@ -81,13 +85,13 @@ module ApibuilderCli
             raise "File[#{@path}] Missing version for org[#{org_key}] project[#{project_name}]"
           end
           if data['generators'].is_a?(Hash)
-            generators = data['generators'].map do |key, data|
-              Generator.new(key, data, get_generator_attributes_by_key(key).clone.merge(attributes))
+            generators = data['generators'].map do |name, data|
+              Generator.new(name, data, get_generator_attributes_by_name(name, attributes))
             end
           elsif data['generators'].is_a?(Array)
             generators = data['generators'].map do |generator|
-              key = generator['generator']
-              Generator.new(key, generator, get_generator_attributes_by_key(key).clone.merge(attributes))
+              name = generator['generator']
+              Generator.new(name, generator, get_generator_attributes_by_name(name, attributes))
             end
           else
             raise "File[#{@path}] Missing generators for org[#{org_key}] project[#{project_name}]"
@@ -128,10 +132,10 @@ module ApibuilderCli
 
     class GeneratorAttribute
 
-      attr_reader :generator_key, :attributes
+      attr_reader :generator_name, :attributes
 
-      def initialize(generator_key, attributes)
-        @generator_key = generator_key
+      def initialize(generator_name, attributes)
+        @generator_name = generator_name
         @attributes = attributes
       end
     end
@@ -173,7 +177,8 @@ module ApibuilderCli
       # files.
       def initialize(name, data, attributes)
         @name = Preconditions.assert_class(name, String)
-        @attributes = attributes
+        @attributes = attributes || {}
+        puts "gen: #{@name} => #{attributes.inspect}"
         if data.is_a?(Array)
           Preconditions.assert_class(data.first, String)
           @targets = data
