@@ -202,8 +202,9 @@ You can also specify attributes to pass in to the code generators (both global a
 Example File w/ Global Generator Attributes:
 
     attributes:
-      play_2_6_client:
-        foo: bar
+      generators:
+        play_2_6_client:
+          foo: bar
 
     code:
       apicollective:
