@@ -79,7 +79,7 @@ attributes:
     play*:
       a: b
     play_client:
-      c: D
+      c: d
 
 code:
   apicollective:

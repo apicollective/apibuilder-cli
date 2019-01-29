@@ -69,21 +69,17 @@ module ApibuilderCli
         # @param name generator name
         # @param pattern e.g. "play_client" or "play*"
         def matches(name, pattern)
-          puts "p: #{pattern}"
           if pattern == "*"
             true
           elsif pattern.end_with?("*")
-            raise pattern.substring(0, -1)
+            name.start_with?(pattern[0, pattern.length - 1])
           else
             name == pattern
           end
         end
 
-        if ga = @attributes.generators.find { |ga| matches(ga.generator_name, name) }
-          ga.attributes.clone.merge(override_attributes)
-        else
-          override_attributes
-        end
+        all = @attributes.generators.select { |ga| matches(name, ga.generator_name) }
+        all.inject(override_attributes) {|fin, ga| fin.merge(ga.attributes) }
       end
 
       code_projects = (@yaml["code"] || {}).map do |org_key, project_map|
