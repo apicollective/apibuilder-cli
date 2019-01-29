@@ -2,7 +2,11 @@ load File.join(File.dirname(__FILE__), '../../init.rb')
 
 describe ApibuilderCli::AppConfig do
 
-  describe ApibuilderCli::AppConfig do
+  def generator(project, name)
+    project.generators.find { |g| g.name == name }
+  end
+
+  describe "basic attributes" do
 
     before do
       @sample_file = ApibuilderCli::Util.write_to_temp_file("""
@@ -50,24 +54,51 @@ code:
       expect(ga.attributes).to eq({ "a" => "b" })
     end
 
-    def generator(project, name)
-      project.generators.find { |g| g.name == name }
-    end
-
     it "reads local generator attributes" do
       app_config = ApibuilderCli::AppConfig.new(:path => @sample_file)
-      apicollective = app_config.code.projects.find { |p| p.name == "apibuilder" }
-      expect(generator(apicollective, "play_2_6_client").attributes).to eq({ "foo" => "bar" })
-      expect(generator(apicollective, "other_client").attributes).to eq({"a" => "b"})
-      expect(generator(apicollective, "random_client").attributes).to eq({})
+      apibuilder = app_config.code.projects.find { |p| p.name == "apibuilder" }
+      expect(generator(apibuilder, "play_2_6_client").attributes).to eq({ "foo" => "bar" })
+      expect(generator(apibuilder, "other_client").attributes).to eq({"a" => "b"})
+      expect(generator(apibuilder, "random_client").attributes).to eq({})
     end
 
     it "supports local override" do
       app_config = ApibuilderCli::AppConfig.new(:path => @sample_file)
-      apicollective = app_config.code.projects.find { |p| p.name == "salary" }
-      expect(generator(apicollective, "play_2_6_client").attributes).to eq({ "foo" => "bar" })
-      expect(generator(apicollective, "happy_client").attributes).to eq({"foo" => "baz"})
+      salary = app_config.code.projects.find { |p| p.name == "salary" }
+      expect(generator(salary, "play_2_6_client").attributes).to eq({ "foo" => "bar" })
+      expect(generator(salary, "happy_client").attributes).to eq({"foo" => "baz"})
     end
   end
 
+  describe "attributes for wildcard generator keys" do
+
+    before do
+      @sample_file2 = ApibuilderCli::Util.write_to_temp_file("""
+attributes:
+  generators:
+    play*:
+      a: b
+    play_client:
+      c: D
+
+code:
+  apicollective:
+    apibuilder:
+      version: latest
+      generators:
+        play_client: generated/app/PlayClient.scala
+        play_json: generated/app/PlayJson.scala
+        other_client: generated/app/OtherClient.scala
+      """.strip)
+    end
+
+    it "reads global generator attributes" do
+      app_config = ApibuilderCli::AppConfig.new(:path => @sample_file2)
+      apibuilder = app_config.code.projects.find { |p| p.name == "apibuilder" }
+      expect(generator(apibuilder, "play_client").attributes).to eq({ "a" => "b", "c" => "d" })
+      expect(generator(apibuilder, "play_json").attributes).to eq({ "a" => "b" })
+      expect(generator(apibuilder, "other_client").attributes).to eq({})
+    end
+
+  end
 end
