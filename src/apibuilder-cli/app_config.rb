@@ -5,7 +5,7 @@ module ApibuilderCli
 
     DEFAULT_FILENAMES = ["#{ApibuilderCli::Config::APIBUILDER_LOCAL_DIR}/config", ".apibuilder", ".apidoc"] unless defined?(DEFAULT_FILENAMES)
 
-    attr_reader :settings, :code, :project_dir
+    attr_reader :settings, :code, :project_dir, :attributes
 
     def AppConfig.default_path
       path = find_config_file
@@ -64,20 +64,39 @@ module ApibuilderCli
              end
 
       @settings = Settings.new((@yaml['settings'] || {}).clone) # NB: clone is not deep, so this will not work if settings become nested
+      @attributes = Attributes.new((@yaml['attributes'] || {}))
+      def get_generator_attributes_by_name(name, override_attributes)
+        # @param name generator name
+        # @param pattern e.g. "play_client" or "play*"
+        def matches(name, pattern)
+          if pattern == "*"
+            true
+          elsif pattern.end_with?("*")
+            name.start_with?(pattern[0, pattern.length - 1])
+          else
+            name == pattern
+          end
+        end
+
+        all = @attributes.generators.select { |ga| matches(name, ga.generator_name) }
+        all.inject(override_attributes) {|fin, ga| fin.merge(ga.attributes) }
+      end
 
       code_projects = (@yaml["code"] || {}).map do |org_key, project_map|
         project_map.map do |project_name, data|
+          attributes = data['attributes'] || {}
           version = data['version'].to_s.strip
           if version == ""
             raise "File[#{@path}] Missing version for org[#{org_key}] project[#{project_name}]"
           end
           if data['generators'].is_a?(Hash)
             generators = data['generators'].map do |name, data|
-              Generator.new(name, data)
+              Generator.new(name, data, get_generator_attributes_by_name(name, {}))
             end
           elsif data['generators'].is_a?(Array)
             generators = data['generators'].map do |generator|
-              Generator.new(generator['generator'], generator)
+              name = generator['generator']
+              Generator.new(name, generator, get_generator_attributes_by_name(name, generator['attributes'] || {}))
             end
           else
             raise "File[#{@path}] Missing generators for org[#{org_key}] project[#{project_name}]"
@@ -116,6 +135,26 @@ module ApibuilderCli
 
     end
 
+    class Attributes
+
+      attr_reader :generators
+
+      def initialize(data)
+        @generators = (data['generators'] || []).map { |name, attributes| GeneratorAttribute.new(name, attributes) }
+      end
+
+    end
+
+    class GeneratorAttribute
+
+      attr_reader :generator_name, :attributes
+
+      def initialize(generator_name, attributes)
+        @generator_name = generator_name
+        @attributes = attributes
+      end
+    end
+
     class Settings
 
       attr_reader :code_create_directories, :code_cleanup_generated_files
@@ -145,14 +184,15 @@ module ApibuilderCli
 
     class Generator
 
-      attr_reader :name, :targets, :files
+      attr_reader :name, :targets, :files, :attributes
 
       # @param target The name of a file path or a
       # directory. Preferred usage is a directory, but paths are
       # supported based on the initial version of the configuration
       # files.
-      def initialize(name, data)
+      def initialize(name, data, attributes)
         @name = Preconditions.assert_class(name, String)
+        @attributes = attributes || {}
         if data.is_a?(Array)
           Preconditions.assert_class(data.first, String)
           @targets = data

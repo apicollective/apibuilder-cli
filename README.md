@@ -56,11 +56,11 @@ Invoke a code generator from the command line
     
 For example, to generate a play 2.3 client for the latest version of apibuilder itself:
 
-    bin/apibuilder code apicollective apibuilder-api latest play_2_5_client .
+    bin/apibuilder code apicollective apibuilder-api latest play_2_6_client .
 
 Each code generator returns a list of files. To download a specific file:
 
-    bin/apibuilder code apicollective apibuilder-api latest play_2_5_client . [<filename> ...]
+    bin/apibuilder code apicollective apibuilder-api latest play_2_6_client . [<filename> ...]
     
 For example:
 
@@ -133,7 +133,7 @@ Example File:
         apibuilder:
           version: latest
           generators:
-            play_2_5_client:
+            play_2_6_client:
               target: generated/app
             play_2_x_routes:
               target: api/conf/routes
@@ -141,7 +141,7 @@ Example File:
         apibuilder-spec:
           version: latest
           generators:
-            play_2_5_client:
+            play_2_6_client:
               target: generated/app
               files:
                 - apicollective*.*
@@ -149,7 +149,7 @@ Example File:
         apibuilder-generator:
           version: latest
           generators:
-            play_2_5_client: generated/app
+            play_2_6_client: generated/app
 
 Note: Previously the configuration file syntax did not specify any files and instead specified the path as the value of the generator name.
 While still supported, this syntax is deprecated:
@@ -189,13 +189,49 @@ Example File w/ Settings:
         apibuilder:
           version: latest
           generators:
-            play_2_5_client: generated/app
+            play_2_6_client: generated/app
 
 Supported settings include:
 
   - code.create.directories: Defaults to false. If true, when you run
     `apibuilder update`, we will create the subdirectories as specified by
     the code generator.
+
+You can also specify attributes to pass in to the code generators
+(both global and local), including the use of a wildcard to select
+multiple generators to which to apply the attributes:
+
+Example File w/ Global Generator Attributes:
+
+    attributes:
+      generators:
+        foo*:
+          key: value
+        play_2_6_client:
+          foo: bar
+
+    code:
+      apicollective:
+        apibuilder:
+          version: latest
+          generators:
+            play_2_6_client: generated/app
+
+Example File w/ Local Generator Attributes:
+
+    code:
+      happycorp:
+        api-salary-calculator:
+            version: 1.3.5
+            generators:
+              - generator: play_2_6_client
+                target: src/test/generated
+                attributes:
+                  foo: baz
+                files:
+                  - HappycorpApiSalaryCalculatorV0MockClient.scala
+
+Supported attributes are defined by each code generators.
 
 
 ## clean
