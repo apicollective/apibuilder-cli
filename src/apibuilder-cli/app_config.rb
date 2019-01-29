@@ -66,7 +66,20 @@ module ApibuilderCli
       @settings = Settings.new((@yaml['settings'] || {}).clone) # NB: clone is not deep, so this will not work if settings become nested
       @attributes = Attributes.new((@yaml['attributes'] || {}))
       def get_generator_attributes_by_name(name, override_attributes)
-        if ga = @attributes.generators.find { |ga| ga.generator_name == name }
+        # @param name generator name
+        # @param pattern e.g. "play_client" or "play*"
+        def matches(name, pattern)
+          puts "p: #{pattern}"
+          if pattern == "*"
+            true
+          elsif pattern.end_with?("*")
+            raise pattern.substring(0, -1)
+          else
+            name == pattern
+          end
+        end
+
+        if ga = @attributes.generators.find { |ga| matches(ga.generator_name, name) }
           ga.attributes.clone.merge(override_attributes)
         else
           override_attributes

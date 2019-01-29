@@ -197,12 +197,16 @@ Supported settings include:
     `apibuilder update`, we will create the subdirectories as specified by
     the code generator.
 
-You can also specify attributes to pass in to the code generators (both global and local):
+You can also specify attributes to pass in to the code generators
+(both global and local), including the use of a wildcard to select
+multiple generators to which to apply the attributes:
 
 Example File w/ Global Generator Attributes:
 
     attributes:
       generators:
+        foo*:
+          key: value
         play_2_6_client:
           foo: bar
 
