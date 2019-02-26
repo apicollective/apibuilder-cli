@@ -54,7 +54,7 @@ Invoke a code generator from the command line
 
     bin/apibuilder code <organization key> <application key> <version> <generator> <target dir> [<filename> ...]
     
-For example, to generate a play 2.3 client for the latest version of apibuilder itself:
+For example, to generate a play 2.6 client for the latest version of apibuilder itself:
 
     bin/apibuilder code apicollective apibuilder-api latest play_2_6_client .
 
