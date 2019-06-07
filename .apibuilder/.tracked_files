@@ -1,11 +1,11 @@
 ---
 apicollective:
-  apibuilder-common:
-    ruby_client:
-    - src/apibuilder-cli/apicollective_apibuilder_common_v0_client.rb
   apibuilder-api:
     ruby_client:
     - src/apibuilder-cli/apicollective_apibuilder_api_v0_client.rb
+  apibuilder-common:
+    ruby_client:
+    - src/apibuilder-cli/apicollective_apibuilder_common_v0_client.rb
   apibuilder-generator:
     ruby_client:
     - src/apibuilder-cli/apicollective_apibuilder_generator_v0_client.rb
