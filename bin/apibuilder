@@ -28,6 +28,10 @@
 #  - Pagination is implemented with environment variables LIMIT and OFFSET. Example:
 #    LIMIT=10 OFFSET=0 apibuilder list applications apicollective
 #
+# apibuilder code apicollective apibuilder-api latest form
+#  - Downloads the invocation form for this service that is the data passed
+#    to the code generators
+#
 # apibuilder code apicollective apibuilder-api latest scala_models /tmp
 #  - Returns the code for apicollective/apibuilder version 'latest' using the
 #    codegenerator 'scala_models', writing the generated code to the directory
@@ -342,25 +346,37 @@ elsif command == "code"
   directory = ARGV.shift.to_s.strip
   filenames = ARGV.collect { |f| f.to_s.strip }
 
-  if org.empty? || application.empty? || version.empty? || generator.empty? || directory.empty?
-    puts "org, application, version, generator, and directory are required"
+  if org.empty? || application.empty? || version.empty? || generator.empty?
+    puts "org, application, version, generator are required"
     exit(1)
   end
+  # TODO: Support code generator attributes here
+  code_form = ::Io::Apibuilder::Api::V0::Models::CodeForm.new(:attributes => [])
 
-  if !File.directory?(directory)
-    puts "ERROR: directory '%s' does not exist" % directory
-    exit(1)
-  end
-
-  begin
-    code = client.code.get(org, application, version, generator).files
-    if filenames.empty?
-      write_files(code, directory)
-    else
-      write_files(filter_files(filenames, code, generator), directory)
+  if generator == "form"
+    begin
+      data = client.code.post_form(org, application, version, code_form)
+      puts data.to_json
+    rescue Exception => e
+      handle_server_error(e)
     end
-  rescue Exception => e
-    handle_server_error(e)
+
+  else
+    if !File.directory?(directory)
+      puts "ERROR: directory '%s' does not exist" % directory
+      exit(1)
+    end
+
+    begin
+      code = client.code.post_by_generator_key(org, application, version, generator, code_form).files
+      if filenames.empty?
+        write_files(code, directory)
+      else
+        write_files(filter_files(filenames, code, generator), directory)
+      end
+    rescue Exception => e
+      handle_server_error(e)
+    end
   end
 
 elsif command == "upload"
