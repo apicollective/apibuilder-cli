@@ -468,7 +468,7 @@ elsif command == "update"
         begin
           attributes = generator.attributes.map { |k, v| Io::Apibuilder::Generator::V0::Models::Attribute.new(:name => k, :value => v) }
           form = Io::Apibuilder::Api::V0::Models::CodeForm.new(:attributes => attributes)
-          code = client.code.post(project.org, project.name, project.version, generator.name, form).files
+          code = client.code.post_by_generator_key(project.org, project.name, project.version, generator.name, form).files
           if generator.files.nil?
             files = code
           else
