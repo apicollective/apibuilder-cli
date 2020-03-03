@@ -87,6 +87,16 @@ module ApibuilderCli
         else
           name, value = stripped.split(/\s*=\s*/, 2).map(&:strip)
 
+          if @profiles[-1].nil?
+            puts "**ERROR** Missing profile block in configuration at #{@path}."
+            puts ''
+            puts "Example:"
+            puts ''
+            puts '[default]'
+            puts 'token = <api token>'
+            exit(1)
+          end
+
           if name != "" && value != ""
             @profiles[-1].add(name, value)
           end
