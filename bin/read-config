@@ -12,17 +12,32 @@ args = ApibuilderCli::Args.parse(ARGV)
 
 path = File.expand_path(args[:path] || ApibuilderCli::Config::default_path)
 
-if File.exists?(path)
-  config = ApibuilderCli::Config.new(:path => path)
-
-  config.profiles.each do |profile|
-    puts ""
-    puts "Profile #{profile.name}:"
-    puts "  api_uri: " + profile.api_uri
-    puts "    token: " + (profile.token ? ApibuilderCli::Util.mask(profile.token) : "none")
-  end
-
-else
-  puts "File #{path} does not exit"
+if !File.exists?(path)
+  puts "ERROR: File #{path} does not exit"
   exit(1)
+end
+
+if IO.read(path).strip.empty?
+  puts "ERROR: File #{path} is empty"
+  exit(1)
+end
+
+config = ApibuilderCli::Config.new(:path => path)
+
+if config.profiles.empty?
+  puts "ERROR: No profiles found in configuration file #{path}."
+  puts ''
+  puts "Example:"
+  puts ''
+  puts '[default]'
+  puts 'token = <api token>'
+  puts ""
+  exit(1)
+end
+
+config.profiles.each do |profile|
+  puts ""
+  puts "Profile #{profile.name}:"
+  puts "  api_uri: " + profile.api_uri
+  puts "    token: " + (profile.token ? ApibuilderCli::Util.mask(profile.token) : "none")
 end

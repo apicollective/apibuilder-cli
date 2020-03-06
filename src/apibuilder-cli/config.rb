@@ -87,7 +87,7 @@ module ApibuilderCli
         else
           name, value = stripped.split(/\s*=\s*/, 2).map(&:strip)
 
-          if name != "" && value != ""
+          if name != "" && value != "" && @profiles[-1]
             @profiles[-1].add(name, value)
           end
         end
