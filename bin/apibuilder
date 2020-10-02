@@ -42,6 +42,13 @@
 #    version of the application. This example would download
 #    http://apibuilder.me/apicollective/apibuilder-api/latest/original and print to stdout
 #
+# apibuilder download_batch apicollective apibuilder-api:1.2.3 apibuilder-spec
+#  - Executes a batch download of 0 or more applications. This example will download
+#    apibuilder-api version 1.2.3 and apibuilder-spec latest version for the organization 'apicollective'
+#
+#    The result will be a JSON object with key 'applications' that is an array. there will be one element
+#    per requested application.
+#
 # apibuilder example apicollective apibuilder-api latest type
 #  - Generates an example JSON document for the specified type
 #
@@ -287,6 +294,31 @@ if command == "list"
   else
     puts "unrecognized resource[#{resource}]"
     exit(1)
+  end
+
+elsif command == "download_batch"
+  org = ARGV.shift.to_s.strip
+
+  applications = ARGV.map do |value|
+    key, version = value.split(":", 2)
+    ::Io::Apibuilder::Api::V0::Models::BatchDownloadApplicationForm.new(:application_key => key, :version => version)
+  end
+
+  if org.empty?
+    puts "org is required"
+    exit(1)
+  end
+
+  if applications.empty?
+    puts "specify at least one application to download"
+    exit(1)
+  end
+
+  begin
+    response = client.batch_download_applications.post(org, ::Io::Apibuilder::Api::V0::Models::BatchDownloadApplicationsForm.new(:applications => applications))
+    puts response.to_json
+  rescue Exception => e
+    handle_server_error(e)
   end
 
 elsif command == "download"
