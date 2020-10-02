@@ -42,9 +42,9 @@
 #    version of the application. This example would download
 #    http://apibuilder.me/apicollective/apibuilder-api/latest/original and print to stdout
 #
-# apibuilder download_batch apicollective apibuilder-api 1.2.3 apibuilder-spec 4.5.6
+# apibuilder download_batch apicollective apibuilder-api:1.2.3 apibuilder-spec
 #  - Executes a batch download of 0 or more applications. This example will download
-#    apibuilder-api version 1.2.3 and apibuilder-spec version 4.5.6 for the organization 'apicollective'
+#    apibuilder-api version 1.2.3 and apibuilder-spec latest version for the organization 'apicollective'
 #
 #    The result will be a JSON object with key 'applications' that is an array. there will be one element
 #    per requested application.
@@ -299,11 +299,9 @@ if command == "list"
 elsif command == "download_batch"
   org = ARGV.shift.to_s.strip
 
-  applications = []
-  i = 0
-  while i < ARGV.length - 1
-    applications << ::Io::Apibuilder::Api::V0::Models::BatchDownloadApplicationForm.new(:application_key => ARGV[i], :version => ARGV[i+1])
-    i += 2
+  applications = ARGV.map do |value|
+    key, version = value.split(":", 2)
+    ::Io::Apibuilder::Api::V0::Models::BatchDownloadApplicationForm.new(:application_key => key, :version => version)
   end
 
   if org.empty?
