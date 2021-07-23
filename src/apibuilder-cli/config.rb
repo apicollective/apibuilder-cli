@@ -43,7 +43,7 @@ module ApibuilderCli
     def Config.default_path
       dir = DEFAULT_DIRECTORIES.find { |p| File.directory?(File.expand_path(p)) }
       if dir.nil?
-        puts "**ERROR** Could not find apibuilder configuration directory. Expected at: %s" % DEFAULT_DIRECTORIES.first
+        puts "**ERROR** Could not find apibuilder configuration directory. Expected at: %s\n** To Fix:\n**   mkdir %s" % [DEFAULT_DIRECTORIES.first, DEFAULT_DIRECTORIES.first]
         exit(1)
       end
 

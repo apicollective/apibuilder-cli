@@ -1,0 +1,82 @@
+#!/usr/bin/env ruby
+
+# Used to create an initial config file
+#
+# create-config [--path path]
+#   path: defaults to ~/.apibuilder/config
+#
+
+load File.join(File.dirname(__FILE__), '../src/apibuilder-cli.rb')
+
+module Ask
+  def Ask.for_hidden
+    settings = `stty -g`.strip
+    begin
+      `stty -echo`
+      input = STDIN.gets
+      puts ""
+    ensure
+      `stty #{settings}`
+    end
+    input
+  end
+
+  def Ask.for_boolean(msg)
+    valid_values = ["y", "n"]
+    print "%s (%s)? " % [msg, valid_values.join("/")]
+    value = ""
+    while value.to_s.strip.empty?
+      value = $stdin.gets.to_s.strip.downcase
+      if !valid_values.include?(value[0])
+        puts "Please enter 'y' or 'n'"
+        value = ""
+      end      
+    end
+    value.downcase[0] == "y"
+  end
+end
+
+args = ApibuilderCli::Args.parse(ARGV)
+
+if args[:path].nil?
+  dir = ApibuilderCli::Config::DEFAULT_DIRECTORIES.first
+  if !File.directory?(dir)
+    if Ask.for_boolean("Directory '%s' does not exist. Create" % dir)
+      `mkdir #{dir}`
+    else
+      puts ""
+      puts "** ERROR ** Cannot continue until directory exists"
+      puts ""
+      exit(1)
+    end
+  end
+end
+
+path = File.expand_path(args[:path] || ApibuilderCli::Config::default_path)
+
+puts ""
+puts "We will need your Api Builder token token to create your config file"
+puts "Please goto to https://app.apibuilder.io/tokens/ and create new token"
+puts "When done, copy and paste your token here:"
+puts ""
+print "  your token: "
+token = Ask.for_hidden
+
+contents = []
+contents << "[default]"
+contents << "token = %s" % token
+
+tmp = ApibuilderCli::Util.write_to_temp_file(contents.join("\n"))
+
+puts ""
+puts "Configuration file created."
+final_path = if !File.exists?(path) || Ask.for_boolean("Replace the existing file in #{path}")
+  path
+else
+  "./example-config"
+end
+
+`mv #{tmp} #{final_path}`
+puts ""
+puts "Configuration file available at: #{final_path}"
+puts ""

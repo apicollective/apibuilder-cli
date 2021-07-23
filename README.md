@@ -19,6 +19,8 @@ No setup needed - just use the API Builder command directly (see below)
 
 # Setup for private APIs
 
+Run ```bin/create-config``` and follow the instructions. This will walk you through the following steps:
+
 1. [Create a token](https://app.apibuilder.io/tokens/) for your user account
 
 2. Create a configuration file in ~/.apibuilder/config
