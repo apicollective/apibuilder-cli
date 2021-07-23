@@ -8,6 +8,11 @@ On MacOS using [brew](https://formulae.brew.sh/formula/apibuilder-cli):
 brew install apibuilder-cli
 ```
 
+For other platforms:
+```
+sudo ./install.sh /usr/local
+```
+
 # Setup for public APIs
 
 No setup needed - just use the API Builder command directly (see below)
