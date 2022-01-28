@@ -31,7 +31,13 @@ module ApibuilderCli
         puts "*************************************************"
         path = DEFAULT_FILENAMES.first
       end
-      Util.file_join(path_root, path)
+      full_path = Util.file_join(path_root, path)
+      # ~/.apibuilder/config is the global conf file, which should not be handled as an app config
+      if full_path == Config.default_path
+        puts "**ERROR** Could not find apibuilder configuration file. Please run apibuilder from a repository."
+        exit(1)
+      end
+      full_path
     end
 
     def AppConfig.find_config_file(root_dir = nil)
