@@ -66,17 +66,15 @@ contents = []
 contents << "[default]"
 contents << "token = %s" % token
 
-tmp = ApibuilderCli::Util.write_to_temp_file(contents.join("\n"))
-
 puts ""
-puts "Configuration file created."
 final_path = if !File.exists?(path) || Ask.for_boolean("Replace the existing file in #{path}")
   path
 else
   "./example-config"
 end
 
-`mv #{tmp} #{final_path}`
+ApibuilderCli::Util.write_to_file(final_path, contents.join("\n"))
+
 puts ""
 puts "Configuration file available at: #{final_path}"
 puts ""
