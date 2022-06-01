@@ -35,8 +35,10 @@ cp -R "$API_BUILDER_ROOT"/src/* "$PREFIX"/src
 
 eval "./util/update-library-path.rb $PREFIX/bin/apibuilder ${PREFIX}/src/apibuilder-cli.rb"
 eval "./util/update-library-path.rb $PREFIX/bin/read-config ${PREFIX}/src/apibuilder-cli.rb"
+eval "./util/update-library-path.rb $PREFIX/bin/create-config ${PREFIX}/src/apibuilder-cli.rb"
 eval "chmod +x $PREFIX/bin/apibuilder"
 eval "chmod +x $PREFIX/bin/read-config"
+eval "chmod +x $PREFIX/bin/create-config"
 
 echo "Installed API_BUILDER_CLI to $PREFIX/bin/apibuilder"
 
