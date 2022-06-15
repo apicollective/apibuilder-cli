@@ -40,7 +40,7 @@ args = ApibuilderCli::Args.parse(ARGV)
 
 if args[:path].nil?
   dir = ApibuilderCli::Config::DEFAULT_DIRECTORIES.first
-  if !File.directory?(dir)
+  if !File.directory?(File.expand_path(dir))
     if Ask.for_boolean("Directory '%s' does not exist. Create" % dir)
       `mkdir #{dir}`
     else
