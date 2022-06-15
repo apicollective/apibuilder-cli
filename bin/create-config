@@ -55,7 +55,7 @@ end
 path = File.expand_path(args[:path] || ApibuilderCli::Config::default_path)
 
 puts ""
-puts "We will need your Api Builder token token to create your config file"
+puts "We will need your API Builder token to create your config file"
 puts "Please goto to https://app.apibuilder.io/tokens/ and create new token"
 puts "When done, copy and paste your token here:"
 puts ""
