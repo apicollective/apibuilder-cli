@@ -178,11 +178,11 @@ If the same generator needs to be invoked multiple times for different target di
         project:
           version: <version>
           generators:
-            - generator: <generator name>:
+            - generator: <generator name>
               target: <path 1>
               files:
                 - <file name or file pattern>
-            - generator: <generator name>:
+            - generator: <generator name>
               target: <path 2>
               files:
                 - <file name or file pattern>
