@@ -88,8 +88,6 @@ module ApibuilderCli
       @current[org][project][generator] = [] if @current[org][project][generator].nil?
       @current[org][project][generator] << file
       @current_raw << file
-
-      @previous[org][project][generator].select!{ |previous_file| previous_file != file } if @previous[org] && @previous[org][project] && @previous[org][project][generator]
     end
 
   end
