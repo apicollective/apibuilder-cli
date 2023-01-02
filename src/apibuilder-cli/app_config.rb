@@ -41,7 +41,7 @@ module ApibuilderCli
     end
 
     def AppConfig.find_config_file(root_dir = nil)
-      DEFAULT_FILENAMES.find { |p| File.exists?(Util.file_join(root_dir, p)) }
+      DEFAULT_FILENAMES.find { |p| File.exist?(Util.file_join(root_dir, p)) }
     end
       
     def AppConfig.parse_project_dir(path)
@@ -59,7 +59,7 @@ module ApibuilderCli
 
     def initialize(opts={})
       @path = Preconditions.assert_class(opts.delete(:path) || AppConfig.default_path, String)
-      Preconditions.check_state(File.exists?(@path), "Apibuilder application config file[#{@path}] not found")
+      Preconditions.check_state(File.exist?(@path), "Apibuilder application config file[#{@path}] not found")
 
       contents = IO.read(@path)
       @yaml = begin

@@ -19,7 +19,7 @@ module ApibuilderCli
 
       if profile_config.nil? && profile
         if profile != DEFAULT_PROFILE_NAME
-          if !File.exists?(config.path)
+          if !File.exist?(config.path)
             raise "Profile[#{profile}] not found as configuration file #{config.path} does not exist"
           else
             raise "Profile[#{profile}] not found in configuration file #{config.path}"
@@ -58,7 +58,7 @@ module ApibuilderCli
       
     def initialize(opts={})
       @path = Preconditions.assert_class(opts.delete(:path) || Config.default_path, String)
-      contents = File.exists?(@path) ? IO.readlines(@path) : []
+      contents = File.exist?(@path) ? IO.readlines(@path) : []
 
       @profiles = []
 

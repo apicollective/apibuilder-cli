@@ -67,7 +67,7 @@ contents << "[default]"
 contents << "token = %s" % token
 
 puts ""
-final_path = if !File.exists?(path) || Ask.for_boolean("Replace the existing file in #{path}")
+final_path = if !File.exist?(path) || Ask.for_boolean("Replace the existing file in #{path}")
   path
 else
   "./example-config"

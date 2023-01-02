@@ -19,7 +19,7 @@ module ApibuilderCli
       @previous = {}
       @current = {}
       @current_raw = []
-      if File.exists?(@path)
+      if File.exist?(@path)
         contents = IO.read(@path).strip
         if contents != ""
           @previous = begin
