@@ -135,7 +135,7 @@ def get_app_config_from_argument(argName)
   args = ApibuilderCli::Args.parse(ARGV)
   path = File.expand_path(args[argName] || ApibuilderCli::AppConfig.default_path)
 
-  if !File.exists?(path)
+  if !File.exist?(path)
     puts "Apibuilder config file #{path} does not exist"
     exit(1)
   end
@@ -427,7 +427,7 @@ elsif command == "upload"
     exit(1)
   end
 
-  if !File.exists?(path)
+  if !File.exist?(path)
     puts "File[#{path}] does not exist"
     exit(1)
   end
@@ -515,10 +515,10 @@ elsif command == "update"
               # check if target path ends with the filename - if not, this is a directory target and need to check if dir exists
               # for example: "play_2_x_routes: api/conf/routes" is a file
               # while "anorm_2_x_parsers: api/app/generated" should be a directory we check if exists
-              FileUtils.mkdir_p(final_target_path) unless final_target_path.include?(file.name) || Dir.exists?(final_target_path) || File.exists?(final_target_path)
+              FileUtils.mkdir_p(final_target_path) unless final_target_path.include?(file.name) || Dir.exist?(final_target_path) || File.exist?(final_target_path)
 
               target_path = File.directory?(final_target_path) ? File.join(final_target_path, file.name) : final_target_path
-              existing_source = File.exists?(target_path) ? IO.read(target_path).strip : ""
+              existing_source = File.exist?(target_path) ? IO.read(target_path).strip : ""
 
               print "    " + target_path.sub(/^#{app_config.project_dir}\/?/, '') + ": "
               if file_is_scaffolding?(file)
