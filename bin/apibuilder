@@ -153,7 +153,7 @@ def strip_apibuilder_comments(value)
     stripped = l.strip
     if stripped.match(/^[\*|\#]\s+service version: .+$/i)
       ""
-    elsif stripped.match(/^[\*|\#]\s+apibuilder:/)
+    elsif stripped.match(/^[\*|\#]\s+apibuilder[:\s]/)
       ""
     elsif stripped.match(/^val UserAgent = /)
       ""
@@ -167,7 +167,11 @@ def strip_apibuilder_comments(value)
       l
     end
   end
-  lines.join("\n").strip
+  remove_multi_line_comments(lines.join("\n").strip)
+end
+
+def remove_multi_line_comments(value)
+  value.gsub(/\/\*.*?\*\//m, '').strip
 end
 
 def write_files(files, directory)
@@ -696,4 +700,3 @@ else
   end
   exit(1)
 end
-
