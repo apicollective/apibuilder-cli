@@ -54,4 +54,22 @@ module ApibuilderCli
 
   end
 
+  def Util.call(client, &block)
+    begin
+      block.call
+    rescue Io::Apibuilder::Api::V0::HttpClient::ServerError => e
+      puts ""
+      puts "ERROR:"
+      if e.message.include?("Connection refused")
+        puts "  Connection refused to #{client.url}"
+        puts "  Check your internet connection or otherwise connectivity"
+        puts "  to API Builder."
+      else
+        puts "  #{e.message}"
+      end
+      puts ""
+      exit(1)
+    end
+  end
+
 end
