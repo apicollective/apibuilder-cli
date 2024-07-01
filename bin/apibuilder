@@ -80,6 +80,8 @@
 
 load File.join(File.dirname(__FILE__), '../src/apibuilder-cli.rb')
 
+MAX_THREADS = 15
+
 env = {
   :profile => ApibuilderCli::Util.read_non_empty_string(ENV['PROFILE']),
   :apibuilder_token => ApibuilderCli::Util.read_non_empty_string(ENV['APIBUILDER_TOKEN']) || ApibuilderCli::Util.read_non_empty_string(ENV['APIDOC_TOKEN']),
@@ -509,7 +511,7 @@ elsif command == "update"
     }
   end.flatten
 
-  all.each_slice(15) do |pairs|
+  all.each_slice(MAX_THREADS) do |pairs|
     threads = pairs.map do |pair|
       Thread.new do
         project = pair.project
