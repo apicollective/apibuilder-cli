@@ -61,6 +61,25 @@ system_or_error("git commit -m 'autocommit: Update version to %s' #{files.join("
 puts "Creating git tag[%s]" % new_version
 system_or_error("git tag -a -m '%s' %s" % [new_version, new_version])
 
-puts "Release tag[%s] created. Need to:" % new_version
-puts "  git push origin"
-puts "  git push --tags origin"
+puts "Release tag[%s] created" % new_version
+
+commands = []
+commands << "git push origin"
+commands << "git push --tags origin"
+
+if ApibuilderCli::Ask.for_boolean("Push to git?")
+  commands.each do |cmd|
+    puts " ==> #{cmd}"
+    system_or_error(cmd)
+  end
+
+  if ApibuilderCli::Ask.for_boolean("Bump brew formula?")
+    system_or_error("brew bump-formula-pr apibuilder-cli --version #{new_version}")
+  end
+
+else
+  puts "To complete the release:"
+  commands.each do |cmd|
+    puts "  #{cmd}"
+  end
+end
