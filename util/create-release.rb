@@ -67,12 +67,14 @@ commands = []
 commands << "git push origin"
 commands << "git push --tags origin"
 
+puts ""
 if ApibuilderCli::Ask.for_boolean("Push to git?")
   commands.each do |cmd|
     puts " ==> #{cmd}"
     system_or_error(cmd)
   end
 
+  puts ""
   if ApibuilderCli::Ask.for_boolean("Bump brew formula?")
     system_or_error("brew bump-formula-pr apibuilder-cli --version #{new_version}")
   end
