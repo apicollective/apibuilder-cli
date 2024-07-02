@@ -38,7 +38,7 @@ module ApibuilderCli
       Io::Apibuilder::Api::V0::Client.new(api_uri, :authorization => auth)
     end
 
-    attr_reader :path
+    attr_reader :path, :settings
 
     def Config.default_path
       dir = DEFAULT_DIRECTORIES.find { |p| File.directory?(File.expand_path(p)) }
@@ -55,12 +55,14 @@ module ApibuilderCli
 
       File.expand_path(File.join(dir, DEFAULT_FILENAME))
     end
-      
+
     def initialize(opts={})
       @path = Preconditions.assert_class(opts.delete(:path) || Config.default_path, String)
       contents = File.exist?(@path) ? IO.readlines(@path) : []
+      capture_settings = false
 
       @profiles = []
+      declared_settings = {}
 
       contents.each_with_index do |line, i|
         stripped = line.strip
@@ -75,24 +77,34 @@ module ApibuilderCli
           reading = key
 
           if key == "profile"
+            capture_settings = false
             Preconditions.check_state(value != "", "%s:%s profile attribute missing name" % [@path, i+1])
             Preconditions.check_state(profile(value).nil?, "%s:%s duplicate profile[%s]" % [@path, i+1, value])
-          elsif key != "default"
+            profile_name = (key == "default") ? "default" : value
+            @profiles << Profile.new(profile_name)
+          elsif key == "settings"
+            capture_settings = true
+          elsif key == "default"
+            capture_settings = false
+            profile_name = (key == "default") ? "default" : value
+            @profiles << Profile.new(profile_name)
+          else
             raise "%s:%s unknown configuration key[%s]" % [@path, i+1, key]
           end
-
-          profile_name = (key == "default") ? "default" : value
-          @profiles << Profile.new(profile_name)
-
         else
           name, value = stripped.split(/\s*=\s*/, 2).map(&:strip)
 
-          if name != "" && value != "" && @profiles[-1]
-            @profiles[-1].add(name, value)
+          if name != "" && value != ""
+            if capture_settings
+              declared_settings[name] = value
+            elsif @profiles[-1]
+              @profiles[-1].add(name, value)
+            end
           end
         end
 
       end
+      @settings = Settings.new(declared_settings)
     end
 
     # returns a sorted list of the profile

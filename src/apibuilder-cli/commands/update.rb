@@ -16,13 +16,13 @@ module ApibuilderCli
     end
 
     class Update
-      MAX_THREADS = 10
 
       def initialize(client, app_config, args)
         @client = client
         @app_config = app_config
         @org = args[:org]
         @app = args[:app]
+        @max_threads = ApibuilderCli::Config.new.settings.max_threads
       end
 
       def run
@@ -40,10 +40,10 @@ module ApibuilderCli
         end.flatten
 
         puts ""
-        slices = all.each_slice(MAX_THREADS)
+        slices = all.each_slice(@max_threads)
         slices.each_with_index do |pairs, i|
-          start = 1 + i*MAX_THREADS
-          ending = start + MAX_THREADS - 1
+          start = 1 + i*@max_threads
+          ending = start + @max_threads - 1
           ending = all.length if ending > all.length
           puts "Executing code generators #{start} - #{ending} / #{all.length}"
 
