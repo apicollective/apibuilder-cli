@@ -2,5 +2,5 @@ Releasing
 =========
 
 ```
-  brew bump-formula-pr apibuilder-cli --version 0.1.50
+  brew bump-formula-pr apibuilder-cli --version 0.1.51
 ```
