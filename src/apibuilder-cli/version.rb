@@ -2,7 +2,7 @@ module ApibuilderCli
 
   module Version
 
-    VERSION = '0.1.49' # Automatically updated by util/create-release.rb
+    VERSION = '0.1.50' # Automatically updated by util/create-release.rb
 
     # Writes contents to a temp file, returning the path
     def Version.current
