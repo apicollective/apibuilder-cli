@@ -35,6 +35,10 @@ if config.profiles.empty?
   exit(1)
 end
 
+puts ""
+puts "Settings"
+puts "  max_threads: #{config.settings.max_threads}"
+
 config.profiles.each do |profile|
   puts ""
   puts "Profile #{profile.name}:"

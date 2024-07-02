@@ -10,7 +10,7 @@ describe ApibuilderCli::Config do
 token = other
 
 [profile public]
-token = 
+token =
 
 [profile foo]
 token = secret-token
@@ -38,4 +38,20 @@ token = secret-token
 
   end
 
+  describe "with a valid settings config" do
+
+    it "reads settings" do
+      config = ApibuilderCli::Config.new(:path => ApibuilderCli::Util.write_to_temp_file("""
+[settings]
+max_threads = 100
+      """.strip))
+      expect(config.settings.max_threads).to eq(100)
+    end
+
+    it "defaults settings" do
+      config = ApibuilderCli::Config.new(:path => ApibuilderCli::Util.write_to_temp_file(""))
+      expect(config.settings.max_threads).to eq(10)
+    end
+
+  end
 end

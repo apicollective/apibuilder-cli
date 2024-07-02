@@ -15,8 +15,8 @@ describe ApibuilderCli::Git do
     it "should work" do
       with_repo do |dir|
         system_quiet("git checkout -b other")
-        ApibuilderCli::Git.checkout("master")
-        expect(ApibuilderCli::Git.current_branch).to eq "master"
+        ApibuilderCli::Git.checkout("main")
+        expect(ApibuilderCli::Git.current_branch).to eq "main"
         ApibuilderCli::Git.checkout("other")
         expect(ApibuilderCli::Git.current_branch).to eq "other"
       end
@@ -73,9 +73,9 @@ describe ApibuilderCli::Git do
 
   describe "#current_branch" do
 
-    it "should detect master" do
+    it "should detect main" do
       with_repo do |dir|
-        expect(ApibuilderCli::Git.current_branch).to eq "master"
+        expect(ApibuilderCli::Git.current_branch).to eq "main"
       end
     end
 
@@ -86,10 +86,10 @@ describe ApibuilderCli::Git do
       end
     end
 
-    it "should detect master when other exists" do
+    it "should detect main when other exists" do
       with_repo do |dir|
-        system_quiet("git checkout -b other; git checkout master")
-        expect(ApibuilderCli::Git.current_branch).to eq "master"
+        system_quiet("git checkout -b other; git checkout main")
+        expect(ApibuilderCli::Git.current_branch).to eq "main"
       end
     end
 
@@ -187,8 +187,8 @@ describe ApibuilderCli::Git do
       with_repo do |dir|
         system_quiet("git checkout -b other")
         expect(ApibuilderCli::Git.current_branch).to eq "other"
-        ApibuilderCli::Git.in_branch("master") do
-          expect(ApibuilderCli::Git.current_branch).to eq "master"
+        ApibuilderCli::Git.in_branch("main") do
+          expect(ApibuilderCli::Git.current_branch).to eq "main"
         end
         expect(ApibuilderCli::Git.current_branch).to eq "other"
       end
@@ -210,7 +210,7 @@ describe ApibuilderCli::Git do
         system_quiet("git checkout -b other")
         expect(ApibuilderCli::Git.current_branch).to eq "other"
         begin
-          ApibuilderCli::Git.in_branch("master") do
+          ApibuilderCli::Git.in_branch("main") do
             raise "error"
           end
         rescue Exception => e

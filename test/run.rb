@@ -10,7 +10,7 @@ end
 gem_home = File.join(File.dirname(__FILE__), '../gems').sub(/^\.\//, '')
 rspec = File.join(gem_home, 'bin/rspec')
 if !File.exist?(rspec)
-  run("export GEM_HOME=%s && gem install rspec --version 3.2.0 --no-rdoc --no-ri --install-dir %s" % [gem_home, gem_home])
+  run("export GEM_HOME=%s && gem install rspec --version 3.2.0 --install-dir %s" % [gem_home, gem_home])
 end
 
 files = `find spec -type f -name "*spec.rb"`.strip.split
