@@ -37,7 +37,7 @@ end
 
 puts ""
 puts "Settings"
-puts "  max_theads: #{config.settings.max_threads}"
+puts "  max_threads: #{config.settings.max_threads}"
 
 config.profiles.each do |profile|
   puts ""
