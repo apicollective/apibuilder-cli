@@ -22,7 +22,7 @@ module ApibuilderCli
         @app_config = app_config
         @org = args[:org]
         @app = args[:app]
-        @max_threads = config.settings.max_threads
+        @config = config
       end
 
       def run
@@ -40,10 +40,10 @@ module ApibuilderCli
         end.flatten
 
         puts ""
-        slices = all.each_slice(@max_threads)
+        slices = all.each_slice(@config.settings.max_threads)
         slices.each_with_index do |pairs, i|
-          start = 1 + i*@max_threads
-          ending = start + @max_threads - 1
+          start = 1 + i*@config.settings.max_threads
+          ending = start + @config.settings.max_threads - 1
           ending = all.length if ending > all.length
           puts "Executing code generators #{start} - #{ending} / #{all.length}"
 
@@ -122,7 +122,9 @@ module ApibuilderCli
           end
         end
 
-        tracked_files.save!
+        if @config.settings.tracked_files_enabled
+          tracked_files.save!
+        end
       end
 
     end

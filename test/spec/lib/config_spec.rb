@@ -44,8 +44,10 @@ token = secret-token
       config = ApibuilderCli::Config.new(:path => ApibuilderCli::Util.write_to_temp_file("""
 [settings]
 max_threads = 100
+tracked_files_enabled =	false
       """.strip))
       expect(config.settings.max_threads).to eq(100)
+      expect(config.settings.tracked_files_enabled).to eq(false)
     end
 
     it "defaults settings" do
