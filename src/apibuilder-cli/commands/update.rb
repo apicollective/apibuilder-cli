@@ -1,5 +1,14 @@
 module ApibuilderCli
   module Commands
+    class ProjectWithGenerator
+      attr_reader :project, :generator, :target
+      def initialize(project, generator, target)
+        @project = project
+        @generator = generator
+        @target = target
+      end
+    end
+
     class Update
       def initialize(client, app_config, args)
         @client = client
@@ -10,7 +19,7 @@ module ApibuilderCli
 
       def run
         puts "Fetching code from #{@client.url}"
-        tracked_files = ApibuilderCli::FileTracker.new(@app_config.project_dir, { :updating_only => { :org => args[:org], :app => args[:app] } })
+        tracked_files = ApibuilderCli::FileTracker.new(@app_config.project_dir, { :updating_only => { :org => @org, :app => @app } })
 
         all = @app_config.projects(:org => @org, :app => @app).map do |project|
           project.generators.map { |generator|
@@ -38,7 +47,7 @@ module ApibuilderCli
               begin
                 attributes = generator.attributes.map { |k, v| Io::Apibuilder::Generator::V0::Models::Attribute.new(:name => k, :value => v) }
                 form = Io::Apibuilder::Api::V0::Models::CodeForm.new(:attributes => attributes)
-                code = ApibuilderCli::Util.call(client) do
+                code = ApibuilderCli::Util.call(@client) do
                   @client.code.post_by_generator_key(project.org, project.name, project.version, generator.name, form).files
                 end
                 if generator.files.nil?

@@ -256,15 +256,6 @@ def upload_version(client, org, application, version, data, path = "")
   end
 end
 
-class ProjectWithGenerator
-  attr_reader :project, :generator, :target
-  def initialize(project, generator, target)
-    @project = project
-    @generator = generator
-    @target = target
-  end
-end
-
 if command == "list"
   resource = ARGV.shift.to_s.strip
 
