@@ -43,7 +43,7 @@ token = secret-token
     it "reads settings" do
       config = ApibuilderCli::Config.new(:path => ApibuilderCli::Util.write_to_temp_file("""
 [settings]
-max_theads = 100
+max_threads = 100
       """.strip))
       expect(config.settings.max_threads).to eq(100)
     end
