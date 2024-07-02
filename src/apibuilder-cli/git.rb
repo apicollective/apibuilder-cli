@@ -35,7 +35,7 @@ module ApibuilderCli
         []
       else
         branch = Git.current_branch.downcase
-        if branch == "master"
+        if ApibuilerCli::Constants::BASE_BRANCHES.include?(branch)
           raw_versions
         else
           # Include a semi-unique hash to serve as a pseudo-delimiter. When searching
