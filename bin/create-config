@@ -30,7 +30,7 @@ module Ask
       if !valid_values.include?(value[0])
         puts "Please enter 'y' or 'n'"
         value = ""
-      end      
+      end
     end
     value.downcase[0] == "y"
   end
@@ -62,7 +62,11 @@ puts ""
 print "  your token: "
 token = Ask.for_hidden
 
+settings = ApibuilderCli::Settings.new
 contents = []
+contents << "[settings]"
+contents << "max_threads = #{settings.max_threads}"
+contents << ""
 contents << "[default]"
 contents << "token = %s" % token
 
