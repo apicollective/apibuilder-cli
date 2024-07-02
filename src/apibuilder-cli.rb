@@ -16,3 +16,7 @@ load File.join(lib_dir, 'apicollective_apibuilder_spec_v0_client.rb')
 load File.join(lib_dir, 'apicollective_apibuilder_common_v0_client.rb')
 load File.join(lib_dir, 'apicollective_apibuilder_generator_v0_client.rb')
 load File.join(lib_dir, 'apicollective_apibuilder_api_v0_client.rb')
+
+Dir.glob(File.join(lib_dir, "commands") + "/*.rb").each do |p|
+  load p
+end

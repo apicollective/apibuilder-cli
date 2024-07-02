@@ -43,7 +43,7 @@ module ApibuilderCli
     def AppConfig.find_config_file(root_dir = nil)
       DEFAULT_FILENAMES.find { |p| File.exist?(Util.file_join(root_dir, p)) }
     end
-      
+
     def AppConfig.parse_project_dir(path)
       project_dir = File.dirname(path)
       # If the config file is buried in a directory starting with '.', bubble up to the
@@ -116,6 +116,14 @@ module ApibuilderCli
       @project_dir = AppConfig.parse_project_dir(@path)
     end
 
+    def projects(args)
+      org = args[:org]
+      app = args[:app] || []
+      code.projects.select { |s|
+        (args[:org].nil? || s.org == args[:org]) && (args[:app].nil? || args[:app].include?(s.name))
+      }
+    end
+
     def save!
       IO.write(@path, @yaml.to_yaml)
     end
@@ -172,7 +180,7 @@ module ApibuilderCli
       end
 
     end
-    
+
     class Project
 
       attr_reader :org, :name, :version, :generators
