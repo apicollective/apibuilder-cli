@@ -1,11 +1,15 @@
 module ApibuilderCli
   module Commands
     class ProjectWithGenerator
-      attr_reader :project, :generator, :target
+      attr_reader :project, :generator, :target, :changes
       def initialize(project, generator, target)
         @project = project
         @generator = generator
         @target = target
+        @changes = []
+      end
+      def add(change)
+        @changes << change
       end
     end
 
@@ -31,11 +35,7 @@ module ApibuilderCli
         end.flatten
 
         all.each_slice(MAX_THREADS) do |pairs|
-          updates = {}
-          threads = pairs.each_with_index.map do |pair, thread_index|
-            updates[thread_index] = []
-            puts "thread_index: #{thread_index}"
-
+          threads = pairs.map do |pair|
             Thread.new do
               project = pair.project
               generator = pair.generator
@@ -73,11 +73,11 @@ module ApibuilderCli
                     tracked_files.track!(project.org, project.name, generator.name, target_path)
                     if file_is_scaffolding?(file)
                       if existing_source == ""
-                        updates[thread_index] << { :source => file.contents, :generator => generator.name, :target => target_path }
+                        pair.add :source => file.contents, :generator => generator.name, :target => target_path
                       end
                     else
                       if different?(file.contents, existing_source)
-                        updates[thread_index] << { :source => file.contents, :generator => generator.name, :target => target_path }
+                        pair.add :source => file.contents, :generator => generator.name, :target => target_path
                       end
                     end
                   end
@@ -88,24 +88,25 @@ module ApibuilderCli
             end
           end
           threads.each(&:join)
+        end
 
-          puts ""
-          if updates.empty?
-            puts "No changes"
-          else
-            puts "Copying updated code"
-            updates.values.flatten.each do |data|
-              puts " - #{data[:generator]} => #{data[:target]}"
-              ApibuilderCli::Util.write_to_file(data[:target], data[:source])
-            end
-            if @app_config.settings.code_cleanup_generated_files
-              puts "Cleaning up obsolete code"
-              tracked_files.to_cleanup.each do |file|
-                file_dir = File.join(File.split(file).shift)
-                cmd = "rm #{file}; rmdir -p #{file_dir} > /dev/null 2>&1"
-                puts "** #{cmd}"
-                `#{cmd}`
-              end
+        puts ""
+        updates = all.map { |g| g.changes }.flatten
+        if updates.empty?
+          puts "No changes"
+        else
+          puts "Copying updated code"
+          updates.each do |data|
+            puts " - #{data[:generator]} => #{data[:target]}"
+            ApibuilderCli::Util.write_to_file(data[:target], data[:source])
+          end
+          if @app_config.settings.code_cleanup_generated_files
+            puts "Cleaning up obsolete code"
+            tracked_files.to_cleanup.each do |file|
+              file_dir = File.join(File.split(file).shift)
+              cmd = "rm #{file}; rmdir -p #{file_dir} > /dev/null 2>&1"
+              puts "** #{cmd}"
+              `#{cmd}`
             end
           end
         end

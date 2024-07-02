@@ -80,7 +80,7 @@
 
 load File.join(File.dirname(__FILE__), '../src/apibuilder-cli.rb')
 
-MAX_THREADS = 15
+BASE_BRANCHES = ['master', 'main']
 
 env = {
   :profile => ApibuilderCli::Util.read_non_empty_string(ENV['PROFILE']),
@@ -495,7 +495,7 @@ elsif command == "clean"
 
   args = ApibuilderCli::Args.parse(ARGV)
   branch = args[:branch].to_s.strip.downcase
-  branch = "master" if branch.empty?
+  branch = BASE_BRANCHES.first if branch.empty?
   legacy = args.key?(:legacy)
   silent = args.key?(:silent)
   limit = 50
@@ -527,9 +527,9 @@ elsif command == "clean"
 
   ApibuilderCli::Git.in_branch(branch) do
     to_delete = versions - ApibuilderCli::Git.tag_list.map { |tag|
-      branch == "master" ? tag : "#{tag}#{ApibuilderCli::Git.branch_suffix(branch)}"
+      BASE_BRANCHES.include?(branch) ? tag : "#{tag}#{ApibuilderCli::Git.branch_suffix(branch)}"
     }
-    if branch == "master"
+    if BASE_BRANCHES.include?(branch)
       to_delete.reject! { |version|
         # Ignore versions with a branch delimiter.
         version.match(/-b[0-9a-f]{7}-.+$/)
