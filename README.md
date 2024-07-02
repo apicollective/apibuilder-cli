@@ -26,6 +26,9 @@ Run ```bin/create-config``` and follow the instructions. This will walk you thro
 2. Create a configuration file in ~/.apibuilder/config
    Example File:
 
+        [settings]
+        max_threads = 10
+
         [default]
         token = <your API token>
 
@@ -48,19 +51,19 @@ List all applications that belong to a specific organization:
 List all versions of a particular application
 
     bin/apibuilder list versions <organization key> <application key>
-    
+
 Note since the GET requests in API Builder are paginated, you might need to
 paginate. Where pagination is required, we use two environment
 variables: LIMIT, OFFSET
 
     LIMIT=10 OFFSET=10 bin/apibuilder list organizations
-    
+
 ## code
 
 Invoke a code generator from the command line
 
     bin/apibuilder code <organization key> <application key> <version> <generator> <target dir> [<filename> ...]
-    
+
 For example, to generate a play 2.6 client for the latest version of apibuilder itself:
 
     bin/apibuilder code apicollective apibuilder-api latest play_2_6_client .
@@ -68,11 +71,11 @@ For example, to generate a play 2.6 client for the latest version of apibuilder 
 Each code generator returns a list of files. To download a specific file:
 
     bin/apibuilder code apicollective apibuilder-api latest play_2_6_client . [<filename> ...]
-    
+
 For example:
 
     bin/apibuilder code apicollective apibuilder-api latest http4s_0_17 . ApicollectiveApibuilderApiV0Client.scala ApicollectiveApibuilderApiV0Server.scala
-    
+
 The file names support wildcard expansion (`?` for a single character, `*` for zero or more), e.g:
 
     bin/apibuilder code apicollective apibuilder-api latest http4s_0_17 . *ApiV?Client*.scala
@@ -104,7 +107,7 @@ The `--update-config` flag tells the cli to update the local `.apibuilder/config
 Invoke code generator based on configuration stored in a local file:
 
     bin/apibuilder update [--path path] [--org org-name] [--app project-name]
-    
+
         path defaults to `.apibuilder/config` in the current directory. Note that this file
         should contain only the parameters needed to identify which code generators to
         invoke and is independent from the global `~/.apibuilder/config` file where you

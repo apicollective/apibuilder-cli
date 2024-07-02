@@ -34,7 +34,11 @@ puts ""
 print "  your token: "
 token = ApibuilderCli::Ask.for_hidden
 
+settings = ApibuilderCli::Settings.new
 contents = []
+contents << "[settings]"
+contents << "max_threads = #{settings.max_threads}"
+contents << ""
 contents << "[default]"
 contents << "token = %s" % token
 
