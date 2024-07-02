@@ -1,5 +1,6 @@
 module ApibuilderCli
   module Commands
+
     class ProjectWithGenerator
       attr_reader :project, :generator, :target, :changes
       def initialize(project, generator, target)
@@ -8,12 +9,15 @@ module ApibuilderCli
         @target = target
         @changes = []
       end
+
       def add(change)
         @changes << change
       end
     end
 
     class Update
+      MAX_THREADS = 10
+
       def initialize(client, app_config, args)
         @client = client
         @app_config = app_config
@@ -27,14 +31,22 @@ module ApibuilderCli
 
         all = @app_config.projects(:org => @org, :app => @app).map do |project|
           project.generators.map { |generator|
-            puts "  #{project.org}/#{project.name}/#{project.version}/#{generator.name}..."
+            puts "  #{project.org}/#{project.name}/#{project.version}/#{generator.name}"
+
             generator.targets.map { |target|
               ProjectWithGenerator.new(project, generator.dup, target.dup)
             }
           }
         end.flatten
 
-        all.each_slice(MAX_THREADS) do |pairs|
+        puts ""
+        slices = all.each_slice(MAX_THREADS)
+        slices.each_with_index do |pairs, i|
+          start = 1 + i*MAX_THREADS
+          ending = start + MAX_THREADS - 1
+          ending = all.length if ending > all.length
+          puts "Executing code generators #{start} - #{ending} / #{all.length}"
+
           threads = pairs.map do |pair|
             Thread.new do
               project = pair.project
@@ -69,7 +81,6 @@ module ApibuilderCli
                     target_path = (File.directory?(final_target_path) ? File.join(final_target_path, file.name) : final_target_path).dup
                     existing_source = File.exist?(target_path) ? IO.read(target_path).strip : ""
 
-                    print "    " + target_path.sub(/^#{@app_config.project_dir}\/?/, '') + ": "
                     tracked_files.track!(project.org, project.name, generator.name, target_path)
                     if file_is_scaffolding?(file)
                       if existing_source == ""
