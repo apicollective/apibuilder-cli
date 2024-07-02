@@ -6,7 +6,6 @@ lib_dir = File.join(dir, "apibuilder-cli")
 
 load File.join(lib_dir, 'preconditions.rb')
 load File.join(lib_dir, 'util.rb')
-load File.join(lib_dir, 'ask.rb')
 load File.join(lib_dir, 'args.rb')
 load File.join(lib_dir, 'config.rb')
 load File.join(lib_dir, 'app_config.rb')
