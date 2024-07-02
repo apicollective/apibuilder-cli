@@ -17,12 +17,12 @@ module ApibuilderCli
 
     class Update
 
-      def initialize(client, app_config, args)
-        @client = client
+      def initialize(config, app_config, args)
+        @client = config.client
         @app_config = app_config
         @org = args[:org]
         @app = args[:app]
-        @max_threads = ApibuilderCli::Config.new.settings.max_threads
+        @max_threads = config.settings.max_threads
       end
 
       def run

@@ -3,13 +3,21 @@ module ApibuilderCli
 
   class Config
 
+    class ValidConfig
+      attr_reader :settings, :client
+      def initialize(settings, client)
+        @settings = settings
+        @client = client
+      end
+    end
+
     APIBUILDER_LOCAL_DIR = ".apibuilder" unless defined?(APIBUILDER_LOCAL_DIR)
     DEFAULT_DIRECTORIES = ["~/.apibuilder", "~/.apidoc"] unless defined?(DEFAULT_DIRECTORIES)
     DEFAULT_FILENAME = "config" unless defined?(DEFAULT_FILENAME)
     DEFAULT_API_URI = "https://api.apibuilder.io" unless defined?(DEFAULT_API_URI)
     DEFAULT_PROFILE_NAME = "default"
 
-    def Config.client_from_profile(opts={})
+    def Config.from_profile(opts={})
       profile = Preconditions.assert_class_or_nil(opts.delete(:profile), String)
       token = Preconditions.assert_class_or_nil(opts.delete(:token), String)
       Preconditions.assert_empty_opts(opts)
@@ -35,7 +43,8 @@ module ApibuilderCli
              end
 
       api_uri = profile_config ? profile_config.api_uri : DEFAULT_API_URI
-      Io::Apibuilder::Api::V0::Client.new(api_uri, :authorization => auth)
+      client = Io::Apibuilder::Api::V0::Client.new(api_uri, :authorization => auth)
+      ValidConfig.new(config.settings, client)
     end
 
     attr_reader :path, :settings

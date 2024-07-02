@@ -90,7 +90,8 @@ env = {
   :has_version => ApibuilderCli::Util.read_non_empty_string(ENV['HAS_VERSION'])
 }
 
-client = ApibuilderCli::Config.client_from_profile(:profile => env[:profile], :token => env[:apibuilder_token])
+config = ApibuilderCli::Config.from_profile(:profile => env[:profile], :token => env[:apibuilder_token])
+client = config.client
 
 command = ARGV.shift.to_s.strip
 
@@ -487,7 +488,7 @@ elsif command == "upload"
 elsif command == "update"
   app_config = get_app_config_from_argument(:path)
   args = ApibuilderCli::Args.parse(ARGV, :multi => ['app'])
-  ApibuilderCli::Commands::Update.new(client, app_config, args).run
+  ApibuilderCli::Commands::Update.new(config, app_config, args).run
 
 elsif command == "clean"
   org = ARGV.shift.to_s.strip
