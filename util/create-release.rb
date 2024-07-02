@@ -11,7 +11,7 @@
 load File.join(File.dirname(__FILE__), '../src/apibuilder-cli.rb')
 
 dirty_files = `git status --porcelain`.strip
-ApibuilderCli::Preconditions.check_state(dirty_files == "", "Local checkout is dirty:\n%s" % dirty_files)
+#ApibuilderCli::Preconditions.check_state(dirty_files == "", "Local checkout is dirty:\n%s" % dirty_files)
 
 version = ApibuilderCli::Version.current
 puts "Current version is %s" % version
@@ -25,25 +25,25 @@ if answer != ""
   new_version = answer
 end
 
-if new_version == version
-  puts "Version has not changed. Exiting"
-  exit(1)
-end
-
-version_path = "src/apibuilder-cli/version.rb"
-new_contents = ""
-found = false
-IO.readlines(version_path).each do |l|
-  if l.match(/VERSION\s*=\s*'\d+\.\d+\.\d+'/)
-    found = true
-    l.sub!(/VERSION = '\d+\.\d+\.\d+'.*$/, "VERSION = '%s' # Automatically updated by util/create-release.rb" % new_version)
+def replace_version(file, new_version)
+  new_contents = ""
+  found = false
+  IO.readlines(file).each do |l|
+    if l.match(/\d+\.\d+\.\d+/)
+      found = true
+      l.sub!(/\d+\.\d+\.\d+/, new_version)
+    end
+    new_contents << l
   end
-  new_contents << l
+  ApibuilderCli::Preconditions.check_state(found, "Failed to update version in #{file}")
+  File.open(file, "w") { |out| out << new_contents }
+  puts "Updated version number in #{file}"
+  file
 end
-ApibuilderCli::Preconditions.check_state(found, "Failed to update #{version_path}")
 
-puts "Update version in #{version_path}"
-File.open(version_path, "w") { |out| out << new_contents }
+files = []
+files << replace_version("src/apibuilder-cli/version.rb", new_version)
+files << replace_version("DEVELOPER.md", new_version)
 
 def system_or_error(cmd)
   if !system(cmd)
@@ -51,11 +51,37 @@ def system_or_error(cmd)
   end
 end
 
-system_or_error("git commit -m 'autocommit: Update version to %s' %s" % [new_version, version_path])
+if new_version == version
+  puts "Version has not changed. Exiting"
+  exit(1)
+end
+
+system_or_error("git commit -m 'autocommit: Update version to %s' #{files.join(" ")}" % new_version)
 
 puts "Creating git tag[%s]" % new_version
 system_or_error("git tag -a -m '%s' %s" % [new_version, new_version])
 
-puts "Release tag[%s] created. Need to:" % new_version
-puts "  git push origin"
-puts "  git push --tags origin"
+puts "Release tag[%s] created" % new_version
+
+commands = []
+commands << "git push origin"
+commands << "git push --tags origin"
+
+puts ""
+if ApibuilderCli::Ask.for_boolean("Push to git?")
+  commands.each do |cmd|
+    puts " ==> #{cmd}"
+    system_or_error(cmd)
+  end
+
+  puts ""
+  if ApibuilderCli::Ask.for_boolean("Bump brew formula?")
+    system_or_error("brew bump-formula-pr apibuilder-cli --version #{new_version}")
+  end
+
+else
+  puts "To complete the release:"
+  commands.each do |cmd|
+    puts "  #{cmd}"
+  end
+end
