@@ -15,7 +15,13 @@ module ApibuilderCli
         raise "Invalid setting for max_threads[#{@max_threads}]. Must be > 0"
       end
 
-      @tracked_files_enabled = all.has_key?("tracked_files_enabled") ? (all.delete("tracked_files_enabled") ? true : false) : DEFAULT_TRACKED_FILES_ENABLED
+      @tracked_files_enabled = if all.has_key?("tracked_files_enabled")
+        value = all["tracked_files_enabled"]
+        all.delete("tracked_files_enabled")
+        parse_boolean("tracked_files_enabled", value)
+      else
+        DEFAULT_TRACKED_FILES_ENABLED
+      end
 
       invalid = all.keys
       if !invalid.empty?
@@ -24,6 +30,18 @@ module ApibuilderCli
         invalid.each { |k| puts " - #{k}" }
         puts ""
         exit(1)
+      end
+    end
+
+    private
+    def parse_boolean(name, value)
+      case value
+      when "true"
+        then true
+      when "false"
+        then false
+      else
+        raise "Invalid value for #{name}[#{value}]. Must be 'true' or 'false'"
       end
     end
 
