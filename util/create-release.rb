@@ -75,9 +75,6 @@ if ApibuilderCli::Ask.for_boolean("Push to git?")
   end
 
   puts ""
-  if ApibuilderCli::Ask.for_boolean("Bump brew formula?")
-    system_or_error("brew bump-formula-pr apibuilder-cli --version #{new_version}")
-  end
 
 else
   puts "To complete the release:"
