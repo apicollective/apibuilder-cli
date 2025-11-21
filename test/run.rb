@@ -1,6 +1,10 @@
 #!/usr/bin/env ruby
 
-load File.join(File.dirname(__FILE__), '..', 'src', 'apibuilder-cli.rb')
+# Ensure we're in a valid directory before running tests
+test_dir = File.dirname(__FILE__)
+Dir.chdir(test_dir) unless Dir.pwd == test_dir
+
+require_relative '../src/apibuilder-cli'
 
 def run(command)
   puts command
