@@ -7,6 +7,11 @@ module ApibuilderCli
 
     attr_reader :settings, :code, :project_dir, :attributes
 
+    # Compatibility method for RSpec 3.2.3 with Ruby 3.3+
+    def self.=~(other)
+      nil
+    end
+
     def AppConfig.default_path
       path = find_config_file
       path_root = Dir.pwd
@@ -185,6 +190,11 @@ module ApibuilderCli
 
       attr_reader :org, :name, :version, :generators
 
+      # Compatibility method for RSpec 3.2.3 with Ruby 3.3+
+      def self.=~(other)
+        nil
+      end
+
       def initialize(org, name, version, generators)
         @org = Preconditions.assert_class(org, String)
         @name = Preconditions.assert_class(name, String)
@@ -199,6 +209,11 @@ module ApibuilderCli
     class Generator
 
       attr_reader :name, :targets, :files, :attributes
+
+      # Compatibility method for RSpec 3.2.3 with Ruby 3.3+
+      def self.=~(other)
+        nil
+      end
 
       # @param target The name of a file path or a
       # directory. Preferred usage is a directory, but paths are
