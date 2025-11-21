@@ -57,7 +57,8 @@ module ApibuilderCli
               reference_target_path = File.join(@app_config.project_dir, ApibuilderCli::Config::APIBUILDER_LOCAL_DIR, target)
 
               begin
-                attributes = generator.attributes.map { |k, v| Io::Apibuilder::Generator::V0::Models::Attribute.new(:name => k, :value => v) }
+                # Use the utility method to normalize attributes to the correct format
+                attributes = ApibuilderCli::Util.normalize_generator_attributes(generator.attributes)
                 form = Io::Apibuilder::Api::V0::Models::CodeForm.new(:attributes => attributes)
                 code = ApibuilderCli::Util.call(@client) do
                   @client.code.post_by_generator_key(project.org, project.name, project.version, generator.name, form).files

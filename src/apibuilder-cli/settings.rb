@@ -2,8 +2,8 @@
 module ApibuilderCli
 
   class Settings
-    DEFAULT_MAX_THREADS = 10
-    DEFAULT_TRACKED_FILES_ENABLED = true
+    DEFAULT_MAX_THREADS = 10 unless defined?(DEFAULT_MAX_THREADS)
+    DEFAULT_TRACKED_FILES_ENABLED = true unless defined?(DEFAULT_TRACKED_FILES_ENABLED)
 
     attr_reader :max_threads, :tracked_files_enabled
 

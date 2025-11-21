@@ -213,11 +213,14 @@ code:
   end
 
   def in_tmpdir
+    current_dir = Dir.pwd
     Dir.mktmpdir do |dir|
-      current_dir = Dir.pwd
-      Dir.chdir(dir)
-      yield Dir.pwd
-      Dir.chdir(current_dir)
+      begin
+        Dir.chdir(dir)
+        yield Dir.pwd
+      ensure
+        Dir.chdir(current_dir)
+      end
     end
   end
 end

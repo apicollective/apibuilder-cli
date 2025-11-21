@@ -264,10 +264,15 @@ def system_quiet(cmd)
 end
 
 def with_repo()
+  current_dir = Dir.pwd
   Dir.mktmpdir do |dir|
-    Dir.chdir(dir)
-    system("git init &> /dev/null")
-    system("touch temp.txt; git add temp.txt; git commit -m 'Initial commit' &> /dev/null")
-    yield dir
+    begin
+      Dir.chdir(dir)
+      system("git init &> /dev/null")
+      system("touch temp.txt; git add temp.txt; git commit -m 'Initial commit' &> /dev/null")
+      yield dir
+    ensure
+      Dir.chdir(current_dir)
+    end
   end
 end

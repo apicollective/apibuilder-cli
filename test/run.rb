@@ -1,6 +1,10 @@
 #!/usr/bin/env ruby
 
-load File.join(File.dirname(__FILE__), '..', 'src', 'apibuilder-cli.rb')
+# Ensure we're in a valid directory before running tests
+test_dir = File.dirname(__FILE__)
+Dir.chdir(test_dir) unless Dir.pwd == test_dir
+
+require_relative '../src/apibuilder-cli'
 
 def run(command)
   puts command
@@ -10,7 +14,7 @@ end
 gem_home = File.join(File.dirname(__FILE__), '../gems').sub(/^\.\//, '')
 rspec = File.join(gem_home, 'bin/rspec')
 if !File.exist?(rspec)
-  run("export GEM_HOME=%s && gem install rspec --version 3.2.0 --install-dir %s" % [gem_home, gem_home])
+  run("export GEM_HOME=%s && gem install rspec --version 3.13.0 --install-dir %s" % [gem_home, gem_home])
 end
 
 files = `find spec -type f -name "*spec.rb"`.strip.split
