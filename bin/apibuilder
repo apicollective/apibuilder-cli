@@ -202,19 +202,34 @@ def filter_files(requested_files, downloaded_files, generator)
   end.flatten|[]
 end
 
+def show_error_info(label, e)
+  $stderr.puts ""
+  $stderr.puts "ERROR #{label}"
+  $stderr.puts "  URI: #{e.uri}"
+  if e.respond_to?(:body_json)
+    json = e.body_json
+    if json.is_a?(Hash)
+      $stderr.puts "  Details: #{json.inspect}"
+    elsif json.is_a?(Array)
+      $stderr.puts "  Details: #{json.map { |item| item.inspect }.join(", ")}"
+    elsif json.is_a?(String)
+      $stderr.puts "  Details: #{json}"
+    else
+      $stderr.puts "  Details: #{json.inspect}"
+    end
+  end
+  $stderr.puts ""
+end
+
 def handle_server_error(e)
   $stderr.puts ""
   if e.is_a?(Io::Apibuilder::Api::V0::HttpClient::ServerError)
     if e.code == 401
-      $stderr.puts "ERROR: 401 Unauthorized"
-      $stderr.puts "  URI: #{e.uri}"
-      $stderr.puts ""
+      show_error_info("401 Unauthorized", e)
       exit(1)
 
     elsif e.code == 404
-      $stderr.puts "ERROR: 404 Not Found"
-      $stderr.puts "  URI: #{e.uri}"
-      $stderr.puts ""
+      show_error_info("404 Not Found", e)
       exit(4)
 
     elsif e.code == 409
@@ -229,7 +244,7 @@ def handle_server_error(e)
       exit(9)
     else
       $stderr.puts "ERROR #{e.code}: Server Error"
-      raise e
+
     end
 
   else
