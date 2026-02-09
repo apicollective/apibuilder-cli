@@ -1,5 +1,6 @@
 require 'yaml'
 require 'tempfile'
+require 'fileutils'
 
 dir = File.dirname(__FILE__)
 lib_dir = File.join(dir, "apibuilder-cli")

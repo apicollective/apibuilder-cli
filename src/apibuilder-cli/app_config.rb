@@ -5,7 +5,7 @@ module ApibuilderCli
 
     DEFAULT_FILENAMES = ["#{ApibuilderCli::Config::APIBUILDER_LOCAL_DIR}/config", ".apibuilder", ".apidoc"] unless defined?(DEFAULT_FILENAMES)
 
-    attr_reader :settings, :code, :project_dir, :attributes
+    attr_reader :settings, :specs, :code, :project_dir, :attributes
 
     def AppConfig.default_path
       path = find_config_file
@@ -70,6 +70,7 @@ module ApibuilderCli
              end
 
       @settings = Settings.new((@yaml['settings'] || {}).clone) # NB: clone is not deep, so this will not work if settings become nested
+      @specs = Specs.new(@yaml['specs'] || {})
       @attributes = Attributes.new((@yaml['attributes'] || {}))
       def get_generator_attributes_by_name(name, override_attributes)
         # @param name generator name
@@ -177,6 +178,17 @@ module ApibuilderCli
         @code_create_directories = data.has_key?("code.create.directories") ? data.delete("code.create.directories") : false
         @code_cleanup_generated_files = data.has_key?("code.cleanup.generated.files") ? data.delete("code.cleanup.generated.files") : false
         Preconditions.check_state(data.empty?, "Invalid settings: #{data.keys.sort}")
+      end
+
+    end
+
+    class Specs
+
+      attr_reader :output, :format
+
+      def initialize(data)
+        @output = data['output']
+        @format = data['format']
       end
 
     end

@@ -49,6 +49,24 @@
 #    The result will be a JSON object with key 'applications' that is an array. there will be one element
 #    per requested application.
 #
+# apibuilder download_specs [--output <dir>] [--format service|original] [--org <org>] [--app <app>]
+#  - Downloads the service spec (or original) for all services listed in the local .apibuilder/config file.
+#  - output: Required (via --output or specs.output in config). The directory where specs will be written,
+#            using nested structure <dir>/<org>/<app>.json
+#  - format: Either 'service' (default) for the parsed JSON spec or 'original' for the raw uploaded file.
+#            Uses specs.format from config if not specified.
+#  - org: Optional. Filter to only download specs for this organization.
+#  - app: Optional. Filter to only download specs for these applications (can be specified multiple times).
+#
+#  Example .apibuilder/config:
+#    specs:
+#      output: src/main/resources/META-INF/specs
+#      format: service
+#
+#    code:
+#      apicollective:
+#        ...
+#
 # apibuilder example apicollective apibuilder-api latest type
 #  - Generates an example JSON document for the specified type
 #
@@ -340,6 +358,89 @@ elsif command == "download_batch"
   rescue Exception => e
     handle_server_error(e)
   end
+
+elsif command == "download_specs"
+  args = ApibuilderCli::Args.parse(ARGV, :multi => ['app'])
+  filter_org = args[:org]
+  filter_apps = args[:app]
+
+  app_config_path = ApibuilderCli::AppConfig.find_config_file
+  if app_config_path.nil?
+    puts "ERROR: Could not find .apibuilder/config file in current directory"
+    exit(1)
+  end
+
+  app_config = ApibuilderCli::AppConfig.new(:path => File.expand_path(app_config_path))
+
+  # CLI args override config specs section
+  output_dir = args[:output].to_s.strip
+  output_dir = app_config.specs.output.to_s.strip if output_dir.empty?
+
+  if output_dir.empty?
+    puts "ERROR: output directory required. Specify --output or configure specs.output in .apibuilder/config"
+    exit(1)
+  end
+
+  format = args[:format].to_s.strip
+  format = app_config.specs.format.to_s.strip if format.empty?
+  format = "service" if format.empty?
+
+  if !["service", "original"].include?(format)
+    puts "--format must be 'service' or 'original'"
+    exit(1)
+  end
+
+  if !File.directory?(output_dir)
+    puts "Creating output directory: #{output_dir}"
+    FileUtils.mkdir_p(output_dir)
+  end
+  projects = app_config.projects(:org => filter_org, :app => filter_apps)
+
+  if projects.empty?
+    puts "No projects found in config#{filter_org ? " for org '#{filter_org}'" : ''}#{filter_apps ? " matching apps #{filter_apps.inspect}" : ''}"
+    exit(0)
+  end
+
+  # Group projects by org for batch downloading
+  projects_by_org = projects.group_by(&:org)
+
+  projects_by_org.each do |org, org_projects|
+    applications = org_projects.map do |project|
+      ::Io::Apibuilder::Api::V0::Models::BatchDownloadApplicationForm.new(
+        :application_key => project.name,
+        :version => project.version
+      )
+    end
+
+    begin
+      puts "Downloading #{applications.size} spec(s) from #{org}..."
+      response = client.batch_download_applications.post(
+        org,
+        ::Io::Apibuilder::Api::V0::Models::BatchDownloadApplicationsForm.new(:applications => applications)
+      )
+
+      response.applications.each do |version|
+        org_dir = File.join(output_dir, version.organization.key)
+        FileUtils.mkdir_p(org_dir)
+
+        filename = "#{version.application.key}.json"
+        filepath = File.join(org_dir, filename)
+
+        content = if format == "service"
+                    JSON.pretty_generate(version.service.to_hash)
+                  else
+                    version.original.data
+                  end
+
+        File.write(filepath, content)
+        puts "  - #{filepath}"
+      end
+    rescue Exception => e
+      handle_server_error(e)
+    end
+  end
+
+  puts "Done."
 
 elsif command == "download"
   org = ARGV.shift.to_s.strip
