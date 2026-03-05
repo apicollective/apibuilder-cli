@@ -97,8 +97,8 @@ module ApibuilderCli
             raise "File[#{@path}] Missing version for org[#{org_key}] project[#{project_name}]"
           end
           if data['generators'].is_a?(Hash)
-            generators = data['generators'].map do |name, data|
-              Generator.new(name, data, get_generator_attributes_by_name(name, {}))
+            generators = data['generators'].map do |name, gen_data|
+              Generator.new(name, gen_data, get_generator_attributes_by_name(name, gen_data.is_a?(Hash) ? (gen_data['attributes'] || {}) : {}))
             end
           elsif data['generators'].is_a?(Array)
             generators = data['generators'].map do |generator|
