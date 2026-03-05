@@ -70,6 +70,46 @@ code:
     end
   end
 
+  describe "inline attributes in hash-format generators" do
+
+    before do
+      @sample_file_inline = ApibuilderCli::Util.write_to_temp_file("""
+code:
+  flow:
+    calculator:
+      version: latest
+      generators:
+        openapi_yaml:
+          target: generated/calculator
+          attributes:
+            aws_api_gateway:
+              integration:
+                type: http_proxy
+                domain: api.flow.io
+    sellability:
+      version: latest
+      generators:
+        openapi_yaml:
+          target: generated/sellability
+      """.strip)
+    end
+
+    it "reads attributes from hash-format generator config" do
+      app_config = ApibuilderCli::AppConfig.new(:path => @sample_file_inline)
+      calculator = app_config.code.projects.find { |p| p.name == "calculator" }
+      attrs = generator(calculator, "openapi_yaml").attributes
+      expect(attrs).to have_key("aws_api_gateway")
+      expect(attrs["aws_api_gateway"]["integration"]["type"]).to eq("http_proxy")
+      expect(attrs["aws_api_gateway"]["integration"]["domain"]).to eq("api.flow.io")
+    end
+
+    it "returns empty attributes when none specified in hash format" do
+      app_config = ApibuilderCli::AppConfig.new(:path => @sample_file_inline)
+      sellability = app_config.code.projects.find { |p| p.name == "sellability" }
+      expect(generator(sellability, "openapi_yaml").attributes).to eq({})
+    end
+  end
+
   describe "attributes for wildcard generator keys" do
 
     before do
