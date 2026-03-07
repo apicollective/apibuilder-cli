@@ -17,12 +17,13 @@ module ApibuilderCli
 
     class Update
 
-      def initialize(config, app_config, args)
+      def initialize(config, app_config, args, opts = {})
         @client = config.client
         @app_config = app_config
         @org = args[:org]
         @app = args[:app]
         @config = config
+        @version = opts[:version]
       end
 
       def run
@@ -31,7 +32,8 @@ module ApibuilderCli
 
         all = @app_config.projects(:org => @org, :app => @app).map do |project|
           project.generators.map { |generator|
-            puts "  #{project.org}/#{project.name}/#{project.version}/#{generator.name}"
+            version = @version || project.version
+            puts "  #{project.org}/#{project.name}/#{version}/#{generator.name}"
 
             generator.targets.map { |target|
               ProjectWithGenerator.new(project, generator.dup, target.dup)
@@ -61,7 +63,7 @@ module ApibuilderCli
                 attributes = ApibuilderCli::Util.normalize_generator_attributes(generator.attributes)
                 form = Io::Apibuilder::Api::V0::Models::CodeForm.new(:attributes => attributes)
                 code = ApibuilderCli::Util.call(@client) do
-                  @client.code.post_by_generator_key(project.org, project.name, project.version, generator.name, form).files
+                  @client.code.post_by_generator_key(project.org, project.name, @version || project.version, generator.name, form).files
                 end
                 if generator.files.nil?
                   files = code

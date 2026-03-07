@@ -57,12 +57,13 @@
 #    The uploaded file will be the specified version, defaulting to
 #    the output from git describe.
 #
-# apibuilder update [--path <path> --org <org> --app <app> --app <app>]
+# apibuilder update [--path <path> --org <org> --app <app> --app <app> --version <version>]
 #  - Reads a config file, optionally specified by path
 #    parameter. Invokes the apibuilder code generators specified in the
 #    configuration file.
 #  - org: If specified, we update code only for this organization
 #  - app: If specified, we update code only for this application. This parameter can  be specified multiple times
+#  - version: If specified, use this version instead of the version in the config file
 #
 # apibuilder clean apicollective apibuilder-api [--branch branch-name] [--silent] [--legacy]
 #  - Interactively deletes from ApiBuilder any version not tagged in the source repo.
@@ -501,7 +502,7 @@ elsif command == "upload"
 elsif command == "update"
   app_config = get_app_config_from_argument(:path)
   args = ApibuilderCli::Args.parse(ARGV, :multi => ['app'])
-  ApibuilderCli::Commands::Update.new(config, app_config, args).run
+  ApibuilderCli::Commands::Update.new(config, app_config, args, :version => args[:version]).run
 
 elsif command == "clean"
   org = ARGV.shift.to_s.strip
@@ -509,7 +510,7 @@ elsif command == "clean"
 
   args = ApibuilderCli::Args.parse(ARGV)
   branch = args[:branch].to_s.strip.downcase
-  branch = ApibuilerCli::Constants::BASE_BRANCHES.first if branch.empty?
+  branch = ApibuilderCli::Constants::BASE_BRANCHES.first if branch.empty?
   legacy = args.key?(:legacy)
   silent = args.key?(:silent)
   limit = 50
@@ -541,9 +542,9 @@ elsif command == "clean"
 
   ApibuilderCli::Git.in_branch(branch) do
     to_delete = versions - ApibuilderCli::Git.tag_list.map { |tag|
-      ApibuilerCli::Constants::BASE_BRANCHES.include?(branch) ? tag : "#{tag}#{ApibuilderCli::Git.branch_suffix(branch)}"
+      ApibuilderCli::Constants::BASE_BRANCHES.include?(branch) ? tag : "#{tag}#{ApibuilderCli::Git.branch_suffix(branch)}"
     }
-    if ApibuilerCli::Constants::BASE_BRANCHES.include?(branch)
+    if ApibuilderCli::Constants::BASE_BRANCHES.include?(branch)
       to_delete.reject! { |version|
         # Ignore versions with a branch delimiter.
         version.match(/-b[0-9a-f]{7}-.+$/)
