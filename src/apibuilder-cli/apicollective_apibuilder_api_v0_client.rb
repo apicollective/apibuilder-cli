@@ -328,7 +328,7 @@ module Io
             # Retrieve the latest version for multiple applications in one API call.
             def post(org_key, batch_versions_latest_form)
               HttpClient::Preconditions.assert_class('org_key', org_key, String)
-              (x = batch_versions_latest_form; x.is_a?(::Io::Apibuilder::Api::V0::Models::BatchVersionsLatestForm) ? x : ::Io::Apibuilder::Api::V0::Models::BatchVersionsLatestForm.new(x))
+              batch_versions_latest_form = (x = batch_versions_latest_form; x.is_a?(::Io::Apibuilder::Api::V0::Models::BatchVersionsLatestForm) ? x : ::Io::Apibuilder::Api::V0::Models::BatchVersionsLatestForm.new(x))
               r = @client.request("/#{CGI.escape(org_key)}/batch/versions/latest").with_json(batch_versions_latest_form.to_json).post
               ::Io::Apibuilder::Api::V0::Models::BatchVersionsLatest.new(r)
             end
