@@ -81,6 +81,10 @@ module Io
             @batch_download_applications ||= ::Io::Apibuilder::Api::V0::Clients::BatchDownloadApplications.new(self)
           end
 
+          def batch_versions_latest
+            @batch_versions_latest ||= ::Io::Apibuilder::Api::V0::Clients::BatchVersionsLatest.new(self)
+          end
+
           def changes
             @changes ||= ::Io::Apibuilder::Api::V0::Clients::Changes.new(self)
           end
@@ -311,6 +315,22 @@ module Io
               (x = batch_download_applications_form; x.is_a?(::Io::Apibuilder::Api::V0::Models::BatchDownloadApplicationsForm) ? x : ::Io::Apibuilder::Api::V0::Models::BatchDownloadApplicationsForm.new(x))
               r = @client.request("/#{CGI.escape(org_key)}/batch/download/applications").with_json(batch_download_applications_form.to_json).post
               ::Io::Apibuilder::Api::V0::Models::BatchDownloadApplications.new(r)
+            end
+
+          end
+
+          class BatchVersionsLatest
+
+            def initialize(client)
+              @client = HttpClient::Preconditions.assert_class('client', client, ::Io::Apibuilder::Api::V0::Client)
+            end
+
+            # Retrieve the latest version for multiple applications in one API call.
+            def post(org_key, batch_versions_latest_form)
+              HttpClient::Preconditions.assert_class('org_key', org_key, String)
+              batch_versions_latest_form = (x = batch_versions_latest_form; x.is_a?(::Io::Apibuilder::Api::V0::Models::BatchVersionsLatestForm) ? x : ::Io::Apibuilder::Api::V0::Models::BatchVersionsLatestForm.new(x))
+              r = @client.request("/#{CGI.escape(org_key)}/batch/versions/latest").with_json(batch_versions_latest_form.to_json).post
+              ::Io::Apibuilder::Api::V0::Models::BatchVersionsLatest.new(r)
             end
 
           end
@@ -1827,6 +1847,86 @@ module Io
             def to_hash
               {
                 :applications => applications.map { |o| o.to_hash }
+              }
+            end
+
+          end
+
+          class BatchVersionLatest
+
+            attr_reader :application_key, :latest_version
+
+            def initialize(incoming={})
+              opts = HttpClient::Helper.symbolize_keys(incoming)
+              HttpClient::Preconditions.require_keys(opts, [:application_key], 'BatchVersionLatest')
+              @application_key = HttpClient::Preconditions.assert_class('application_key', opts.delete(:application_key), String)
+              @latest_version = (x = opts.delete(:latest_version); x.nil? ? nil : HttpClient::Preconditions.assert_class('latest_version', x, String))
+            end
+
+            def to_json
+              JSON.dump(to_hash)
+            end
+
+            def copy(incoming={})
+              BatchVersionLatest.new(to_hash.merge(HttpClient::Helper.symbolize_keys(incoming)))
+            end
+
+            def to_hash
+              {
+                :application_key => application_key,
+                :latest_version => latest_version
+              }
+            end
+
+          end
+
+          class BatchVersionsLatest
+
+            attr_reader :applications
+
+            def initialize(incoming={})
+              opts = HttpClient::Helper.symbolize_keys(incoming)
+              HttpClient::Preconditions.require_keys(opts, [:applications], 'BatchVersionsLatest')
+              @applications = HttpClient::Preconditions.assert_class('applications', opts.delete(:applications), Array).map { |v| (x = v; x.is_a?(::Io::Apibuilder::Api::V0::Models::BatchVersionLatest) ? x : ::Io::Apibuilder::Api::V0::Models::BatchVersionLatest.new(x)) }
+            end
+
+            def to_json
+              JSON.dump(to_hash)
+            end
+
+            def copy(incoming={})
+              BatchVersionsLatest.new(to_hash.merge(HttpClient::Helper.symbolize_keys(incoming)))
+            end
+
+            def to_hash
+              {
+                :applications => applications.map { |o| o.to_hash }
+              }
+            end
+
+          end
+
+          class BatchVersionsLatestForm
+
+            attr_reader :application_keys
+
+            def initialize(incoming={})
+              opts = HttpClient::Helper.symbolize_keys(incoming)
+              HttpClient::Preconditions.require_keys(opts, [:application_keys], 'BatchVersionsLatestForm')
+              @application_keys = HttpClient::Preconditions.assert_class('application_keys', opts.delete(:application_keys), Array).map { |v| HttpClient::Preconditions.assert_class('application_keys', v, String) }
+            end
+
+            def to_json
+              JSON.dump(to_hash)
+            end
+
+            def copy(incoming={})
+              BatchVersionsLatestForm.new(to_hash.merge(HttpClient::Helper.symbolize_keys(incoming)))
+            end
+
+            def to_hash
+              {
+                :application_keys => application_keys
               }
             end
 

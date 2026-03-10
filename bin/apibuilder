@@ -317,6 +317,33 @@ if command == "list"
     exit(1)
   end
 
+elsif command == "batch" && ARGV.first == "latest-versions"
+  ARGV.shift # consume "latest-versions"
+  org = ARGV.shift.to_s.strip
+  application_keys = ARGV.map(&:strip).reject(&:empty?)
+
+  if org.empty?
+    puts "org is required"
+    exit(1)
+  end
+
+  if application_keys.empty?
+    puts "specify at least one application key"
+    exit(1)
+  end
+
+  begin
+    form = ::Io::Apibuilder::Api::V0::Models::BatchVersionsLatestForm.new(:application_keys => application_keys)
+    response = client.batch_versions_latest.post(org, form)
+    response.applications.each do |app|
+      if app.latest_version
+        puts "#{app.application_key} #{app.latest_version}"
+      end
+    end
+  rescue Exception => e
+    handle_server_error(e)
+  end
+
 elsif command == "download_batch"
   org = ARGV.shift.to_s.strip
 
