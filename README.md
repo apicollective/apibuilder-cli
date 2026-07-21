@@ -246,25 +246,6 @@ Example File w/ Local Generator Attributes:
 
 Supported attributes are defined by each code generators.
 
-### Tracked versions
-
-`update` resolves `latest` to a concrete version once per application (so all of an
-application's generators produce code from the same version, even if a new version is
-uploaded while the update runs) and records the resolved versions in
-`.apibuilder/.tracked_versions`:
-
-    apicollective:
-      apibuilder: 0.16.53
-      apibuilder-spec: 0.16.50
-
-This file makes code currency queryable as data. Generated files are not rewritten
-when only their comments change, so the `Service version` headers inside them can be
-older than the version the code actually reflects; `.tracked_versions` always names
-the version the last `update` ran against. Commit it alongside the generated code.
-Writing the file is controlled by the same `tracked_files_enabled` setting as
-`.tracked_files`.
-
-
 ## clean
 
 Delete versions in ApiBuilder that are not tagged in the source repo.

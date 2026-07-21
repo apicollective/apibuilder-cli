@@ -30,11 +30,9 @@ module ApibuilderCli
       def run
         puts "Fetching code from #{@client.url}"
         tracked_files = ApibuilderCli::FileTracker.new(@app_config.project_dir, { :updating_only => { :org => @org, :app => @app } })
-        version_tracker = ApibuilderCli::VersionTracker.new(@app_config.project_dir)
 
         all = @app_config.projects(:org => @org, :app => @app).map do |project|
           version = resolve_version(project)
-          version_tracker.set!(project.org, project.name, version) unless version == "latest"
           project.generators.map { |generator|
             puts "  #{project.org}/#{project.name}/#{version}/#{generator.name}"
 
@@ -130,14 +128,12 @@ module ApibuilderCli
 
         if @config.settings.tracked_files_enabled
           tracked_files.save!
-          version_tracker.save!
         end
       end
 
       # Resolves 'latest' to the concrete version the server would serve, so that every
       # generator of a project generates from the same version even if an upload lands
-      # mid-run, and so the version can be recorded in .apibuilder/.tracked_versions.
-      # Falls back to the declared version on failure: previous behavior, nothing recorded.
+      # mid-run. Falls back to the declared version on failure (previous behavior).
       def resolve_version(project)
         declared = @version || project.version
         return declared unless declared == "latest"
