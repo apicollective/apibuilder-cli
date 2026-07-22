@@ -246,7 +246,6 @@ Example File w/ Local Generator Attributes:
 
 Supported attributes are defined by each code generators.
 
-
 ## clean
 
 Delete versions in ApiBuilder that are not tagged in the source repo.

@@ -2,11 +2,12 @@ module ApibuilderCli
   module Commands
 
     class ProjectWithGenerator
-      attr_reader :project, :generator, :target, :changes
-      def initialize(project, generator, target)
+      attr_reader :project, :generator, :target, :version, :changes
+      def initialize(project, generator, target, version)
         @project = project
         @generator = generator
         @target = target
+        @version = version
         @changes = []
       end
 
@@ -31,12 +32,12 @@ module ApibuilderCli
         tracked_files = ApibuilderCli::FileTracker.new(@app_config.project_dir, { :updating_only => { :org => @org, :app => @app } })
 
         all = @app_config.projects(:org => @org, :app => @app).map do |project|
+          version = resolve_version(project)
           project.generators.map { |generator|
-            version = @version || project.version
             puts "  #{project.org}/#{project.name}/#{version}/#{generator.name}"
 
             generator.targets.map { |target|
-              ProjectWithGenerator.new(project, generator.dup, target.dup)
+              ProjectWithGenerator.new(project, generator.dup, target.dup, version)
             }
           }
         end.flatten
@@ -63,7 +64,7 @@ module ApibuilderCli
                 attributes = ApibuilderCli::Util.normalize_generator_attributes(generator.attributes)
                 form = Io::Apibuilder::Api::V0::Models::CodeForm.new(:attributes => attributes)
                 code = ApibuilderCli::Util.call(@client) do
-                  @client.code.post_by_generator_key(project.org, project.name, @version || project.version, generator.name, form).files
+                  @client.code.post_by_generator_key(project.org, project.name, pair.version, generator.name, form).files
                 end
                 if generator.files.nil?
                   files = code
@@ -127,6 +128,22 @@ module ApibuilderCli
 
         if @config.settings.tracked_files_enabled
           tracked_files.save!
+        end
+      end
+
+      # Resolves 'latest' to the concrete version the server would serve, so that every
+      # generator of a project generates from the same version even if an upload lands
+      # mid-run. Falls back to the declared version on failure (previous behavior).
+      def resolve_version(project)
+        declared = @version || project.version
+        return declared unless declared == "latest"
+        begin
+          resolved = ApibuilderCli::Util.call(@client) do
+            @client.versions.get_by_application_key_and_version(project.org, project.name, "latest")
+          end
+          resolved.nil? ? declared : resolved.version
+        rescue StandardError
+          declared
         end
       end
 
